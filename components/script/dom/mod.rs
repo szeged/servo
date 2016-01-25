@@ -217,6 +217,11 @@ mod create;
 #[deny(missing_docs, non_snake_case)]
 pub mod bindings;
 pub mod blob;
+pub mod bluetooth;
+pub mod bluetoothadvertisingdata;
+pub mod bluetoothcharacteristicproperties;
+pub mod bluetoothdevice;
+pub mod bluetoothuuid;
 pub mod browsingcontext;
 pub mod canvasgradient;
 pub mod canvaspattern;
