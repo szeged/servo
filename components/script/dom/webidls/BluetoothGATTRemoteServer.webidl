@@ -10,7 +10,7 @@ interface BluetoothGATTRemoteServer {
 
   readonly attribute boolean connected;
 
-  //void disconnect();
+  void disconnect();
   //Promise<BluetoothGATTService> getPrimaryService(BluetoothServiceUUID service);
   //Promise<sequence<BluetoothGATTService>>getPrimaryServices(optional BluetoothServiceUUID service);
 };

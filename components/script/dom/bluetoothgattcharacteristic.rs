@@ -12,7 +12,6 @@ use dom::bluetoothgattservice::BluetoothGATTService;
 use util::str::DOMString;
 use uuid::Uuid;
 
-
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattcharacteristic
 
 #[dom_struct]

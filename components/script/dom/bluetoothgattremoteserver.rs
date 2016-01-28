@@ -32,18 +32,6 @@ impl BluetoothGATTRemoteServer {
         global,
         BluetoothGATTRemoteServerBinding::Wrap)
     }
-
-    fn disconnect(&self) -> () {
-        //  FIXME (zakorgy)
-        //  Set this.connected to false.
-        //  In parallel: if, for all BluetoothDevices device in the whole UA with device@[[representedDevice]]
-        //  the same device as this.device@[[representedDevice]],
-        //  device.gattServer === null or !device.gattServer.connected,
-        //  the UA MAY destroy device@[[representedDevice]]’s ATT Bearer.
-        //  https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-disconnect
-        //  https://webbluetoothcg.github.io/web-bluetooth/#same-device
-            ()
-    }
 }
 
 impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
@@ -55,5 +43,11 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-connected
     fn Connected(&self) -> bool {
         self.connected
+    }
+
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-disconnect
+    fn Disconnect(&self) -> () {
+        //  FIXME (zakorgy)
+            ()
     }
 }
