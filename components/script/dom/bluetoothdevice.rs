@@ -2,15 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{BluetoothDeviceMethods, VendorIDSource};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
+use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use util::str::DOMString;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
+
+pub type Uuid = DOMString;
 
 #[dom_struct]
 pub struct BluetoothDevice {
@@ -23,8 +26,8 @@ pub struct BluetoothDevice {
     vendorID: u32,
     productID: u32,
     productVersion: u32,
-    // gattServer: BluetoothGATTRemoteServer,
-    // uuids: UUID[],
+    gattServer: JS<BluetoothGATTRemoteServer>,
+    //TODO:uuids: Vec<u32>,
 }
 
 impl BluetoothDevice {
@@ -35,7 +38,8 @@ impl BluetoothDevice {
                          vendorIDSource: VendorIDSource,
                          vendorID: u32,
                          productID: u32,
-                         productVersion: u32)
+                         productVersion: u32,
+                         gattServer: &BluetoothGATTRemoteServer)
                          -> BluetoothDevice {
         BluetoothDevice {
             reflector_: Reflector::new(),
@@ -47,6 +51,7 @@ impl BluetoothDevice {
             vendorID: vendorID,
             productID: productID,
             productVersion: productVersion,
+            gattServer: JS::from_ref(gattServer),
         }
     }
 
@@ -58,7 +63,8 @@ impl BluetoothDevice {
              vendorIDSource: VendorIDSource,
              vendorID: u32,
              productID: u32,
-             productVersion: u32)
+             productVersion: u32,
+             gattServer: &BluetoothGATTRemoteServer)
              -> Root<BluetoothDevice> {
         reflect_dom_object(box BluetoothDevice::new_inherited(id,
                                                               name,
@@ -67,42 +73,56 @@ impl BluetoothDevice {
                                                               vendorIDSource,
                                                               vendorID,
                                                               productID,
-                                                              productVersion),
+                                                              productVersion,
+                                                              gattServer),
                            global,
                            BluetoothDeviceBinding::Wrap)
     }
 }
 
 impl BluetoothDeviceMethods for BluetoothDevice {
+     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id
     fn Id(&self) -> DOMString {
         self.id.clone()
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name
     fn GetName(&self) -> Option<DOMString> {
         Some(self.name.clone())
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#addata
     fn AdData(&self) -> Root<BluetoothAdvertisingData> {
         Root::from_ref(&*self.adData)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-deviceclass
     fn GetDeviceClass(&self) -> Option<u32> {
         Some(self.deviceClass)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-vendoridsource
     fn GetVendorIDSource(&self) -> Option<VendorIDSource> {
         Some(self.vendorIDSource)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-vendorid
     fn GetVendorID(&self) -> Option<u32> {
         Some(self.vendorID)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-productid
     fn GetProductID(&self) -> Option<u32> {
         Some(self.productID)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-productversion
     fn GetProductVersion(&self) -> Option<u32> {
         Some(self.productVersion)
+    }
+
+    // https://webbluetoothcg.github.io/web-bluetooth/#gattserver
+    fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
+        Some(Root::from_ref(&*self.gattServer))
     }
 }

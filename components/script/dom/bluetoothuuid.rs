@@ -13,6 +13,7 @@ pub struct BluetoothUUID {
     reflector_: Reflector,
 }
 
+
 impl BluetoothUUID {
     pub fn CanonicalUUID(_: GlobalRef, _alias: u32) -> DOMString {
         DOMString::new()

@@ -20,7 +20,7 @@ interface BluetoothDevice {
     readonly attribute unsigned long? vendorID;
     readonly attribute unsigned long? productID;
     readonly attribute unsigned long? productVersion;
-    // readonly attribute BluetoothGATTRemoteServer? gattServer;
-    // readonly attribute UUID[] uuids;
+    readonly attribute BluetoothGATTRemoteServer? gattServer;
+    //readonly attribute UUID[] uuids;
     //Promise<BluetoothGATTRemoteServer> connectGATT();
 };

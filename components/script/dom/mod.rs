@@ -223,6 +223,8 @@ pub mod bluetoothcharacteristicproperties;
 pub mod bluetoothdevice;
 pub mod bluetoothgattcharacteristic;
 pub mod bluetoothgattdescriptor;
+pub mod bluetoothgattremoteserver;
+pub mod bluetoothgattservice;
 pub mod bluetoothuuid;
 pub mod browsingcontext;
 pub mod canvasgradient;

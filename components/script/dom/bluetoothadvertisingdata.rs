@@ -40,14 +40,17 @@ impl BluetoothAdvertisingData {
 }
 
 impl BluetoothAdvertisingDataMethods for BluetoothAdvertisingData {
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothadvertisingdata-appearance
     fn GetAppearance(&self) -> Option<u16> {
         Some(self.appearance)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothadvertisingdata-txpower
     fn GetTxPower(&self) -> Option<i8> {
         Some(self.txPower)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothadvertisingdata-rssi
     fn GetRssi(&self) -> Option<i8> {
         Some(self.rssi)
     }

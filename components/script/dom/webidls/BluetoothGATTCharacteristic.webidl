@@ -7,7 +7,7 @@
 
 interface BluetoothGATTCharacteristic {
   readonly attribute BluetoothCharacteristicProperties properties;
-  //readonly attribute BluetoothGATTService service;
+  readonly attribute BluetoothGATTService service;
   readonly attribute UUID uuid;
   //readonly attribute ArrayBuffer? value;
 
