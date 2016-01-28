@@ -27,8 +27,8 @@ impl BluetoothGATTRemoteServer {
 
     pub fn new(global: GlobalRef, device: &BluetoothDevice, connected: bool) -> Root<BluetoothGATTRemoteServer> {
         reflect_dom_object(box BluetoothGATTRemoteServer::new_inherited(
-                            device,
-                            connected),
+                           device,
+                           connected),
         global,
         BluetoothGATTRemoteServerBinding::Wrap)
     }

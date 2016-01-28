@@ -23,8 +23,8 @@ pub struct BluetoothGATTDescriptor {
 
 impl BluetoothGATTDescriptor {
     pub fn new_inherited(characteristic: &BluetoothGATTCharacteristic,
-                        uuid: Uuid,
-                        ) -> BluetoothGATTDescriptor {
+                         uuid: Uuid)
+                         -> BluetoothGATTDescriptor {
         BluetoothGATTDescriptor {
             reflector_: Reflector::new(),
             characteristic: JS::from_ref(characteristic),
@@ -33,12 +33,11 @@ impl BluetoothGATTDescriptor {
     }
 
     pub fn new(global: GlobalRef,
-            characteristic: &BluetoothGATTCharacteristic,
-            uuid: Uuid,
-            ) -> Root<BluetoothGATTDescriptor>{
+               characteristic: &BluetoothGATTCharacteristic,
+               uuid: Uuid)
+               -> Root<BluetoothGATTDescriptor>{
         reflect_dom_object(box BluetoothGATTDescriptor::new_inherited(characteristic,
-                                                                    uuid,
-                                                                    ),
+                                                                      uuid),
                             global,
                             BluetoothGATTDescriptorBinding::Wrap)
     }

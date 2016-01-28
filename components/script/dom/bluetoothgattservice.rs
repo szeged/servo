@@ -32,9 +32,9 @@ impl BluetoothGATTService {
 
     pub fn new(global: GlobalRef, device: &BluetoothDevice, isPrimary: bool, uuid: Uuid) -> Root<BluetoothGATTService> {
         reflect_dom_object(box BluetoothGATTService::new_inherited(
-                            device,
-                            isPrimary,
-                            uuid),
+                           device,
+                           isPrimary,
+                           uuid),
         global,
         BluetoothGATTServiceBinding::Wrap)
     }
