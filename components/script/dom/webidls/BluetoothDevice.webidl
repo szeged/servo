@@ -14,7 +14,7 @@ enum VendorIDSource {
 interface BluetoothDevice {
     readonly attribute DOMString id;
     readonly attribute DOMString? name;
-    readonly attribute BluetoothAdvertisingData adData;
+    //readonly attribute BluetoothAdvertisingData adData;
     readonly attribute unsigned long? deviceClass;
     readonly attribute VendorIDSource? vendorIDSource;
     readonly attribute unsigned long? vendorID;

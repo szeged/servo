@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test innerHeight</title>
+    <script type="text/javascript">
+      function requestDevice() {
+          var device= window.navigator.bluetooth.requestDevice("Egyik","Másik");
+          console.log(device);
+          return device;
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="requestDevice();">Test</button>  
+  </body>
+</html>

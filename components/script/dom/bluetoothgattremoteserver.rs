@@ -8,20 +8,21 @@ use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
+use std::cell::Cell;
 
 #[dom_struct]
 pub struct BluetoothGATTRemoteServer {
     reflector_: Reflector,
     device: JS<BluetoothDevice>,
-    connected: bool,
+    connected: Cell<bool>,
 }
 
 impl BluetoothGATTRemoteServer {
-    pub fn new_inherited(device: &BluetoothDevice, connected: bool) -> BluetoothGATTRemoteServer {
+    pub fn new_inherited(device: &BluetoothDevice, is_connected: bool) -> BluetoothGATTRemoteServer {
         BluetoothGATTRemoteServer {
             reflector_: Reflector::new(),
             device: JS::from_ref(device),
-            connected: connected,
+            connected: Cell::new(is_connected),
         }
     }
 
@@ -42,11 +43,12 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-connected
     fn Connected(&self) -> bool {
-        self.connected
+        self.connected.clone().get()
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-disconnect
     fn Disconnect(&self) -> () {
+        self.connected.set(!self.Connected());
         //  FIXME (zakorgy)
             ()
     }
