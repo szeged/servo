@@ -29,7 +29,7 @@ interface NavigatorID {
   readonly attribute DOMString userAgent;
 };
 
-[NoInterfaceObject/*, Exposed=Window,Worker*/]
+[NoInterfaceObject]
 interface NavigatorBluetooth {
 	readonly attribute Bluetooth bluetooth;
 };

@@ -20,44 +20,53 @@ use std::cmp::Ordering;
 #[dom_struct]
 pub struct Bluetooth {
     reflector_: Reflector,
-    globalref: GlobalRef,
+    mockDevice: JS<BluetoothDevice>,
 }
 
 impl Bluetooth {
-	pub fn new_inherited() -> Bluetooth {
-		Bluetooth {
-		reflector_: Reflector::new(),
-		}
-	}
+    pub fn new_inherited(global: GlobalRef) -> Bluetooth {
+        Bluetooth {
+        reflector_: Reflector::new(),
+        mockDevice: JS::from_ref(&BluetoothDevice::new(global,
+                                                       DOMString::from("DeviceID"),
+                                                       DOMString::from("DeviceName"),
+                                                       342_u32,
+                                                       VendorIDSource::Bluetooth,
+                                                       8543_u32,
+                                                       1100_u32,
+                                                       200_u32,
+                                                       )),
+        }
+    }
 
-	pub fn new(global: GlobalRef) -> Root<Bluetooth> {
-		reflect_dom_object(box Bluetooth::new_inherited(),
+    pub fn new(global: GlobalRef) -> Root<Bluetooth> {
+        reflect_dom_object(box Bluetooth::new_inherited(global),
                            global,
                            BluetoothBinding::Wrap)
     }
 
     pub fn request_device(&self,
-					  	  nameFilter: DOMString,
-					  	  namePrefixFilter: DOMString
-					  	  ) -> DOMString {
-    	let mut rvDOMString = DOMString::new();
-		if nameFilter.is_empty() && namePrefixFilter.is_empty() {
-			rvDOMString = DOMString::from("Error:empty nameFilter and namePrefixFilter");
-		} else if nameFilter.is_empty() {
-			rvDOMString = DOMString::from("Namefilter is empty");
-		} else if namePrefixFilter.is_empty() {
-			rvDOMString = DOMString::from("NamePrefixFilter is empty!");
-		} else {
-			rvDOMString = DOMString::from("NameFilter and namePrefixFilter both has a value!");
-		}
+                          nameFilter: DOMString,
+                          namePrefixFilter: DOMString
+                          ) -> DOMString {
+        let mut rvDOMString = DOMString::new();
+        if nameFilter.is_empty() && namePrefixFilter.is_empty() {
+            rvDOMString = DOMString::from("Error:empty nameFilter and namePrefixFilter");
+        } else if nameFilter.is_empty() {
+            rvDOMString = DOMString::from("Namefilter is empty");
+        } else if namePrefixFilter.is_empty() {
+            rvDOMString = DOMString::from("NamePrefixFilter is empty!");
+        } else {
+            rvDOMString = DOMString::from("NameFilter and namePrefixFilter both has a value!");
+        }
 
-		rvDOMString
-	}
+        rvDOMString
+    }
 }
 
 
-impl BluetoothMethods for Bluetooth {	
-	fn RequestDevice(&self,nameFilter: DOMString, namePrefixFilter: DOMString) -> DOMString {		
-		self.request_device(nameFilter, namePrefixFilter)
-	}
+impl BluetoothMethods for Bluetooth {   
+    fn RequestDevice(&self) -> Root<BluetoothDevice> {       
+        Root::from_ref(&*self.mockDevice)
+    }
 }

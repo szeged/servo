@@ -26,7 +26,7 @@ pub struct BluetoothDevice {
     vendorID: u32,
     productID: u32,
     productVersion: u32,
-    gattServer: Option<JS<BluetoothGATTRemoteServer>>,
+    //gattServer: Option<JS<BluetoothGATTRemoteServer>>,
     //TODO:uuids: Vec<u32>,
 }
 
@@ -38,8 +38,9 @@ impl BluetoothDevice {
                          vendorIDSource: VendorIDSource,
                          vendorID: u32,
                          productID: u32,
-                         productVersion: u32,
-                         gattServer: Option<&BluetoothGATTRemoteServer>)
+                         productVersion: u32
+                         //gattServer: Option<&BluetoothGATTRemoteServer>
+                         )
                          -> BluetoothDevice {
         BluetoothDevice {
             reflector_: Reflector::new(),
@@ -51,7 +52,7 @@ impl BluetoothDevice {
             vendorID: vendorID,
             productID: productID,
             productVersion: productVersion,
-            gattServer: gattServer.map(JS::from_ref),
+            //gattServer: gattServer.map(JS::from_ref),
         }
     }
 
@@ -64,7 +65,8 @@ impl BluetoothDevice {
              vendorID: u32,
              productID: u32,
              productVersion: u32,
-             gattServer: Option<&BluetoothGATTRemoteServer>)
+             //gattServer: Option<&BluetoothGATTRemoteServer>
+             )
              -> Root<BluetoothDevice> {
         reflect_dom_object(box BluetoothDevice::new_inherited(id,
                                                               name,
@@ -73,8 +75,9 @@ impl BluetoothDevice {
                                                               vendorIDSource,
                                                               vendorID,
                                                               productID,
-                                                              productVersion,
-                                                              gattServer),
+                                                              productVersion
+                                                              //gattServer
+                                                              ),
                            global,
                            BluetoothDeviceBinding::Wrap)
     }
@@ -122,11 +125,11 @@ impl BluetoothDeviceMethods for BluetoothDevice {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#gattserver
-    fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
+    /*fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
         if let Some(ref is_server) = self.gattServer.clone() {
             Some(Root::from_ref(&is_server))
         } else {
             None
         }
-    }
+    }*/
 }

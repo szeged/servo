@@ -9,7 +9,7 @@ interface Bluetooth {
 // TODO(dati) use Promise when implemented ( https://github.com/servo/servo/issues/4282 )
 //    Promise<BluetoothDevice> requestDevice(RequestDeviceOptions options);
 //    BluetoothDevice requestDevice(RequestDeviceOptions options);
-	DOMString requestDevice (DOMString nameFilter, DOMString namePrefixFilter ); // próba function konzolhoz
+	BluetoothDevice requestDevice (); // próba function konzolhoz
 };
 
 // Bluetooth implements EventTarget;

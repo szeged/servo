@@ -4,49 +4,49 @@
     <title>Test innerHeight</title>
     <script type="text/javascript">
       function getName() {
-          var deviceName = window.navigator.bluetooth.requestDevice().getName();
+          var deviceName = window.navigator.bluetooth.requestDevice().name;
           console.log(deviceName);
-          return deviceId;
+          return deviceName;
       }
       function getDeviceClass() {
-          var deviceClass = window.navigator.bluetooth.requestDevice().getName();
+          var deviceClass = window.navigator.bluetooth.requestDevice().class;
           console.log(deviceClass);
           return deviceClass;
       }
       function getVendorIDSource() {
-          var vendorIdSource = window.navigator.bluetooth.requestDevice().getName();
+          var vendorIdSource = window.navigator.bluetooth.requestDevice().vendorIDSource;
           console.log(vendorIdSource);
           return vendorIdSource;
       }
       function getVendorID() {
-          var vendorId = window.navigator.bluetooth.requestDevice().getName();
+          var vendorId = window.navigator.bluetooth.requestDevice().vendorID;
           console.log(vendorId);
           return vendorId;
       }
       function getProductID() {
-          var productId = window.navigator.bluetooth.requestDevice().getName();
+          var productId = window.navigator.bluetooth.requestDevice().productID;
           console.log(productId);
           return productId;
       }
       function getProductVersion() {
-          var productVersion = window.navigator.bluetooth.requestDevice().getProductVersion();
+          var productVersion = window.navigator.bluetooth.requestDevice().productVersion;
           console.log(productVersion);
           return productVersion;
       }
       function getGattServer() {
-          var gattServer = window.navigator.bluetooth.requestDevice().getGattServer();
+          var gattServer = window.navigator.bluetooth.requestDevice().gatt;
           console.log(gattServer);
           return gattServer
       }
     </script>
   </head>
   <body>
-    <button onclick="getName();">Test Name</button>
-    <button onclick="getDeviceClass();">Test Class</button>
-    <button onclick="getVendorIDSource();">Test Name VendorIDSource</button>
-    <button onclick="getVendorID();">Test VendorID</button>
-    <button onclick="getProductID();">Test ProductID</button>
-    <button onclick="getProductVersion();">Test ProductVersion</button>
-    <button onclick="getGattServer();">Test GATTServer</button>  
+    <button onclick="getName();">Test Name</button></br>
+    <button onclick="getDeviceClass();">Test Class</button></br>
+    <button onclick="getVendorIDSource();">Test Name VendorIDSource</button></br>
+    <button onclick="getVendorID();">Test VendorID</button></br>
+    <button onclick="getProductID();">Test ProductID</button></br>
+    <button onclick="getProductVersion();">Test ProductVersion</button></br>
+    <button onclick="getGattServer();">Test GATTServer</button> </br>
   </body>
 </html>
