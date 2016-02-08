@@ -3,6 +3,13 @@
   <head>
     <title>Test innerHeight</title>
     <script type="text/javascript">
+      function getID() {
+          var device = window.navigator.bluetooth.requestDevice();
+          console.log(device);   
+          var deviceId = device.Id();
+          console.log(deviceId);
+          return deviceId;
+      } 
       function getName() {
           var deviceName = window.navigator.bluetooth.requestDevice().name;
           console.log(deviceName);

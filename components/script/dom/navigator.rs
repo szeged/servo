@@ -23,7 +23,7 @@ impl Navigator {
     fn new_inherited(window: &Window) -> Navigator {
         Navigator {
             reflector_: Reflector::new(),
-            bluetooth: JS::from_ref(&Bluetooth::new(GlobalRef::Window(window)))
+            bluetooth: JS::from_ref(&Bluetooth::new(GlobalRef::Window(window))),
         }
     }
 
