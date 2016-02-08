@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<title>Bluetooth Device test</title>
+	<body>
+	<button type="button" onclick="getID()">Device.getID</button>
+	<button type="button" onclick="GetDeviceClass()">Device.GetDeviceClass</button>
+	<button type="button" onclick="GetVendorIDSource()">Device.GetVendorIDSource</button>
+	<button type="button" onclick="GetVendorID()">Device.GetVendorID</button>
+	<button type="button" onclick="GetProductID()">Device.GetProductID</button>
+	<button type="button" onclick="GetGattServer()">Device.GetGattServer</button>
+	<button type="button" onclick="ConnectGATT()">Device.ConnectGATT</button>
+	<button type="button" onclick="AdData()">Device.AdData</button>
+	<button type="button" onclick="Device()">Server.Device</button>
+	<button type="button" onclick="Connected()">Server.Connected</button>
+	<button type="button" onclick="Disconnect()">Server.Disconnect</button>
+	<button type="button" onclick="GetAppearance()">Addata.GetAppearance</button>
+	<button type="button" onclick="GetTxPower()">Addata.GetTxPower</button>
+	<button type="button" onclick="GetRssi()">Addata.GetRssi</button>
+	<p id="demo"></p>
+	<script>
+		//BluetoothDevice methods:
+		var device = window.navigator.bluetooth.requestDevice();
+
+		function getID() {
+			document.getElementById("demo").innerHTML = device.id;
+		}
+
+		function GetDeviceClass() {
+			document.getElementById("demo").innerHTML = device.deviceClass;
+		}
+
+		function GetVendorIDSource() {
+			document.getElementById("demo").innerHTML = device.vendorIDSource;
+		}
+
+		function GetVendorID() {
+			document.getElementById("demo").innerHTML = device.vendorID;
+		}
+
+		function GetProductID() {
+			document.getElementById("demo").innerHTML = device.productID;
+		}
+
+		function GetGattServer() {
+			document.getElementById("demo").innerHTML = device.gattServer;
+		}
+
+		function ConnectGATT() {
+			document.getElementById("demo").innerHTML = device.ConnectGATT();
+		}
+
+		function AdData() {
+			document.getElementById("demo").innerHTML = device.adData;
+		}
+
+		//BluetoothGATTServer methods:
+		var server = device.GetGattServer();
+
+		function Device() {
+			document.getElementById("demo").innerHTML = server.device;
+		}
+
+		function Connected() {
+			document.getElementById("demo").innerHTML = server.connected;
+		}
+
+		function Disconnect() {
+			document.getElementById("demo").innerHTML = server.Disconnect();
+		}
+
+		//BluetoothAdvertisingData methods:
+		var addata = device.AdData();
+
+		function GetAppearance() {
+			document.getElementById("demo").innerHTML = device.appearance;
+		}
+
+		function GetTxPower() {
+			document.getElementById("demo").innerHTML = addata.txPower;
+		}
+
+		function GetRssi() {
+			document.getElementById("demo").innerHTML = addata.rssi;
+		}
+	</script>
+	</body>
+</html>

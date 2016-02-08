@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<title>GATT Service Test</title>
+<body>
+	<button type="button" onclick="Device()">Service.Device</button>
+	<button type="button" onclick="IsPrimary()">Service.IsPrimary</button>
+	<button type="button" onclick="Uuid()">Service.Uuid</button>
+	<button type="button" onclick="GetCharacteristic()">Service.GetCharacteristic</button>
+	<button type="button" onclick="GetCharacteristics()">Service.GetCharacteristics</button>
+	<button type="button" onclick="GetIncludedService()">Service.GetIncludedService</button>
+	<button type="button" onclick="GetIncludedServices()">Service.GetIncludedServices</button>
+	<p id="demo"></p>
+	<script>
+	var service = window.navigator.window.navigator.bluetooth.requestDevice().
+
+		function Device() {
+				document.getElementById("demo").innerHTML = service.device;
+		}
+
+		function IsPrimary() {
+				document.getElementById("demo").innerHTML = service.isPrimary;
+		}
+
+		function Uuid() {
+				document.getElementById("demo").innerHTML = service.uuid;
+		}
+
+		function GetCharacteristic() {
+				document.getElementById("demo").innerHTML = service.getCharacteristic();
+		}
+
+		function GetCharacteristics() {
+				document.getElementById("demo").innerHTML = service.getCharacteristics();
+		}
+
+		function GetIncludedService() {
+				document.getElementById("demo").innerHTML = service.getIncludedService();
+		}
+
+		function GetIncludedServices() {
+				document.getElementById("demo").innerHTML = service.getIncludedServices();
+		}
+	</script>
+</body>
+</html>

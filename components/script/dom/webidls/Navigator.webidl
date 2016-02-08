@@ -8,6 +8,7 @@ interface Navigator {
   // objects implementing this interface also implement the interfaces given below
 };
 Navigator implements NavigatorID;
+Navigator implements NavigatorBluetooth;
 //Navigator implements NavigatorLanguage;
 //Navigator implements NavigatorOnLine;
 //Navigator implements NavigatorContentUtils;

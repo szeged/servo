@@ -7,9 +7,11 @@ use dom::bindings::codegen::Bindings::BluetoothGATTDescriptorBinding::BluetoothG
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::conversions;
 use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
 use util::str::DOMString;
 use uuid::Uuid;
+use js::jsapi::JS_NewArrayBuffer;
 
 // http://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattdescriptor
 

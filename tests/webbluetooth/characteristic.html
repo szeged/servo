@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<title>Characteristic Test</title>
+<body>
+	<button type="button" onclick="Properties()">Characteristic.Properties</button>
+	<button type="button" onclick="Service()">Characteristic.Service</button>
+	<button type="button" onclick="Uuid()">Characteristic.Uuid</button>
+	<button type="button" onclick="Value()">Characteristic.Value</button>
+	<button type="button" onclick="GetDescriptor()">Characteristic.GetDescriptor</button>
+	<button type="button" onclick="GetDescriptors()">Characteristic.GetDescriptors</button>
+	<button type="button" onclick="ReadValue()">Characteristic.ReadValue</button>
+	<button type="button" onclick="WriteValue()">Characteristic.WriteValue</button>
+	<button type="button" onclick="StartNotification()">Characteristic.StartNotification</button>
+	<button type="button" onclick="StopNotification()">Characteristic.StopNotification</button>
+	<p id="demo"></p>
+	<script>
+	var characteristic = window.navigator.window.navigator.bluetooth.requestDevice().
+
+		function Properties() {
+				document.getElementById("demo").innerHTML = characteristic.properties;
+		}
+
+		function Service() {
+				document.getElementById("demo").innerHTML = characteristic.service;
+		}
+
+		function Uuid() {
+				document.getElementById("demo").innerHTML = characteristic.uuid;
+		}
+
+		function Value() {
+				document.getElementById("demo").innerHTML = characteristic.value();
+		}
+
+		function GetDescriptor() {
+				document.getElementById("demo").innerHTML = characteristic.getDescriptor();
+		}
+
+		function GetDescriptors() {
+				document.getElementById("demo").innerHTML = characteristic.getDescriptors();
+		}
+
+		function ReadValue() {
+				document.getElementById("demo").innerHTML = characteristic.readValue();
+		}
+
+		function WriteValue() {
+				document.getElementById("demo").innerHTML = characteristic.writeValue();
+		}
+
+		function StartNotification() {
+				document.getElementById("demo").innerHTML = characteristic.startNotification();
+		}
+
+		function StopNotification() {
+				document.getElementById("demo").innerHTML = characteristic.stopNotification();
+		}
+	</script>
+</body>
+</html>

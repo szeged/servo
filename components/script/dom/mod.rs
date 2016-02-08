@@ -342,6 +342,7 @@ pub mod messageevent;
 pub mod mouseevent;
 pub mod namednodemap;
 pub mod navigator;
+//pub mod navigatorbluetooth;
 pub mod navigatorinfo;
 pub mod node;
 pub mod nodeiterator;

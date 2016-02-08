@@ -14,7 +14,7 @@ enum VendorIDSource {
 interface BluetoothDevice {
     readonly attribute DOMString id;
     readonly attribute DOMString? name;
-    readonly attribute BluetoothAdvertisingData adData;
+    //readonly attribute BluetoothAdvertisingData adData;
     readonly attribute unsigned long? deviceClass;
     readonly attribute VendorIDSource? vendorIDSource;
     readonly attribute unsigned long? vendorID;
@@ -22,5 +22,5 @@ interface BluetoothDevice {
     readonly attribute unsigned long? productVersion;
     readonly attribute BluetoothGATTRemoteServer? gattServer;
     //readonly attribute UUID[] uuids;
-    //Promise<BluetoothGATTRemoteServer> connectGATT();
+    //boolean connectGATT();
 };
