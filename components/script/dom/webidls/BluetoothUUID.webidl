@@ -5,14 +5,6 @@
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothuuid
 
-interface BluetoothUUID {
-    //static UUID getService((DOMString or unsigned long) name);
-    //static UUID getCharacteristic((DOMString or unsigned long) name);
-    //static UUID getDescriptor((DOMString or unsigned long) name);
-
-    static UUID canonicalUUID([EnforceRange] unsigned long alias);
-};
-
 typedef DOMString UUID;
 
 typedef (DOMString or unsigned long) BluetoothServiceUUID;
@@ -21,3 +13,10 @@ typedef (DOMString or unsigned long) BluetoothCharacteristicUUID;
 
 typedef (DOMString or unsigned long) BluetoothDescriptorUUID;
 
+interface BluetoothUUID {
+    static UUID getService(BluetoothServiceUUID name);
+    //static UUID getCharacteristic(BluetoothCharacteristicUUID name);
+    static UUID getDescriptor(BluetoothDescriptorUUID name);
+
+    static UUID canonicalUUID([EnforceRange] unsigned long alias);
+};

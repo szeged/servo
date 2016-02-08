@@ -22,5 +22,5 @@ interface BluetoothDevice {
     readonly attribute unsigned long? productVersion;
     //readonly attribute BluetoothGATTRemoteServer? gattServer;
     //readonly attribute UUID[] uuids;
-    //Promise<BluetoothGATTRemoteServer> connectGATT();
+    //Promise<BluetoothGATTRemoteServer> connectGATT(); Rometeserver connect-jét hívja meg
 };

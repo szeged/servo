@@ -3,57 +3,72 @@
   <head>
     <title>Test innerHeight</title>
     <script type="text/javascript">
-      function getID() {
-          var device = window.navigator.bluetooth.requestDevice();
-          console.log(device);   
-          var deviceId = device.Id();
+      function getID(device) {   
+          var deviceId = device.id;
           console.log(deviceId);
           return deviceId;
       } 
-      function getName() {
-          var deviceName = window.navigator.bluetooth.requestDevice().name;
+      function getName(device) {
+          var deviceName = device.name;
           console.log(deviceName);
           return deviceName;
       }
-      function getDeviceClass() {
-          var deviceClass = window.navigator.bluetooth.requestDevice().class;
+      function getAdData(device) {
+          var adData = device.adData;
+          console.log(adData);
+          return adData;
+      }
+      function getDeviceClass(device) {
+          var deviceClass = device.deviceClass;
           console.log(deviceClass);
           return deviceClass;
       }
-      function getVendorIDSource() {
-          var vendorIdSource = window.navigator.bluetooth.requestDevice().vendorIDSource;
+      function getVendorIDSource(device) {
+          var vendorIdSource = device.vendorIDSource;
           console.log(vendorIdSource);
           return vendorIdSource;
       }
-      function getVendorID() {
-          var vendorId = window.navigator.bluetooth.requestDevice().vendorID;
+      function getVendorID(device) {
+          var vendorId = device.vendorID;
           console.log(vendorId);
           return vendorId;
       }
-      function getProductID() {
-          var productId = window.navigator.bluetooth.requestDevice().productID;
+      function getProductID(device) {
+          var productId = device.productID;
           console.log(productId);
           return productId;
       }
-      function getProductVersion() {
-          var productVersion = window.navigator.bluetooth.requestDevice().productVersion;
+      function getProductVersion(device) {
+          var productVersion = device.productVersion;
           console.log(productVersion);
           return productVersion;
       }
-      function getGattServer() {
-          var gattServer = window.navigator.bluetooth.requestDevice().gatt;
+      function getGattServer(device) {
+          var gattServer = device.gatt;
           console.log(gattServer);
-          return gattServer
+          return gattServer;
       }
+      function testConnectGATT(device) {
+          console.log(device.gattServer);
+          var testConnect = device.connectGATT();
+          console.log(device.gattServer);
+          return testConnect;
+      }
+
     </script>
   </head>
   <body>
-    <button onclick="getName();">Test Name</button></br>
-    <button onclick="getDeviceClass();">Test Class</button></br>
-    <button onclick="getVendorIDSource();">Test Name VendorIDSource</button></br>
-    <button onclick="getVendorID();">Test VendorID</button></br>
-    <button onclick="getProductID();">Test ProductID</button></br>
-    <button onclick="getProductVersion();">Test ProductVersion</button></br>
-    <button onclick="getGattServer();">Test GATTServer</button> </br>
+    <script>
+      var device = window.navigator.bluetooth.requestDevice();
+    </script>
+    <button onclick="getName(device);">Test Name</button></br>
+    <button onclick="getAdData(device);">Test Name</button></br>
+    <button onclick="getDeviceClass(device);">Test Class</button></br>
+    <button onclick="getVendorIDSource(device);">Test Name VendorIDSource</button></br>
+    <button onclick="getVendorID(device);">Test VendorID</button></br>
+    <button onclick="getProductID(device);">Test ProductID</button></br>
+    <button onclick="getProductVersion(device);">Test ProductVersion</button></br>
+    <button onclick="getGattServer(device);">Test GATTServer</button> </br>
+    <button onclick="testConnectGATT(device);">Test ConnectGATTFunction</button> </br>    
   </body>
 </html>

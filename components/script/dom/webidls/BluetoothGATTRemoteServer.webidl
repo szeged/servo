@@ -13,4 +13,5 @@ interface BluetoothGATTRemoteServer {
   void disconnect();
   //Promise<BluetoothGATTService> getPrimaryService(BluetoothServiceUUID service);
   //Promise<sequence<BluetoothGATTService>>getPrimaryServices(optional BluetoothServiceUUID service);
+  //Promise<BluetoothRemoteGATTServer> connect();
 };

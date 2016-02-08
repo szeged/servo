@@ -4,6 +4,7 @@
 
 use dom::bindings::global::GlobalRef;
 use dom::bindings::reflector::Reflector;
+use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
 use util::str::DOMString;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothuuid
@@ -16,5 +17,13 @@ pub struct BluetoothUUID {
 impl BluetoothUUID {
     pub fn CanonicalUUID(_: GlobalRef, _alias: u32) -> DOMString {
         DOMString::new()
+    }
+
+    pub fn GetDescriptor(_: GlobalRef, name: StringOrUnsignedLong) -> DOMString {
+    	DOMString::new()
+    }
+
+    pub fn GetService(_: GlobalRef, name: StringOrUnsignedLong) -> DOMString {
+    	DOMString::new()
     }
 }

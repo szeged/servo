@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test innerHeight</title>
+    <script type="text/javascript">
+      function getGattServer(device) {   
+          var deviceId = device.id;
+          console.log(deviceId);
+          return deviceId;
+      }
+      function connectTest(device) {
+        console.log(device.gatt)
+        var connect = device.connect();
+        console.log(device.gatt)
+      }
+      function connectTest(device) {
+        console.log(device.gatt)
+        var connect = device.discconnect();
+        console.log(device.gatt)
+      }
+    </script>
+  </head>
+  <body>
+    <script>
+      var device = window.navigator.bluetooth.requestDevice().gatt;
+    </script>
+    <button onclick="getGattServer(device);">Test GATTServer</button> </br>
+  </body>
+</html>

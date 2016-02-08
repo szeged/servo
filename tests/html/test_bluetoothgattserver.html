@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test innerHeight</title>
+    <script type="text/javascript">
+      function  getDevice(gatt) {
+        console.log(gatt.device);
+        return gatt.device;
+      }
+      function isConnected(gatt) {
+        console.log(gatt.connected);
+        return gatt.connected;
+      }
+      function testConnect(gatt) {
+        console.log(gatt.connected);
+        var connect = device.connect();
+        console.log(gatt.connected);
+      }
+      function testDisconnect(gatt) {
+        console.log(gatt.connected);
+        var connect = device.discconnect();
+        console.log(gatt.connected);
+      }
+      function testGetPrimaryService(gatt,service) {
+        var primaryService = device.getPrimaryService(service);
+        console.log(primaryService);
+      }
+      function testGetPrimaryServices(gatt,service) {
+        var primaryService = device.getPrimaryService(service);
+        console.log(primaryService);
+      }
+    </script>
+  </head>
+  <body>
+    <script>
+      var gatt = window.navigator.bluetooth.requestDevice().gatt;
+      //TODO add services(zakorgy)
+    </script>
+    <button onclick="getDevice(gatt);">Test Device</button> </br>
+    <button onclick="isConnected(gatt);">Test Connected</button> </br>
+    <button onclick="testConnect(gatt);">Test Connecting</button> </br>
+    <button onclick="testDisconnect(gatt);">Test Disconnecting</button> </br>
+    <button onclick="getPrimaryService(gatt,service);">Test testGetPrimaryService</button> </br>
+    <button onclick="getPrimaryServices(gatt,service);">Test testGetPrimaryServices</button> </br>
+  </body>
+</html>
