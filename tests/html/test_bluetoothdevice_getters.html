@@ -55,6 +55,49 @@
           return testConnect;
       }
 
+      function testDevice(device) {
+        if (device === undefined ) {
+          console.log("Device not present");
+        }
+
+        if(device.id === undefined) {
+          console.log("Devicename not present");
+        } else {
+          console.log("Devicename: " + device.id);
+        }
+
+        if(device.adData === undefined) {
+          console.log("Advertising Data is not set!");
+        } else {
+          console.log("Advertising is set: " + device.adData);
+        }
+        if(device.deviceClass === undefined) {
+          console.log("Device Class not present!");
+        } else {
+          console.log("Device Class: " + device.deviceClass);
+        }
+        if(device.VendorID === undefined) {
+          console.log("VendorID not present!");
+        } else {
+          console.log("Advertising data present: " + device.VendorID);
+        }
+        if(device.productID === undefined) {
+          console.log("Advertising Data not present!");
+        } else {
+          console.log("Advertising data present: " + device.productID);
+        }
+        if(device.productVersion === undefined) {
+          console.log("Advertising Data not present!");
+        } else {
+          console.log("Advertising data present: " + device.productVersion);
+        }
+        if(device.gatt === undefined) {
+          console.log("Advertising Data not present!");
+        } else {
+          console.log("Advertising data present: " + device.gatt);
+        }
+      }
+
     </script>
   </head>
   <body>
