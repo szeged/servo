@@ -3657,6 +3657,29 @@ impl ToJSValConvertible for %s {
 """) % (self.type, "\n".join(enumValues), self.type, "\n".join(enumConversions))
 
 
+class CGElseChain(CGThing):
+    """
+    Concatenate if statements in an if-else-if-else chain.
+    """
+    def __init__(self, children):
+        self.children = [c for c in children if c is not None]
+
+    def declare(self):
+        assert False
+
+    def define(self):
+        if not self.children:
+            return ""
+        s = self.children[0].define()
+        assert s.endswith("\n")
+        for child in self.children[1:]:
+            code = child.define()
+            assert code.startswith("if") or code.startswith("{")
+            assert code.endswith("\n")
+            s = s.rstrip() + " else " + code
+        return s
+
+
 class CGUnionConversionStruct(CGThing):
     def __init__(self, type, descriptorProvider):
         assert not type.nullable()
@@ -3745,49 +3768,35 @@ class CGUnionConversionStruct(CGThing):
             conversions.append(CGIfWrapper("value.get().is_object()", templateBody))
 
         stringTypes = [t for t in memberTypes if t.isString() or t.isEnum()]
-        if len(stringTypes) > 0:
-            assert len(stringTypes) == 1
-            memberType = stringTypes[0]
-            if memberType.isEnum():
-                name = memberType.inner.identifier.name
-            else:
-                name = memberType.name
-            match = (
-                "match %s::TryConvertTo%s(cx, value) {\n"
-                "    Err(_) => return Err(()),\n"
-                "    Ok(Some(value)) => return Ok(%s::e%s(value)),\n"
-                "    Ok(None) => (),\n"
-                "}\n") % (self.type, name, self.type, name)
-            conversions.append(CGGeneric(match))
-            names.append(name)
-
         numericTypes = [t for t in memberTypes if t.isNumeric()]
-        if len(numericTypes) > 0:
-            assert len(numericTypes) == 1
-            memberType = numericTypes[0]
-            name = memberType.name
-            match = (
-                "match %s::TryConvertTo%s(cx, value) {\n"
-                "    Err(_) => return Err(()),\n"
-                "    Ok(Some(value)) => return Ok(%s::e%s(value)),\n"
-                "    Ok(None) => (),\n"
-                "}\n") % (self.type, name, self.type, name)
-            conversions.append(CGGeneric(match))
-            names.append(name)
+        booleanTypes = [t for t in memberTypes if t.isBoolean()]
+        if stringTypes or numericTypes or booleanTypes:
+            assert len(stringTypes) <= 1
+            assert len(numericTypes) <= 1
+            assert len(booleanTypes) <= 1
 
-        booleanTypes = [t for t in memberTypes if t.isBoolean()]        
-        if len(booleanTypes) > 0:
-            assert len(booleanTypes) == 1
-            memberType = booleanTypes[0]
-            name = memberType.name
-            match = (
-                "match %s::TryConvertTo%s(cx, value) {\n"
-                "    Err(_) => return Err(()),\n"
-                "    Ok(Some(value)) => return Ok(%s::e%s(value)),\n"
-                "    Ok(None) => (),\n"
-                "}\n") % (self.type, name, self.type, name)
-            conversions.append(CGGeneric(match))
-            names.append(name)
+            def getStringOrPrimitiveConversion(memberType):
+                typename = get_name(memberType)
+                return CGGeneric(get_match(typename))
+            other = CGList([])
+            stringConversion = map(getStringOrPrimitiveConversion, stringTypes)
+            numericConversion = map(getStringOrPrimitiveConversion, numericTypes)
+            booleanConversion = map(getStringOrPrimitiveConversion, booleanTypes)
+            if stringConversion:
+                if booleanConversion:
+                    conversions.append(booleanConversion[0])
+                if numericConversion:
+                    conversions.append(numericConversion[0])
+                conversions.append(stringConversion[0])
+            elif numericConversion:
+                if booleanConversion:
+                    conversions.append(booleanConversion[0])
+                conversions.append(numericConversion[0])
+            else:
+                assert booleanConversion
+                conversions.append(booleanConversion[0])
+        else:
+            other = None
 
         conversions.append(CGGeneric(
             "throw_not_in_union(cx, \"%s\");\n"

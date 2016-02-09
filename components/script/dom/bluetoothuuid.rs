@@ -5,6 +5,7 @@
 use dom::bindings::global::GlobalRef;
 use dom::bindings::reflector::Reflector;
 use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
+use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong::{eString, eUnsignedLong};
 use util::str::DOMString;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothuuid
@@ -23,7 +24,10 @@ impl BluetoothUUID {
     	DOMString::new()
     }
 
-    pub fn GetService(_: GlobalRef, name: StringOrUnsignedLong) -> DOMString {
-    	DOMString::new()
+    pub fn GetService(_: GlobalRef, name: StringOrUnsignedLong) -> u32 {
+    	match name {
+            StringOrUnsignedLong::eString(s) => 100,
+            StringOrUnsignedLong::eUnsignedLong(u) => u,
+        }
     }
 }

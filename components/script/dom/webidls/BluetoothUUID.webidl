@@ -14,7 +14,7 @@ typedef (DOMString or unsigned long) BluetoothCharacteristicUUID;
 typedef (DOMString or unsigned long) BluetoothDescriptorUUID;
 
 interface BluetoothUUID {
-    static UUID getService(BluetoothServiceUUID name);
+    static unsigned long getService(BluetoothServiceUUID name);
     //static UUID getCharacteristic(BluetoothCharacteristicUUID name);
     static UUID getDescriptor(BluetoothDescriptorUUID name);
 
