@@ -58,6 +58,7 @@ extern crate offscreen_gl_context;
 extern crate profile_traits;
 extern crate rand;
 extern crate ref_slice;
+extern crate regex;
 extern crate rustc_serialize;
 extern crate script_traits;
 #[macro_use(state_pseudo_classes)] extern crate selectors;

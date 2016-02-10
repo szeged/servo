@@ -10,6 +10,8 @@ use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
 use util::str::DOMString;
+use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong::{eString, eUnsignedLong};
+use dom::bluetoothuuid;
 use uuid::Uuid;
 
 #[dom_struct]
@@ -55,4 +57,5 @@ impl BluetoothGATTServiceMethods for BluetoothGATTService {
     fn Uuid(&self) -> DOMString {
         DOMString::from_string(self.uuid.to_simple_string().clone())
     }
+
 }

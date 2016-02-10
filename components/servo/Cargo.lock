@@ -1530,6 +1530,7 @@ dependencies = [
  "profile_traits 0.0.1",
  "rand 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "ref_slice 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "regex 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "script_traits 0.0.1",
  "selectors 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
