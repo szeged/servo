@@ -3778,25 +3778,39 @@ class CGUnionConversionStruct(CGThing):
             def getStringOrPrimitiveConversion(memberType):
                 typename = get_name(memberType)
                 return CGGeneric(get_match(typename))
-            other = CGList([])
+            other = []
             stringConversion = map(getStringOrPrimitiveConversion, stringTypes)
             numericConversion = map(getStringOrPrimitiveConversion, numericTypes)
             booleanConversion = map(getStringOrPrimitiveConversion, booleanTypes)
             if stringConversion:
                 if booleanConversion:
-                    conversions.append(booleanConversion[0])
+                    other.append(booleanConversion[0])
                 if numericConversion:
-                    conversions.append(numericConversion[0])
-                conversions.append(stringConversion[0])
+                    other.append(numericConversion[0])
+                other.append(stringConversion[0])
             elif numericConversion:
                 if booleanConversion:
-                    conversions.append(booleanConversion[0])
-                conversions.append(numericConversion[0])
+                    other.append(booleanConversion[0])
+                other.append(numericConversion[0])
             else:
                 assert booleanConversion
-                conversions.append(booleanConversion[0])
-        else:
-            other = None
+                other.append(booleanConversion[0])
+            if hasObjectTypes:
+                if object:
+                    conversions.append(CGWrapper(
+                        CGList(other,"\n\n"),
+                        pre="else {\n",
+                        post="\n}"))
+                else:
+                    conversions.append(CGWrapper(
+                        CGList(other,"\n\n"),
+                        pre="",
+                        post=""))
+            else: 
+                conversions.append(CGWrapper(
+                        CGList(other,"\n\n"),
+                        pre="",
+                        post=""))
 
         conversions.append(CGGeneric(
             "throw_not_in_union(cx, \"%s\");\n"
