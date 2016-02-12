@@ -6,10 +6,13 @@
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattcharacteristic
 
 interface BluetoothGATTCharacteristic {
-  readonly attribute BluetoothCharacteristicProperties properties;
-  readonly attribute BluetoothGATTService service;
+  readonly attribute BluetoothCharacteristicProperties? properties;
+  readonly attribute BluetoothGATTService? service;
   readonly attribute UUID uuid;
   //readonly attribute ArrayBuffer? value;
+
+  void SetProperties(BluetoothCharacteristicProperties properties);
+  void SetService(BluetoothGATTService service);
 
   // TODO(fokinv) use Promise when implemented ( https://github.com/servo/servo/issues/4282 )
 

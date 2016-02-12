@@ -11,35 +11,36 @@ use dom::bluetoothcharacteristicproperties::BluetoothCharacteristicProperties;
 use dom::bluetoothgattservice::BluetoothGATTService;
 use util::str::DOMString;
 use uuid::Uuid;
+use dom::bindings::cell::DOMRefCell;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattcharacteristic
 
 #[dom_struct]
 pub struct BluetoothGATTCharacteristic {
     reflector_: Reflector,
-    properties: JS<BluetoothCharacteristicProperties>,
-    service: JS<BluetoothGATTService>,
+    properties: DOMRefCell<Option<JS<BluetoothCharacteristicProperties>>>,
+    service: DOMRefCell<Option<JS<BluetoothGATTService>>>,
     uuid: Uuid,
     //value :ArrayBuffer,
 }
 
 impl BluetoothGATTCharacteristic {
-    pub fn new_inherited(service: &BluetoothGATTService,
+    pub fn new_inherited(service: Option<&BluetoothGATTService>,
                          uuid: Uuid,
-                         properties: &BluetoothCharacteristicProperties)
+                         properties: Option<&BluetoothCharacteristicProperties>)
                          -> BluetoothGATTCharacteristic {
         BluetoothGATTCharacteristic {
             reflector_: Reflector::new(),
-            service: JS::from_ref(service),
+            service: DOMRefCell::new(service.map(JS::from_ref)),
             uuid: uuid,
-            properties: JS::from_ref(properties),
+            properties: DOMRefCell::new(properties.map(JS::from_ref)),
         }
     }
 
     pub fn new(global: GlobalRef,
-               service: &BluetoothGATTService,
+               service: Option<&BluetoothGATTService>,
                uuid: Uuid,
-               properties: &BluetoothCharacteristicProperties)
+               properties: Option<&BluetoothCharacteristicProperties>)
                -> Root<BluetoothGATTCharacteristic>{
         reflect_dom_object(box BluetoothGATTCharacteristic::new_inherited(service,
                                                                           uuid,
@@ -52,17 +53,33 @@ impl BluetoothGATTCharacteristic {
 
 impl BluetoothGATTCharacteristicMethods for BluetoothGATTCharacteristic {
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattcharacteristic-properties
-    fn Properties(&self) -> Root<BluetoothCharacteristicProperties> {
-        Root::from_ref(&*self.properties)
+    fn GetProperties(&self) -> Option<Root<BluetoothCharacteristicProperties>> {
+        if let Some(ref is_prop) = self.properties.borrow().clone() {
+            Some(Root::from_ref(&*is_prop))
+        } else {
+            None
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattcharacteristic-service
-    fn Service(&self) -> Root<BluetoothGATTService> {
-        Root::from_ref(&*self.service)
+    fn GetService(&self) -> Option<Root<BluetoothGATTService>> {
+        if let Some(ref is_service) = self.service.borrow().clone() {
+            Some(Root::from_ref(&*is_service))
+        } else {
+            None
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattcharacteristic-uuid
     fn Uuid(&self) -> DOMString {
         DOMString::from_string(self.uuid.to_string().clone())
+    }
+
+    fn SetProperties(&self, properties: &BluetoothCharacteristicProperties){
+        *self.properties.borrow_mut() = Some(JS::from_ref(properties));
+    }
+
+    fn SetService(&self, service: &BluetoothGATTService){
+        *self.service.borrow_mut() = Some(JS::from_ref(service));
     }
 }

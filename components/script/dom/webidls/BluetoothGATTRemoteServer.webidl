@@ -6,11 +6,13 @@
 //https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattremoteserver
 
 interface BluetoothGATTRemoteServer {
-  readonly attribute BluetoothDevice device;
+  readonly attribute BluetoothDevice? device;
 
   readonly attribute boolean connected;
 
+  void connect();
   void disconnect();
+  void SetDevice(BluetoothDevice device);
   //Promise<BluetoothGATTService> getPrimaryService(BluetoothServiceUUID service);
   //Promise<sequence<BluetoothGATTService>>getPrimaryServices(optional BluetoothServiceUUID service);
   //Promise<BluetoothRemoteGATTServer> connect();

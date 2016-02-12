@@ -13,26 +13,27 @@ use util::str::DOMString;
 use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong::{eString, eUnsignedLong};
 use dom::bluetoothuuid;
 use uuid::Uuid;
+use dom::bindings::cell::DOMRefCell;
 
 #[dom_struct]
 pub struct BluetoothGATTService {
     reflector_: Reflector,
-    device: JS<BluetoothDevice>,
+    device: DOMRefCell<Option<JS<BluetoothDevice>>>,
     isPrimary: bool,
     uuid: Uuid,
 }
 
 impl BluetoothGATTService {
-    pub fn new_inherited(device: &BluetoothDevice, isPrimary: bool, uuid: Uuid) -> BluetoothGATTService {
+    pub fn new_inherited(device: Option<&BluetoothDevice>, isPrimary: bool, uuid: Uuid) -> BluetoothGATTService {
         BluetoothGATTService {
             reflector_: Reflector::new(),
-            device: JS::from_ref(device),
+            device: DOMRefCell::new(device.map(JS::from_ref)),
             isPrimary: isPrimary,
             uuid: uuid,
         }
     }
 
-    pub fn new(global: GlobalRef, device: &BluetoothDevice, isPrimary: bool, uuid: Uuid) -> Root<BluetoothGATTService> {
+    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, isPrimary: bool, uuid: Uuid) -> Root<BluetoothGATTService> {
         reflect_dom_object(box BluetoothGATTService::new_inherited(
                            device,
                            isPrimary,
@@ -44,8 +45,12 @@ impl BluetoothGATTService {
 
 impl BluetoothGATTServiceMethods for BluetoothGATTService {
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattservice-device
-    fn Device(&self) -> Root<BluetoothDevice> {
-        Root::from_ref(&*self.device)
+    fn GetDevice(&self) -> Option<Root<BluetoothDevice>> {
+        if let Some(ref is_device) = self.device.borrow().clone() {
+            Some(Root::from_ref(&*is_device))
+        } else {
+            None
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattservice-uuid
@@ -58,4 +63,7 @@ impl BluetoothGATTServiceMethods for BluetoothGATTService {
         DOMString::from_string(self.uuid.to_simple_string().clone())
     }
 
+    fn SetDevice(&self, device: &BluetoothDevice){
+        *self.device.borrow_mut() = Some(JS::from_ref(device));
+    }
 }

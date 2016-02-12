@@ -10,63 +10,61 @@ use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use util::str::DOMString;
+use dom::bindings::cell::DOMRefCell;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
 
 pub type Uuid = DOMString;
-
 #[dom_struct]
 pub struct BluetoothDevice {
     reflector_: Reflector,
     id: DOMString,
     name: DOMString,
-    //adData: JS<BluetoothAdvertisingData>,
+    adData: DOMRefCell<Option<JS<BluetoothAdvertisingData>>>,
     deviceClass: u32,
     vendorIDSource: VendorIDSource,
     vendorID: u32,
     productID: u32,
     productVersion: u32,
-    //gattServer: Option<JS<BluetoothGATTRemoteServer>>,
+    gattServer: DOMRefCell<Option<JS<BluetoothGATTRemoteServer>>>,
     //TODO:uuids: Vec<u32>,
 }
 
 impl BluetoothDevice {
     pub fn new_inherited(id: DOMString,
                          name: DOMString,
-                         //adData: &BluetoothAdvertisingData,
+                         adData: Option<&BluetoothAdvertisingData>,
                          deviceClass: u32,
                          vendorIDSource: VendorIDSource,
                          vendorID: u32,
                          productID: u32,
-                         productVersion: u32
-                         //gattServer: Option<&BluetoothGATTRemoteServer>
-                         )
+                         productVersion: u32,
+                         gattServer: Option<&BluetoothGATTRemoteServer>)
                          -> BluetoothDevice {
         BluetoothDevice {
             reflector_: Reflector::new(),
             id: id,
             name: name,
-            //adData: JS::from_ref(adData),
+            adData: DOMRefCell::new(adData.map(JS::from_ref)),
             deviceClass: deviceClass,
             vendorIDSource: vendorIDSource,
             vendorID: vendorID,
             productID: productID,
             productVersion: productVersion,
-            //gattServer: gattServer.map(JS::from_ref),
+            gattServer: DOMRefCell::new(gattServer.map(JS::from_ref)),
         }
     }
 
     pub fn new(global: GlobalRef,
              id: DOMString,
              name: DOMString,
-             //adData: &BluetoothAdvertisingData,
+             adData: Option<&BluetoothAdvertisingData>,
              deviceClass: u32,
              vendorIDSource: VendorIDSource,
              vendorID: u32,
              productID: u32,
              productVersion: u32,
-             //gattServer: Option<&BluetoothGATTRemoteServer>
-             )
+             gattServer: Option<&BluetoothGATTRemoteServer>)
              -> Root<BluetoothDevice> {
         reflect_dom_object(box BluetoothDevice::new_inherited(id,
                                                               name,
@@ -95,9 +93,13 @@ impl BluetoothDeviceMethods for BluetoothDevice {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#addata
-    /*fn AdData(&self) -> Root<BluetoothAdvertisingData> {
-        Root::from_ref(&*self.adData)
-    }*/
+    fn GetAdData(&self) -> Option<Root<BluetoothAdvertisingData>> {
+        if let Some(ref is_data) = self.adData.borrow().clone() {
+            Some(Root::from_ref(&*is_data))
+        } else {
+            None
+        }
+    }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-deviceclass
     fn GetDeviceClass(&self) -> Option<u32> {
@@ -125,11 +127,29 @@ impl BluetoothDeviceMethods for BluetoothDevice {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#gattserver
-    /*fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
-        if let Some(ref is_server) = self.gattServer.clone() {
-            Some(Root::from_ref(&is_server))
+
+    fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
+        if let Some(ref is_server) = self.gattServer.borrow().clone() {
+            Some(Root::from_ref(&*is_server))
         } else {
             None
+        }
+    }
+
+    fn SetGattServer(&self, server: &BluetoothGATTRemoteServer){
+        *self.gattServer.borrow_mut() = Some(JS::from_ref(server));
+    }
+
+    fn SetAdData(&self, addata: &BluetoothAdvertisingData){
+        *self.adData.borrow_mut() = Some(JS::from_ref(addata));
+    }
+
+    /*fn ConnectGATT(&self) -> {
+        //FIXME
+        &self.gattServer.Connect();
+        match &self.gattServer {
+            &None => return false,
+            &Some(ref server) => return true,
         }
     }*/
 }

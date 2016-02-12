@@ -14,13 +14,15 @@ enum VendorIDSource {
 interface BluetoothDevice {
     readonly attribute DOMString id;
     readonly attribute DOMString? name;
-    //readonly attribute BluetoothAdvertisingData adData;
+    readonly attribute BluetoothAdvertisingData? adData;
     readonly attribute unsigned long? deviceClass;
     readonly attribute VendorIDSource? vendorIDSource;
     readonly attribute unsigned long? vendorID;
     readonly attribute unsigned long? productID;
     readonly attribute unsigned long? productVersion;
-    //readonly attribute BluetoothGATTRemoteServer? gattServer;
+    readonly attribute BluetoothGATTRemoteServer? gattServer;
+    void SetAdData(BluetoothAdvertisingData addata);
+    void SetGattServer(BluetoothGATTRemoteServer server);
     //readonly attribute UUID[] uuids;
-    //Promise<BluetoothGATTRemoteServer> connectGATT(); Rometeserver connect-jét hívja meg
+    //boolean connectGATT();
 };
