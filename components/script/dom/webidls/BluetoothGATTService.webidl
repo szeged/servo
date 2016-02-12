@@ -6,9 +6,11 @@
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattservice
 
 interface BluetoothGATTService {
-    readonly attribute BluetoothDevice device;
+    readonly attribute BluetoothDevice? device;
     readonly attribute boolean isPrimary;
     readonly attribute UUID uuid;
+
+    void SetDevice(BluetoothDevice device);
     //Promise<BluetoothGATTCharacteristic>getCharacteristic(BluetoothCharacteristicUUID characteristic);
     //Promise<sequence<BluetoothGATTCharacteristic>>
     //getCharacteristics(optional BluetoothCharacteristicUUID characteristic);

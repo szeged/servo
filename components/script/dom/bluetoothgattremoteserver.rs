@@ -9,36 +9,47 @@ use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
 use std::cell::Cell;
+use dom::bindings::cell::DOMRefCell;
 
 #[dom_struct]
 pub struct BluetoothGATTRemoteServer {
     reflector_: Reflector,
-    device: JS<BluetoothDevice>,
+    device: DOMRefCell<Option<JS<BluetoothDevice>>>,
     connected: Cell<bool>,
 }
 
 impl BluetoothGATTRemoteServer {
-    pub fn new_inherited(device: &BluetoothDevice, is_connected: bool) -> BluetoothGATTRemoteServer {
+    pub fn new_inherited(device: Option<&BluetoothDevice>, is_connected: bool) -> BluetoothGATTRemoteServer {
         BluetoothGATTRemoteServer {
             reflector_: Reflector::new(),
-            device: JS::from_ref(device),
+            device: DOMRefCell::new(device.map(JS::from_ref)),
             connected: Cell::new(is_connected),
         }
     }
 
-    pub fn new(global: GlobalRef, device: &BluetoothDevice, connected: bool) -> Root<BluetoothGATTRemoteServer> {
+    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, connected: bool) -> Root<BluetoothGATTRemoteServer> {
         reflect_dom_object(box BluetoothGATTRemoteServer::new_inherited(
                            device,
                            connected),
         global,
         BluetoothGATTRemoteServerBinding::Wrap)
     }
+
+    
+    /*pub fn setDevice(&mut self, device: &BluetoothDevice) -> Root<BluetoothGATTRemoteServer>{
+        self.device = Some(JS::from_ref(device));
+        Root::from_ref(&self)
+    }*/
 }
 
 impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-device
-    fn Device(&self) -> Root<BluetoothDevice> {
-        Root::from_ref(&*self.device)
+    fn GetDevice(&self) -> Option<Root<BluetoothDevice>> {
+        if let Some(ref is_device) = self.device.borrow().clone() {
+            Some(Root::from_ref(&*is_device))
+        } else {
+            None
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-connected
@@ -46,9 +57,17 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
         self.connected.get()
     }
 
+    fn Connect(&self) -> () {
+        //FIXME
+    }
+
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-disconnect
     fn Disconnect(&self) -> () {
         //  FIXME (zakorgy)
             ()
+    }
+
+    fn SetDevice(&self, device: &BluetoothDevice){
+        *self.device.borrow_mut() = Some(JS::from_ref(device));
     }
 }
