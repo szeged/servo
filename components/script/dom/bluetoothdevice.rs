@@ -11,6 +11,8 @@ use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use util::str::DOMString;
 use dom::bindings::cell::DOMRefCell;
+use js::jsapi::JSContext;
+use js::jsval::JSVal;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
 
@@ -27,7 +29,6 @@ pub struct BluetoothDevice {
     productID: u32,
     productVersion: u32,
     gattServer: DOMRefCell<Option<JS<BluetoothGATTRemoteServer>>>,
-    //TODO:uuids: Vec<u32>,
 }
 
 impl BluetoothDevice {
@@ -68,13 +69,13 @@ impl BluetoothDevice {
              -> Root<BluetoothDevice> {
         reflect_dom_object(box BluetoothDevice::new_inherited(id,
                                                               name,
-                                                              //adData,
+                                                              adData,
                                                               deviceClass,
                                                               vendorIDSource,
                                                               vendorID,
                                                               productID,
-                                                              productVersion
-                                                              //gattServer
+                                                              productVersion,
+                                                              gattServer
                                                               ),
                            global,
                            BluetoothDeviceBinding::Wrap)

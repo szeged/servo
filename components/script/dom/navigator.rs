@@ -7,7 +7,6 @@ use dom::bindings::codegen::Bindings::NavigatorBinding::NavigatorMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
-use dom::bluetooth::Bluetooth;
 //use dom::navigatorbluetooth::{NavigatorBluetooth};
 use dom::navigatorinfo;
 use dom::window::Window;

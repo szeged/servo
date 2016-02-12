@@ -37,7 +37,7 @@ const BLUETOOTH_ASSIGNED_CHARCTERISTICS: &'static [(&'static str,u32)] = &[
     ];
 
 const BLUETOOTH_ASSIGNED_DESCRIPTORS: &'static [(&'static str,u32)] = &[
-    //TODO(zakorgy) create all the services 
+    //TODO(zakorgy) create all the descriptors 
     //https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
     ("org.bluetooth.service.alert_notification",0x1811u32),
     ("org.bluetooth.service.automation_io",0x1815u32),

@@ -18,6 +18,4 @@ interface BluetoothUUID {
     static UUID getCharacteristic(BluetoothCharacteristicUUID name);
     static UUID getDescriptor(BluetoothDescriptorUUID name);
     static UUID canonicalUUID([EnforceRange] unsigned long alias);
-    void passOptionalNullableUnion4(optional (DOMString or sequence<DOMString>)? seq);
-
 };
