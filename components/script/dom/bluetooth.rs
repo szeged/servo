@@ -17,6 +17,12 @@ use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
 use dom::bluetoothgattdescriptor::BluetoothGATTDescriptor;
 use dom::bluetoothgattservice::BluetoothGATTService;
 use uuid::Uuid;
+use dom::window::Window;
+
+lazy_static! {
+    pub static ref GLOBALREF: Option<&'static Window> = None;
+}
+
 
 #[dom_struct]
 pub struct Bluetooth {
@@ -82,7 +88,7 @@ impl Bluetooth {
                            BluetoothBinding::Wrap)
     }
 
-    pub fn request_device(&self,
+pub fn request_device(&self,
                           nameFilter: DOMString,
                           namePrefixFilter: DOMString
                           ) -> DOMString {

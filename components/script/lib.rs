@@ -47,6 +47,8 @@ extern crate hyper;
 extern crate image;
 extern crate ipc_channel;
 extern crate js;
+#[macro_use]
+extern crate lazy_static;
 extern crate libc;
 #[macro_use]
 extern crate log;

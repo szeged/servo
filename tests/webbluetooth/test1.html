@@ -4,14 +4,24 @@
 	<body>
 	<table>
 	<tr>
+	<td>Device methods</td>
+	</tr>
+	<tr>
 	<td><button type="button" onclick="getID()">Device.getID</button></td>
 	<td><button type="button" onclick="GetDeviceClass()">Device.GetDeviceClass</button></td>
 	<td><button type="button" onclick="GetVendorIDSource()">Device.GetVendorIDSource</button></td>
+	</tr>
+	<tr>
 	<td><button type="button" onclick="GetVendorID()">Device.GetVendorID</button></td>
 	<td><button type="button" onclick="GetProductID()">Device.GetProductID</button></td>
 	<td><button type="button" onclick="GetGattServer()">Device.GetGattServer</button></td>
-	<td><button type="button" onclick="ConnectGATT()">Device.ConnectGATT</button></td>
+	</tr>
+	<tr>
 	<td><button type="button" onclick="AdData()">Device.AdData</button></td>
+	<td><button type="button" onclick="ConnectGATT()">Device.ConnectGATT</button></td>
+	</tr>
+	<tr>
+	<td>Server methods</td>
 	</tr>
 	<tr>
 	<td><button type="button" onclick="Device()">Server.Device</button></td>
@@ -19,18 +29,73 @@
 	<td><button type="button" onclick="Disconnect()">Server.Disconnect</button></td>
 	</tr>
 	<tr>
+	<td>AdvertisingData methods</td>
+	</tr>
+	<tr>
 	<td><button type="button" onclick="GetAppearance()">Addata.GetAppearance</button></td>
 	<td><button type="button" onclick="GetTxPower()">Addata.GetTxPower</button></td>
 	<td><button type="button" onclick="GetRssi()">Addata.GetRssi</button></td>
 	</tr>
+	<tr>
+	<td>Properties methods</td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="Broadcast()">Prop.broadcast</button></td>
+	<td><button type="button" onclick="Read()">Prop.read</button></td>
+	<td><button type="button" onclick="WriteWithoutResponse()">Prop.wWResponse</button></td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="Write()">Prop.write</button></td>
+	<td><button type="button" onclick="Notify()">Prop.notify</button></td>
+	<td><button type="button" onclick="Indicate()">Prop.indicate</button></td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="AuthenticatedSignedWrites()">Prop.aSWrites</button></td>
+	<td><button type="button" onclick="ReliableWrite()">Prop.rWrite</button></td>
+	<td><button type="button" onclick="WritableAuxiliaries()">Prop.wAuxiliaries</button></td>
+	</tr>
+	<tr>
+	<td>Characteristic methods</td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="GetProperties()">Characteristic.GetProperties</button></td>
+	<td><button type="button" onclick="GetService()">Characteristic.GetService</button></td>
+	<td><button type="button" onclick="Uuid()">Characteristic.Uuid</button></td>
+	</tr>
+	<tr>
+	<td>Descriptor methods</td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="GetCharacteristic()">Descriptor.GetCharacteristic</button></td>
+	<td><button type="button" onclick="Uuid()">Descriptor.Uuid</button></td>
+	</tr>
+	<tr>
+	<td>Service methods</td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="GetDevice()">Service.GetDevice</button></td>
+	<td><button type="button" onclick="IsPrimary()">Service.IsPrimary</button></td>
+	<td><button type="button" onclick="Uuid()">Service.Uuid</button></td>
+	</tr>
 	</table>
 	<p id="demo"></p>
 	<script>
-		//BluetoothDevice methods:
 		var device = window.navigator.bluetooth.requestDevice();
+		device.SetGattServer(window.navigator.bluetooth.mockServer());
+		var server = device.gattServer;
 		server.SetDevice(device);
-		var server = window.navigator.bluetooth.requestDevice().gattServer;
+		device.SetAdData(window.navigator.bluetooth.mockAdData());
 		var addata = device.adData;
+		var descriptor = window.navigator.bluetooth.mockDescriptor();
+		descriptor.SetCharacteristic(window.navigator.bluetooth.mockCharacteristic());
+		var characteristic = descriptor.characteristic;
+		characteristic.SetProperties(window.navigator.bluetooth.mockProperties());
+		var properties = characteristic.properties;
+		characteristic.SetService(window.navigator.bluetooth.mockService());
+		var service = characteristic.service;
+		service.SetDevice(device);
+
+		//BluetoothDevice methods:
 		function getID() {
 			document.getElementById("demo").innerHTML = device.id;
 		}
@@ -52,6 +117,7 @@
 		}
 
 		function GetGattServer() {
+			//device.setGattServer(server);
 			document.getElementById("demo").innerHTML = device.gattServer;
 		}
 
@@ -66,7 +132,7 @@
 		//BluetoothGATTServer methods:
 
 		function Device() {
-			document.getElementById("demo").innerHTML = server.device.deviceClass;
+			document.getElementById("demo").innerHTML = server.device;
 		}
 
 		function Connected() {
@@ -90,6 +156,70 @@
 		function GetRssi() {
 			document.getElementById("demo").innerHTML = addata.rssi;
 		}
+
+		//BluetoothCharacteristicProperties methods:
+
+		function Broadcast() {
+			document.getElementById("demo").innerHTML = properties.broadcast;
+		}
+		function Read() {
+			document.getElementById("demo").innerHTML = properties.read;
+		}
+		function WriteWithoutResponse() {
+			document.getElementById("demo").innerHTML = properties.writeWithoutResponse;
+		}
+		function Write() {
+			document.getElementById("demo").innerHTML = properties.write;
+		}
+		function Notify() {
+			document.getElementById("demo").innerHTML = properties.notify;
+		}
+		function Indicate() {
+			document.getElementById("demo").innerHTML = properties.indicate;
+		}
+		function AuthenticatedSignedWrites() {
+			document.getElementById("demo").innerHTML = properties.authenticatedSignedWrites;
+		}
+		function ReliableWrite() {
+			document.getElementById("demo").innerHTML = properties.reliableWrite;
+		}
+		function WritableAuxiliaries() {
+			document.getElementById("demo").innerHTML = properties.writableAuxiliaries;
+		}
+
+		//BluetoothGATTCharacteristic methods:
+
+		function GetProperties() {
+			document.getElementById("demo").innerHTML = characteristic.properties;
+		}
+		function GetService() {
+			document.getElementById("demo").innerHTML = characteristic.service;
+		}
+		function Uuid() {
+			document.getElementById("demo").innerHTML = characteristic.uuid;
+		}
+
+		//BluetoothGATTDescriptor methods:
+
+		function GetCharacteristic() {
+			document.getElementById("demo").innerHTML = descriptor.characteristic;
+		}
+		function Uuid() {
+			document.getElementById("demo").innerHTML = descriptor.uuid;
+		}
+
+		//BluetoothGATTService methods:
+
+		function Uuid() {
+			document.getElementById("demo").innerHTML = service.uuid;
+		}
+		function IsPrimary() {
+			document.getElementById("demo").innerHTML = service.isPrimary;
+		}
+		function GetDevice() {
+			document.getElementById("demo").innerHTML = service.device;
+		}
+
 	</script>
 	</body>
 </html>
