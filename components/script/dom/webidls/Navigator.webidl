@@ -6,7 +6,6 @@
 // https://html.spec.whatwg.org/multipage/#navigator
 interface Navigator {
   // objects implementing this interface also implement the interfaces given below
-  
 
 };
 Navigator implements NavigatorID;
@@ -20,16 +19,16 @@ Navigator implements NavigatorBluetooth;
 // https://html.spec.whatwg.org/multipage/#navigatorid
 [NoInterfaceObject/*, Exposed=Window,Worker*/]
 interface NavigatorID {
-  readonly attribute DOMString appCodeName; // constant "Mozilla"
-  readonly attribute DOMString appName;
-  readonly attribute DOMString appVersion;
-  readonly attribute DOMString platform;
-  readonly attribute DOMString product; // constant "Gecko"
-  boolean taintEnabled(); // constant false
-  readonly attribute DOMString userAgent;
+    readonly attribute DOMString appCodeName; // constant "Mozilla"
+    readonly attribute DOMString appName;
+    readonly attribute DOMString appVersion;
+    readonly attribute DOMString platform;
+    readonly attribute DOMString product; // constant "Gecko"
+    boolean taintEnabled(); // constant false
+    readonly attribute DOMString userAgent;
 };
 
 [NoInterfaceObject]
 interface NavigatorBluetooth {
-	readonly attribute Bluetooth bluetooth;
+    readonly attribute Bluetooth bluetooth;
 };

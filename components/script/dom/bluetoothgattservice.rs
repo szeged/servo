@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate uuid;
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding::BluetoothGATTServiceMethods;
 use dom::bindings::global::GlobalRef;
@@ -10,10 +11,7 @@ use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
 use util::str::DOMString;
-use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong::{eString, eUnsignedLong};
-use dom::bluetoothuuid;
 use uuid::Uuid;
-use dom::bindings::cell::DOMRefCell;
 
 #[dom_struct]
 pub struct BluetoothGATTService {
@@ -33,7 +31,11 @@ impl BluetoothGATTService {
         }
     }
 
-    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, isPrimary: bool, uuid: Uuid) -> Root<BluetoothGATTService> {
+    pub fn new(global: GlobalRef,
+               device: Option<&BluetoothDevice>,
+               isPrimary: bool,
+               uuid: Uuid)
+               -> Root<BluetoothGATTService> {
         reflect_dom_object(box BluetoothGATTService::new_inherited(
                            device,
                            isPrimary,
@@ -63,7 +65,7 @@ impl BluetoothGATTServiceMethods for BluetoothGATTService {
         DOMString::from_string(self.uuid.to_simple_string().clone())
     }
 
-    fn SetDevice(&self, device: &BluetoothDevice){
+    fn SetDevice(&self, device: &BluetoothDevice) {
         *self.device.borrow_mut() = Some(JS::from_ref(device));
     }
 }

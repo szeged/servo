@@ -1,18 +1,16 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-use dom::bluetooth::Bluetooth;
+
 use dom::bindings::codegen::Bindings::NavigatorBinding;
 use dom::bindings::codegen::Bindings::NavigatorBinding::NavigatorMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
-//use dom::navigatorbluetooth::{NavigatorBluetooth};
+use dom::bluetooth::Bluetooth;
 use dom::navigatorinfo;
 use dom::window::Window;
 use util::str::DOMString;
-use std::cell::RefCell;
-use std::thread;
 
 #[dom_struct]
 pub struct Navigator {
@@ -70,7 +68,7 @@ impl NavigatorMethods for Navigator {
     fn AppVersion(&self) -> DOMString {
         navigatorinfo::AppVersion()
     }
-
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-navigator-bluetooth
     fn Bluetooth(&self) -> Root<Bluetooth> {
         Root::from_ref(&*self.bluetooth)
     }

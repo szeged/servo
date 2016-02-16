@@ -3797,20 +3797,11 @@ class CGUnionConversionStruct(CGThing):
                 other.append(booleanConversion[0])
             if hasObjectTypes:
                 if object:
-                    conversions.append(CGWrapper(
-                        CGList(other,"\n\n"),
-                        pre="else {\n",
-                        post="\n}"))
+                    conversions.append(CGWrapper(CGList(other, "\n\n"), pre="else {\n", post="\n}"))
                 else:
-                    conversions.append(CGWrapper(
-                        CGList(other,"\n\n"),
-                        pre="",
-                        post=""))
-            else: 
-                conversions.append(CGWrapper(
-                        CGList(other,"\n\n"),
-                        pre="",
-                        post=""))
+                    conversions.append(CGWrapper(CGList(other, "\n\n"), pre="", post=""))
+            else:
+                conversions.append(CGWrapper(CGList(other, "\n\n"), pre="", post=""))
 
         conversions.append(CGGeneric(
             "throw_not_in_union(cx, \"%s\");\n"
