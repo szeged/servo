@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding::BluetoothGATTRemoteServerMethods;
 use dom::bindings::global::GlobalRef;
@@ -9,7 +10,6 @@ use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
 use std::cell::Cell;
-use dom::bindings::cell::DOMRefCell;
 
 #[dom_struct]
 pub struct BluetoothGATTRemoteServer {
@@ -27,19 +27,16 @@ impl BluetoothGATTRemoteServer {
         }
     }
 
-    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, connected: bool) -> Root<BluetoothGATTRemoteServer> {
+    pub fn new(global: GlobalRef,
+               device: Option<&BluetoothDevice>,
+               connected: bool)
+               -> Root<BluetoothGATTRemoteServer> {
         reflect_dom_object(box BluetoothGATTRemoteServer::new_inherited(
                            device,
                            connected),
         global,
         BluetoothGATTRemoteServerBinding::Wrap)
     }
-
-    
-    /*pub fn setDevice(&mut self, device: &BluetoothDevice) -> Root<BluetoothGATTRemoteServer>{
-        self.device = Some(JS::from_ref(device));
-        Root::from_ref(&self)
-    }*/
 }
 
 impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
@@ -56,7 +53,7 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
     fn Connected(&self) -> bool {
         self.connected.get()
     }
-
+    //https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-connect
     fn Connect(&self) -> () {
         //FIXME
     }
@@ -68,7 +65,7 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
             ()
     }
 
-    fn SetDevice(&self, device: &BluetoothDevice){
+    fn SetDevice(&self, device: &BluetoothDevice) {
         *self.device.borrow_mut() = Some(JS::from_ref(device));
     }
 }

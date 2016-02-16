@@ -6,10 +6,10 @@
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetooth
 
 interface Bluetooth {
-	// TODO(dati) use Promise when implemented ( https://github.com/servo/servo/issues/4282 )
-	//    Promise<BluetoothDevice> requestDevice(RequestDeviceOptions options);
-	//    BluetoothDevice requestDevice(RequestDeviceOptions options);
-	BluetoothDevice requestDevice ();
+    // TODO(dati) use Promise when implemented ( https://github.com/servo/servo/issues/4282 )
+    //Promise<BluetoothDevice> requestDevice(RequestDeviceOptions options);
+    //BluetoothDevice requestDevice(RequestDeviceOptions options);
+    BluetoothDevice requestDevice ();
 };
 
 // Bluetooth implements EventTarget;

@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{BluetoothDeviceMethods, VendorIDSource};
 use dom::bindings::global::GlobalRef;
@@ -10,9 +11,6 @@ use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use util::str::DOMString;
-use dom::bindings::cell::DOMRefCell;
-use js::jsapi::JSContext;
-use js::jsval::JSVal;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
 
@@ -128,7 +126,6 @@ impl BluetoothDeviceMethods for BluetoothDevice {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#gattserver
-
     fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
         if let Some(ref is_server) = self.gattServer.borrow().clone() {
             Some(Root::from_ref(&*is_server))
@@ -137,11 +134,11 @@ impl BluetoothDeviceMethods for BluetoothDevice {
         }
     }
 
-    fn SetGattServer(&self, server: &BluetoothGATTRemoteServer){
+    fn SetGattServer(&self, server: &BluetoothGATTRemoteServer) {
         *self.gattServer.borrow_mut() = Some(JS::from_ref(server));
     }
 
-    fn SetAdData(&self, addata: &BluetoothAdvertisingData){
+    fn SetAdData(&self, addata: &BluetoothAdvertisingData) {
         *self.adData.borrow_mut() = Some(JS::from_ref(addata));
     }
 
