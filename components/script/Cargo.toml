@@ -12,6 +12,9 @@ path = "lib.rs"
 [features]
 debugmozjs = ['js/debugmozjs']
 
+[dependencies.blurz]
+git = "https://github.com/dati91/blurz"
+
 [dependencies.plugins]
 path = "../plugins"
 

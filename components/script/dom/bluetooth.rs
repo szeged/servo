@@ -7,7 +7,7 @@ use dom::bindings::codegen::Bindings::BluetoothBinding::BluetoothMethods;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{VendorIDSource};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothcharacteristicproperties::BluetoothCharacteristicProperties;
 use dom::bluetoothdevice::BluetoothDevice;
@@ -17,6 +17,9 @@ use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use dom::bluetoothgattservice::BluetoothGATTService;
 use util::str::DOMString;
 use uuid::Uuid;
+
+use blurz::bluetooth_adapter::BluetoothAdapter as BTAdapter;
+use blurz::bluetooth_device::BluetoothDevice as BTDevice;
 
 #[dom_struct]
 pub struct Bluetooth {
@@ -85,7 +88,23 @@ impl Bluetooth {
 
 impl BluetoothMethods for Bluetooth {
 //https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice
-    fn RequestDevice(&self) -> Root<BluetoothDevice> {
+    /*fn RequestMockDevice(&self) -> Root<BluetoothDevice> {
         Root::from_ref(&*self.mockDevice)
+    }*/
+
+    fn RequestDevice(&self) -> Root<BluetoothDevice> {
+        let adapter: BTAdapter = BTAdapter::init().unwrap();
+        let device: BTDevice = adapter.get_first_device().unwrap();
+        BluetoothDevice::new(self.global().r(),
+                             DOMString::from(device.address()),
+                             DOMString::from(device.name()),
+                             None,
+                             device.class(),
+                             VendorIDSource::Bluetooth,
+                             device.vendor_id(),
+                             device.product_id(),
+                             device.product_version(),
+                             None,
+                             )
     }
 }
