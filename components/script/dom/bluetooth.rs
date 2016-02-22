@@ -18,8 +18,8 @@ use dom::bluetoothgattservice::BluetoothGATTService;
 use util::str::DOMString;
 use uuid::Uuid;
 
-use blurz::bluetooth_adapter::BluetoothAdapter as BTAdapter;
-use blurz::bluetooth_device::BluetoothDevice as BTDevice;
+use device::bluetooth::BluetoothAdapter as BTAdapter;
+use device::bluetooth::BluetoothDevice as BTDevice;
 
 #[dom_struct]
 pub struct Bluetooth {
@@ -93,17 +93,18 @@ impl BluetoothMethods for Bluetooth {
     }*/
 
     fn RequestDevice(&self) -> Root<BluetoothDevice> {
-        let adapter: BTAdapter = BTAdapter::init().unwrap();
-        let device: BTDevice = adapter.get_first_device().unwrap();
+        let adapter: BTAdapter = BTAdapter::create_adapter();
+        let devices: Vec<BTDevice> = adapter.get_devices();
+        let device: &BTDevice = devices.get(0).unwrap();
         BluetoothDevice::new(self.global().r(),
-                             DOMString::from(device.address()),
-                             DOMString::from(device.name()),
+                             DOMString::from(device.get_address()),
+                             DOMString::from(device.get_name()),
                              None,
-                             device.class(),
+                             device.get_class(),
                              VendorIDSource::Bluetooth,
-                             device.vendor_id(),
-                             device.product_id(),
-                             device.product_version(),
+                             device.get_vendor_id(),
+                             device.get_product_id(),
+                             device.get_product_version(),
                              None,
                              )
     }

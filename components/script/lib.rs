@@ -32,7 +32,7 @@ extern crate angle;
 extern crate app_units;
 #[macro_use]
 extern crate bitflags;
-extern crate blurz;
+extern crate device;
 extern crate canvas;
 extern crate canvas_traits;
 extern crate caseless;
