@@ -97,8 +97,13 @@ impl BluetoothAdapter {
     }
 
     #[cfg(target_os = "linux")]
-    pub fn set_address(&self) {
+    pub fn get_alias(&self) -> String {
+        self.get_adapter().get_alias()
+    }
 
+    #[cfg(target_os = "linux")]
+    pub fn set_alias(&self, value: String) {
+        self.get_adapter().set_alias(value);
     }
 
     #[cfg(target_os = "linux")]
@@ -113,27 +118,27 @@ impl BluetoothAdapter {
 
     #[cfg(target_os = "linux")]
     pub fn is_powered(&self) -> bool {
-        false
+        self.get_adapter().is_powered()
     }
 
     #[cfg(target_os = "linux")]
-    pub fn set_powered(&self) {
-
+    pub fn set_powered(&self, value: bool) {
+        self.get_adapter().set_powered(value);
     }
 
     #[cfg(target_os = "linux")]
     pub fn is_discoverable(&self) -> bool {
-        false
+        self.get_adapter().is_discoverable()
     }
 
     #[cfg(target_os = "linux")]
-    pub fn set_discoverable(&self) {
-
+    pub fn set_discoverable(&self, value: bool) {
+        self.get_adapter().set_discoverable(value);
     }
 
     #[cfg(target_os = "linux")]
     pub fn is_discovering(&self) -> bool {
-        false
+        self.get_adapter().is_discovering()
     }
 
     #[cfg(target_os = "linux")]
@@ -212,49 +217,53 @@ impl BluetoothDevice {
     }
 
     #[cfg(target_os = "linux")]
-    pub fn get_product_version(&self) -> u32 {
-        self.get_device().get_product_version()
-    }
-
     pub fn get_device_id(&self) -> u32 {
-        //self.get_device().get_device_id()
-        0u32
+        self.get_device().get_device_id()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn is_pairable(&self) -> bool {
-        false
+        self.get_device().is_pairable()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn is_paired(&self) -> bool {
-        false
+        self.get_device().is_paired()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn is_connectable(&self) -> bool {
-        false
+        self.get_device().is_connectable()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn is_connected(&self) -> bool {
-        false
+        self.get_device().is_connected()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn is_trustable(&self) -> bool {
-        false
+        self.get_device().is_trustable()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn get_uuids(&self) -> Vec<String> {
-        Vec::new()
+        self.get_device().get_uuids()
     }
 
-    pub fn get_inqury_rssi(&self) -> i32 {
-        0
+    #[cfg(target_os = "linux")]
+    pub fn get_inquiry_rssi(&self) -> i32 {
+        self.get_device().get_rssi()
     }
 
+    #[cfg(target_os = "linux")]
     pub fn get_inquiry_tx_power(&self) -> i32 {
         0
     }
 
+    #[cfg(target_os = "linux")]
     pub fn create_gatt_connection(&self) {
-
+        self.get_device().connect();
     }
 }
 
