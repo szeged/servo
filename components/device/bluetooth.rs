@@ -6,6 +6,10 @@
 use blurz::bluetooth_adapter::BluetoothAdapter as BluetoothAdapterBluez;
 #[cfg(target_os = "linux")]
 use blurz::bluetooth_device::BluetoothDevice as BluetoothDeviceBluez;
+#[cfg(target_os = "linux")]
+use blurz::bluetooth_gatt_service::BluetoothGATTService as BluetoothGATTServiceBluez;
+#[cfg(target_os = "linux")]
+use blurz::bluetooth_gatt_characteristic::BluetoothGATTCharacteristic as BluetoothGATTCharacteristicBluez;
 
 #[derive(Clone, Debug)]
 pub struct BluetoothAdapter {
@@ -25,7 +29,7 @@ pub struct BluetoothDevice {
 
 #[derive(Debug)]
 struct BluetoothDiscoverySession<'a> {
-    adapter: &'a BluetoothAdapter
+    adapter: &'a BluetoothAdapter,
 }
 
 #[derive(Debug)]
@@ -33,6 +37,19 @@ struct BluetoothDiscoveryFilter {
     rssi: i16,
     pathloss: u16,
 }
+
+#[derive(Clone, Debug)]
+pub struct BluetoothGATTService {
+    #[cfg(target_os = "linux")]
+    gatt_service: BluetoothGATTServiceBluez,
+}
+
+#[derive(Clone, Debug)]
+pub struct BluetoothGATTCharacteristic {
+    #[cfg(target_os = "linux")]
+    gatt_characteristic: BluetoothGATTCharacteristicBluez,
+}
+
 
 impl BluetoothAdapter {
     #[cfg(target_os = "linux")]
@@ -253,7 +270,8 @@ impl BluetoothDevice {
 
     #[cfg(target_os = "linux")]
     pub fn get_inquiry_rssi(&self) -> i32 {
-        self.get_device().get_rssi()
+        //self.get_device().get_rssi()
+        0
     }
 
     #[cfg(target_os = "linux")]
@@ -265,5 +283,59 @@ impl BluetoothDevice {
     pub fn create_gatt_connection(&self) {
         self.get_device().connect();
     }
+
+    pub fn get_gatt_services(&self) -> Vec<BluetoothGATTService> {
+        let services = self.device.get_gatt_services();
+        let mut v: Vec<BluetoothGATTService> = Vec::new();
+        for service in services {
+            v.push(BluetoothGATTService::new(
+                BluetoothGATTServiceBluez::new(service.clone())));
+        }
+        v
+    }
 }
 
+impl BluetoothGATTService {
+    pub fn new(gatt_service: BluetoothGATTServiceBluez)
+           -> BluetoothGATTService {
+        BluetoothGATTService {
+            gatt_service: gatt_service
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn get_gatt_service(&self) -> BluetoothGATTServiceBluez {
+        self.gatt_service.clone()
+    }
+
+    #[cfg(target_os = "linux")]
+    pub fn get_characteristics(&self) -> Vec<BluetoothGATTCharacteristic> {
+        let characteristics = self.get_gatt_service().get_characteristics();
+        let mut v: Vec<BluetoothGATTCharacteristic> = Vec::new();
+        for characteristic in characteristics {
+            v.push(BluetoothGATTCharacteristic::new(
+                BluetoothGATTCharacteristicBluez::new(characteristic.clone())));
+        }
+        v
+    }
+}
+
+impl BluetoothGATTCharacteristic {
+    pub fn new(gatt_characteristic: BluetoothGATTCharacteristicBluez)
+           -> BluetoothGATTCharacteristic {
+        BluetoothGATTCharacteristic {
+            gatt_characteristic: gatt_characteristic
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn get_gatt_characteristic(&self) -> BluetoothGATTCharacteristicBluez {
+        self.gatt_characteristic.clone()
+    }
+
+    #[cfg(target_os = "linux")]
+    pub fn read_value(&self) -> u8 {
+        self.get_gatt_characteristic().read_value()
+    }
+
+}

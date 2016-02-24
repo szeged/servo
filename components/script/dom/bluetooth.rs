@@ -104,7 +104,7 @@ impl BluetoothMethods for Bluetooth {
                              VendorIDSource::Bluetooth,
                              device.get_vendor_id(),
                              device.get_product_id(),
-                             device.get_product_version(),
+                             device.get_device_id(),
                              None,
                              )
     }
