@@ -23,6 +23,7 @@ interface BluetoothDevice {
     readonly attribute BluetoothGATTRemoteServer? gattServer;
     void SetAdData(BluetoothAdvertisingData addata);
     void SetGattServer(BluetoothGATTRemoteServer server);
+    BluetoothGATTRemoteServer CreateGattServer(boolean connected);
     //readonly attribute UUID[] uuids;
-    //boolean connectGATT();
+    boolean connectGATT();
 };

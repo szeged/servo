@@ -3784,25 +3784,18 @@ class CGUnionConversionStruct(CGThing):
             booleanConversion = map(getStringOrPrimitiveConversion, booleanTypes)
             if stringConversion:
                 if booleanConversion:
-                    other.append(booleanConversion[0])
+                    other.append(CGIfWrapper("value.get().is_boolean()", booleanConversion[0]))
                 if numericConversion:
-                    other.append(numericConversion[0])
+                    other.append(CGIfWrapper("value.get().is_number()", numericConversion[0]))
                 other.append(stringConversion[0])
             elif numericConversion:
                 if booleanConversion:
-                    other.append(booleanConversion[0])
+                    other.append(CGIfWrapper("value.get().is_boolean()", booleanConversion[0]))
                 other.append(numericConversion[0])
             else:
                 assert booleanConversion
                 other.append(booleanConversion[0])
-            if hasObjectTypes:
-                if object:
-                    conversions.append(CGWrapper(CGList(other, "\n\n"), pre="else {\n", post="\n}"))
-                else:
-                    conversions.append(CGWrapper(CGList(other, "\n\n"), pre="", post=""))
-            else:
-                conversions.append(CGWrapper(CGList(other, "\n\n"), pre="", post=""))
-
+            conversions.append(CGList(other,"\n\n"))
         conversions.append(CGGeneric(
             "throw_not_in_union(cx, \"%s\");\n"
             "Err(())" % ", ".join(names)))

@@ -11,6 +11,7 @@ interface BluetoothGATTService {
     readonly attribute UUID uuid;
 
     void SetDevice(BluetoothDevice device);
+    BluetoothGATTCharacteristic getCharacteristic();
     //Promise<BluetoothGATTCharacteristic>getCharacteristic(BluetoothCharacteristicUUID characteristic);
     //Promise<sequence<BluetoothGATTCharacteristic>>
     //getCharacteristics(optional BluetoothCharacteristicUUID characteristic);
