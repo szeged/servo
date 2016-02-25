@@ -32,12 +32,12 @@ extern crate angle;
 extern crate app_units;
 #[macro_use]
 extern crate bitflags;
-extern crate device;
 extern crate canvas;
 extern crate canvas_traits;
 extern crate caseless;
 extern crate core;
 extern crate cssparser;
+extern crate device;
 extern crate devtools_traits;
 extern crate encoding;
 extern crate euclid;

@@ -9,7 +9,6 @@ use dom::bindings::js::Root;
 use dom::bindings::reflector::{Reflector, reflect_dom_object};
 
 // https://webbluetoothcg.github.io/web-bluetooth/#characteristicproperties
-
  #[dom_struct]
 pub struct BluetoothCharacteristicProperties {
     reflector_: Reflector,

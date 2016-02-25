@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTDescriptorBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTDescriptorBinding::BluetoothGATTDescriptorMethods;
 use dom::bindings::global::GlobalRef;
@@ -10,10 +11,8 @@ use dom::bindings::reflector::{Reflector, reflect_dom_object};
 use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
 use util::str::DOMString;
 use uuid::Uuid;
-use dom::bindings::cell::DOMRefCell;
 
 // http://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattdescriptor
-
 #[dom_struct]
 pub struct BluetoothGATTDescriptor {
     reflector_: Reflector,
@@ -45,6 +44,7 @@ impl BluetoothGATTDescriptor {
 }
 
 impl BluetoothGATTDescriptorMethods for BluetoothGATTDescriptor {
+
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattdescriptor-characteristic
     fn GetCharacteristic(&self) -> Option<Root<BluetoothGATTCharacteristic>> {
         if let Some(ref is_characteristic) = self.characteristic.borrow().clone() {
@@ -58,8 +58,8 @@ impl BluetoothGATTDescriptorMethods for BluetoothGATTDescriptor {
     fn Uuid(&self) -> DOMString {
         DOMString::from_string(self.uuid.to_string())
     }
-
-    fn SetCharacteristic(&self, characteristic: &BluetoothGATTCharacteristic){
+    // https://webbluetoothcg.github.io/web-bluetooth/#create-a-bluetoothremotegattdescriptor-representing
+    fn SetCharacteristic(&self, characteristic: &BluetoothGATTCharacteristic) {
         *self.characteristic.borrow_mut() = Some(JS::from_ref(characteristic));
     }
 }

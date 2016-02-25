@@ -3795,7 +3795,7 @@ class CGUnionConversionStruct(CGThing):
             else:
                 assert booleanConversion
                 other.append(booleanConversion[0])
-            conversions.append(CGList(other,"\n\n"))
+            conversions.append(CGList(other, "\n\n"))
         conversions.append(CGGeneric(
             "throw_not_in_union(cx, \"%s\");\n"
             "Err(())" % ", ".join(names)))

@@ -13,9 +13,7 @@ interface BluetoothGATTCharacteristic {
 
   void SetProperties(BluetoothCharacteristicProperties properties);
   void SetService(BluetoothGATTService service);
-  
   // TODO(fokinv) use Promise when implemented ( https://github.com/servo/servo/issues/4282 )
-
   //Promise<BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
   //Promise<sequence<BluetoothGATTDescriptor>>
   //getDescriptors(optional BluetoothDescriptorUUID descriptor);

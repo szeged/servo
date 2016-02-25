@@ -7,9 +7,9 @@ use blurz::bluetooth_adapter::BluetoothAdapter as BluetoothAdapterBluez;
 #[cfg(target_os = "linux")]
 use blurz::bluetooth_device::BluetoothDevice as BluetoothDeviceBluez;
 #[cfg(target_os = "linux")]
-use blurz::bluetooth_gatt_service::BluetoothGATTService as BluetoothGATTServiceBluez;
-#[cfg(target_os = "linux")]
 use blurz::bluetooth_gatt_characteristic::BluetoothGATTCharacteristic as BluetoothGATTCharacteristicBluez;
+#[cfg(target_os = "linux")]
+use blurz::bluetooth_gatt_service::BluetoothGATTService as BluetoothGATTServiceBluez;
 
 #[derive(Clone, Debug)]
 pub struct BluetoothAdapter {

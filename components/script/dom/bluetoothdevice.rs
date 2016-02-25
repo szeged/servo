@@ -2,22 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{BluetoothDeviceMethods, VendorIDSource};
+use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding;
+use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding::BluetoothGATTRemoteServerMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
 use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
 use util::str::DOMString;
-use dom::bindings::cell::DOMRefCell;
-use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding;
-use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding::BluetoothGATTRemoteServerMethods;
-
-
-// https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
 
 pub type Uuid = DOMString;
+
+// https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice
 #[dom_struct]
 pub struct BluetoothDevice {
     reflector_: Reflector,
@@ -84,6 +83,7 @@ impl BluetoothDevice {
 }
 
 impl BluetoothDeviceMethods for BluetoothDevice {
+
      // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id
     fn Id(&self) -> DOMString {
         self.id.clone()
@@ -129,7 +129,6 @@ impl BluetoothDeviceMethods for BluetoothDevice {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#gattserver
-
     fn GetGattServer(&self) -> Option<Root<BluetoothGATTRemoteServer>> {
         if let Some(ref is_server) = self.gattServer.borrow().clone() {
             Some(Root::from_ref(&*is_server))
@@ -138,27 +137,29 @@ impl BluetoothDeviceMethods for BluetoothDevice {
         }
     }
 
-    fn SetGattServer(&self, server: &BluetoothGATTRemoteServer){
+    // https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing
+    fn SetGattServer(&self, server: &BluetoothGATTRemoteServer) {
         *self.gattServer.borrow_mut() = Some(JS::from_ref(server));
     }
 
-    fn SetAdData(&self, addata: &BluetoothAdvertisingData){
+    // https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing
+    fn SetAdData(&self, addata: &BluetoothAdvertisingData) {
         *self.adData.borrow_mut() = Some(JS::from_ref(addata));
     }
 
-    fn CreateGattServer(&self, connected: bool) -> Root<BluetoothGATTRemoteServer>{
+    // https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing
+    fn CreateGattServer(&self, connected: bool) -> Root<BluetoothGATTRemoteServer> {
       BluetoothGATTRemoteServer::new(self.global().r(),
                                      Some(self),
                                      connected)
     }
-
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-connect
     fn ConnectGATT(&self) -> bool {
-        //FIXME
         match self.gattServer.borrow().clone() {
             None => false,
             Some(ref server) => {
                 (*server).Connect();
-                    true},
+                    true },
         }
     }
 }

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use device::bluetooth::BluetoothAdapter as BTAdapter;
+use device::bluetooth::BluetoothDevice as BTDevice;
 use dom::bindings::codegen::Bindings::BluetoothBinding;
 use dom::bindings::codegen::Bindings::BluetoothBinding::BluetoothMethods;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{VendorIDSource};
@@ -13,9 +15,7 @@ use dom::bluetoothdevice::BluetoothDevice;
 use dom::bluetoothuuid::BluetoothUUID;
 use util::str::DOMString;
 
-use device::bluetooth::BluetoothAdapter as BTAdapter;
-use device::bluetooth::BluetoothDevice as BTDevice;
-
+// https://webbluetoothcg.github.io/web-bluetooth/#bluetooth
 #[dom_struct]
 pub struct Bluetooth {
     reflector_: Reflector,
@@ -23,9 +23,8 @@ pub struct Bluetooth {
 
 impl Bluetooth {
     pub fn new_inherited() -> Bluetooth {
-
         Bluetooth {
-        reflector_: Reflector::new(),
+            reflector_: Reflector::new(),
         }
     }
 
@@ -39,6 +38,7 @@ impl Bluetooth {
 
 impl BluetoothMethods for Bluetooth {
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice
     fn RequestDevice(&self) -> Root<BluetoothDevice> {
         let adapter: BTAdapter = BTAdapter::create_adapter();
         let devices: Vec<BTDevice> = adapter.get_devices();
@@ -56,16 +56,18 @@ impl BluetoothMethods for Bluetooth {
                              )
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice
+    // FIXME: This method is only for test purposes!(zakorgy)
     fn CreateDevice(&self,
                     device_id: DOMString,
                     device_name: DOMString,
-                    //ad_data: egyenlőre legyen None
+                    //ad_data: None
                     device_class: u32,
                     vendor_id_source_string: DOMString,
                     vendor_id: u32,
                     product_id: u32,
                     product_version: u32
-                    //gattServer: itt is None
+                    //gattServer: None
                     ) -> Root<BluetoothDevice> {
         let vendor_id_source = match vendor_id_source_string.trim() {
             "Bluetooth" => VendorIDSource::Bluetooth,
@@ -86,18 +88,22 @@ impl BluetoothMethods for Bluetooth {
                                              ))
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#example-d5112950
     fn CanonicalTest(&self, alias: u32) -> DOMString {
         BluetoothUUID::CanonicalUUID(self.global().r(), alias)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#example-d5112950
     fn GetServiceTest(&self, name: StringOrUnsignedLong) -> DOMString {
         BluetoothUUID::GetService(self.global().r(), name)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#example-d5112950
     fn GetCharacteristicTest(&self, name: StringOrUnsignedLong) -> DOMString {
-        BluetoothUUID::GetCharacteristic(self.global().r(), name)   
+        BluetoothUUID::GetCharacteristic(self.global().r(), name)
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#example-d5112950
     fn GetDescriptorTest(&self, name: StringOrUnsignedLong) -> DOMString {
         BluetoothUUID::GetDescriptor(self.global().r(), name)
     }

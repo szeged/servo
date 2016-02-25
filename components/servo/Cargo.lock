@@ -131,6 +131,14 @@ version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "blurz"
+version = "0.1.0"
+source = "git+https://github.com/dati91/blurz#2380c7b83b08d3edb3299459ac791f3b6c3923c2"
+dependencies = [
+ "dbus 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "brotli"
 version = "0.3.20"
 source = "git+https://github.com/ende76/brotli-rs#c243045b88b2d2924c35269586fa9b770184c74c"
@@ -338,6 +346,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dbus"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pkg-config 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "debug-builders"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -348,6 +365,13 @@ version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "unreachable 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "device"
+version = "0.0.1"
+dependencies = [
+ "blurz 0.1.0 (git+https://github.com/dati91/blurz)",
 ]
 
 [[package]]
@@ -1510,6 +1534,7 @@ dependencies = [
  "canvas_traits 0.0.1",
  "caseless 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cssparser 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "device 0.0.1",
  "devtools_traits 0.0.1",
  "encoding 0.2.32 (registry+https://github.com/rust-lang/crates.io-index)",
  "euclid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",

@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate uuid;
+use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding::BluetoothGATTServiceMethods;
 use dom::bindings::global::GlobalRef;
@@ -12,8 +13,8 @@ use dom::bluetoothdevice::BluetoothDevice;
 use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
 use util::str::DOMString;
 use uuid::Uuid;
-use dom::bindings::cell::DOMRefCell;
 
+// https://webbluetoothcg.github.io/web-bluetooth/#bluetoothremotegattservice
 #[dom_struct]
 pub struct BluetoothGATTService {
     reflector_: Reflector,
@@ -62,18 +63,20 @@ impl BluetoothGATTServiceMethods for BluetoothGATTService {
         DOMString::from_string(self.uuid.to_simple_string().clone())
     }
 
-    fn SetDevice(&self, device: &BluetoothDevice){
+    // https://webbluetoothcg.github.io/web-bluetooth/#create-a-bluetoothremotegattservice-representing
+    fn SetDevice(&self, device: &BluetoothDevice) {
         *self.device.borrow_mut() = Some(JS::from_ref(device));
     }
 
-    fn GetCharacteristic(&self) -> Root<BluetoothGATTCharacteristic> {;
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattservice-getcharacteristic
+    fn GetCharacteristic(&self) -> Root<BluetoothGATTCharacteristic> {
         let uuid: Uuid = Uuid::new_v4(); //<- ennek a mezőnek kellene valahogy értéket adni
                                          //stringet tudunk castolni BluetoothUUID::GetService()-el
                                          //DOMString-re amiből már lehet Uuid-t csinálni
         BluetoothGATTCharacteristic::new(self.global().r(),
-                                  Some(self),                                  
+                                  Some(self),
                                   uuid,
-                                  None                                 
+                                  None
                                   )
 
     }
