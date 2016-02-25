@@ -2,11 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::reflector::Reflector;
-use regex::Regex;
+use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
+//use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong::{eString, eUnsignedLong};
 use util::str::DOMString;
+//use std::fmt::LowerHex;
+use regex::Regex;
+//use dom::domexception::{DOMException, DOMErrorName};
+//use dom::bindings::js;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothuuid
 
@@ -18,43 +22,45 @@ pub struct BluetoothUUID {
 }
 
 
-const BLUETOOTH_ASSIGNED_SERVICES: &'static [(&'static str, u32)] = &[
-//TODO(zakorgy) create all the services
-//https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
-    ("org.bluetooth.service.alert_notification", 0x1811u32),
-    ("org.bluetooth.service.automation_io", 0x1815u32),
+const BLUETOOTH_ASSIGNED_SERVICES: &'static [(&'static str,u32)] = &[
+    //TODO(zakorgy) create all the services 
+    //https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
+    ("org.bluetooth.service.alert_notification",0x1811_u32),
+    ("org.bluetooth.service.automation_io",0x1815_u32),
+    ("org.bluetooth.service.battery_service",0x180f_u32),
     ];
 
-const BLUETOOTH_ASSIGNED_CHARCTERISTICS: &'static [(&'static str, u32)] = &[
-//TODO(zakorgy) create all the characteristics
-//https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
-    ("org.bluetooth.characteristic.aerobic_heart_rate_lower_limit", 0x2A7Eu32),
-    ("org.bluetooth.characteristic.aerobic_heart_rate_upper_limit", 0x2A84u32),
+const BLUETOOTH_ASSIGNED_CHARCTERISTICS: &'static [(&'static str,u32)] = &[
+    //TODO(zakorgy) create all the characteristics 
+    //https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
+    ("org.bluetooth.characteristic.aerobic_heart_rate_lower_limit",0x2a7e_u32),
+    ("org.bluetooth.characteristic.aerobic_heart_rate_upper_limit",0x2a84_u32),
+    ("org.bluetooth.characteristic.battery_level",0x2a19_u32),
     ];
 
-const BLUETOOTH_ASSIGNED_DESCRIPTORS: &'static [(&'static str, u32)] = &[
-//TODO(zakorgy) create all the descriptors
-//https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
-    ("org.bluetooth.descriptor.gatt.characteristic_extended_properties", 0x2900u32),
-    ("org.bluetooth.descriptor.gatt.characteristic_user_description", 0x2901u32),
+const BLUETOOTH_ASSIGNED_DESCRIPTORS: &'static [(&'static str,u32)] = &[
+    //TODO(zakorgy) create all the descriptors 
+    //https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
+    ("org.bluetooth.descriptor.gatt.characteristic_extended_properties",0x2900_u32),
+    ("org.bluetooth.descriptor.gatt.characteristic_user_description",0x2901_u32),
     ];
 
 
 impl BluetoothUUID {
-    pub fn CanonicalUUID(_: GlobalRef, _alias: u32) -> UUID {
+    pub fn CanonicalUUID(_: GlobalRef, alias: u32) -> UUID {
         let mut base_uuid = DOMString::from("00000000-0000-1000-8000-00805f9b34fb");
         base_uuid =  DOMString::from_string(base_uuid.
-                                           replace("00000000", &*format!("{:08x}", &_alias)));
+                                           replace("00000000",&*format!("{:08x}",&alias)));
         base_uuid
     }
 
     pub fn GetService(globalref: GlobalRef,
                       name: StringOrUnsignedLong)
                       -> UUID {
-        BluetoothUUID::ResolveUUIDName(globalref,
+      BluetoothUUID::ResolveUUIDName(globalref,
                                        name,
                                        BLUETOOTH_ASSIGNED_SERVICES,
-                                       DOMString::from("org.bluetooth.service"))
+                                       DOMString::from("org.bluetooth.service") )
     }
 
     pub fn GetCharacteristic(globalref: GlobalRef,
@@ -63,7 +69,7 @@ impl BluetoothUUID {
         BluetoothUUID::ResolveUUIDName(globalref,
                                        name,
                                        BLUETOOTH_ASSIGNED_CHARCTERISTICS,
-                                       DOMString::from("org.bluetooth.characteristic"))
+                                       DOMString::from("org.bluetooth.characteristic") )
     }
 
 
@@ -73,13 +79,13 @@ impl BluetoothUUID {
         BluetoothUUID::ResolveUUIDName(globalref,
                                        name,
                                        BLUETOOTH_ASSIGNED_DESCRIPTORS,
-                                       DOMString::from("org.bluetooth.descriptor"))
+                                       DOMString::from("org.bluetooth.descriptor") )
     }
 
     pub fn ResolveUUIDName(globalref: GlobalRef,
                            name: StringOrUnsignedLong,
-                           assigned_numbers_table: &'static [(&'static str, u32)],
-                           prefix: DOMString
+                           assigned_numbers_table: &'static [(&'static str,u32)],
+                           prefix: DOMString 
                            ) -> DOMString {
 
         match name {
@@ -92,13 +98,15 @@ impl BluetoothUUID {
                 if regex.is_match(&*dstring) {
                     dstring
                 } else {
-                    let concatenated = format!("{}.{}", dstring, prefix);
+                    let concatenated = format!("{}.{}",prefix,dstring);
                     let mut is_in_table = false;
-                    let mut service_number: u32 = 0x00000000_u32;
+                    let mut service_number:u32 = 0x00000000_u32;
                     for service in assigned_numbers_table {
+
                         if service.0 == concatenated {
                             is_in_table = true;
                             service_number = service.1;
+                            break;
                         }
                     }
                     if is_in_table {

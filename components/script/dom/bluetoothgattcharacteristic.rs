@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTCharacteristicBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTCharacteristicBinding::BluetoothGATTCharacteristicMethods;
 use dom::bindings::global::GlobalRef;
@@ -12,6 +11,7 @@ use dom::bluetoothcharacteristicproperties::BluetoothCharacteristicProperties;
 use dom::bluetoothgattservice::BluetoothGATTService;
 use util::str::DOMString;
 use uuid::Uuid;
+use dom::bindings::cell::DOMRefCell;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothgattcharacteristic
 
@@ -75,11 +75,11 @@ impl BluetoothGATTCharacteristicMethods for BluetoothGATTCharacteristic {
         DOMString::from_string(self.uuid.to_string().clone())
     }
 
-    fn SetProperties(&self, properties: &BluetoothCharacteristicProperties) {
+    fn SetProperties(&self, properties: &BluetoothCharacteristicProperties){
         *self.properties.borrow_mut() = Some(JS::from_ref(properties));
     }
 
-    fn SetService(&self, service: &BluetoothGATTService) {
+    fn SetService(&self, service: &BluetoothGATTService){
         *self.service.borrow_mut() = Some(JS::from_ref(service));
     }
 }

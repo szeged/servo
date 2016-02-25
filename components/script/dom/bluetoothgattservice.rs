@@ -3,15 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate uuid;
-use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTServiceBinding::BluetoothGATTServiceMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::reflector::{Reflector, Reflectable, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
+use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
 use util::str::DOMString;
 use uuid::Uuid;
+use dom::bindings::cell::DOMRefCell;
 
 #[dom_struct]
 pub struct BluetoothGATTService {
@@ -31,11 +32,7 @@ impl BluetoothGATTService {
         }
     }
 
-    pub fn new(global: GlobalRef,
-               device: Option<&BluetoothDevice>,
-               isPrimary: bool,
-               uuid: Uuid)
-               -> Root<BluetoothGATTService> {
+    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, isPrimary: bool, uuid: Uuid) -> Root<BluetoothGATTService> {
         reflect_dom_object(box BluetoothGATTService::new_inherited(
                            device,
                            isPrimary,
@@ -65,7 +62,19 @@ impl BluetoothGATTServiceMethods for BluetoothGATTService {
         DOMString::from_string(self.uuid.to_simple_string().clone())
     }
 
-    fn SetDevice(&self, device: &BluetoothDevice) {
+    fn SetDevice(&self, device: &BluetoothDevice){
         *self.device.borrow_mut() = Some(JS::from_ref(device));
+    }
+
+    fn GetCharacteristic(&self) -> Root<BluetoothGATTCharacteristic> {;
+        let uuid: Uuid = Uuid::new_v4(); //<- ennek a mezőnek kellene valahogy értéket adni
+                                         //stringet tudunk castolni BluetoothUUID::GetService()-el
+                                         //DOMString-re amiből már lehet Uuid-t csinálni
+        BluetoothGATTCharacteristic::new(self.global().r(),
+                                  Some(self),                                  
+                                  uuid,
+                                  None                                 
+                                  )
+
     }
 }

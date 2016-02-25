@@ -5,18 +5,13 @@
 use dom::bindings::codegen::Bindings::BluetoothBinding;
 use dom::bindings::codegen::Bindings::BluetoothBinding::BluetoothMethods;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{VendorIDSource};
+use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
 use dom::bindings::global::GlobalRef;
-use dom::bindings::js::{JS, Root};
-use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
-use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
-use dom::bluetoothcharacteristicproperties::BluetoothCharacteristicProperties;
+use dom::bindings::js::Root;
+use dom::bindings::reflector::{Reflector, Reflectable, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
-use dom::bluetoothgattcharacteristic::BluetoothGATTCharacteristic;
-use dom::bluetoothgattdescriptor::BluetoothGATTDescriptor;
-use dom::bluetoothgattremoteserver::BluetoothGATTRemoteServer;
-use dom::bluetoothgattservice::BluetoothGATTService;
+use dom::bluetoothuuid::BluetoothUUID;
 use util::str::DOMString;
-use uuid::Uuid;
 
 use device::bluetooth::BluetoothAdapter as BTAdapter;
 use device::bluetooth::BluetoothDevice as BTDevice;
@@ -24,73 +19,25 @@ use device::bluetooth::BluetoothDevice as BTDevice;
 #[dom_struct]
 pub struct Bluetooth {
     reflector_: Reflector,
-    mockDevice: JS<BluetoothDevice>,
-    mockServer: JS<BluetoothGATTRemoteServer>,
-    mockAdData: JS<BluetoothAdvertisingData>,
-    mockProperties: JS<BluetoothCharacteristicProperties>,
-    mockCharacteristic: JS<BluetoothGATTCharacteristic>,
-    mockDescriptor: JS<BluetoothGATTDescriptor>,
-    mockService: JS<BluetoothGATTService>,
 }
 
 impl Bluetooth {
-    pub fn new_inherited(global: GlobalRef) -> Bluetooth {
+    pub fn new_inherited() -> Bluetooth {
+
         Bluetooth {
         reflector_: Reflector::new(),
-        mockDevice: JS::from_ref(&BluetoothDevice::new(global,
-                                                       DOMString::from("DeviceID"),
-                                                       DOMString::from("DeviceName"),
-                                                       None,
-                                                       342_u32,
-                                                       VendorIDSource::Bluetooth,
-                                                       8543_u32,
-                                                       1100_u32,
-                                                       200_u32,
-                                                       None,
-                                                       )),
-    mockAdData: JS::from_ref(&BluetoothAdvertisingData::new(global,
-                                                            1234_u16,
-                                                            13_i8,
-                                                            69_i8)),
-    mockProperties: JS::from_ref(&BluetoothCharacteristicProperties::new(global,
-                                                                         true,
-                                                                         true,
-                                                                         false,
-                                                                         true,
-                                                                         false,
-                                                                         true,
-                                                                         false,
-                                                                         true,
-                                                                         false)),
-    mockServer: JS::from_ref(&BluetoothGATTRemoteServer::new(global,
-                                                             None,
-                                                             true)),
-    mockCharacteristic: JS::from_ref(&BluetoothGATTCharacteristic::new(global,
-                                                                       None,
-                                                                       Uuid::new_v4(),
-                                                                       None)),
-    mockDescriptor: JS::from_ref(&BluetoothGATTDescriptor::new(global,
-                                                               None,
-                                                               Uuid::new_v4())),
-    mockService: JS::from_ref(&BluetoothGATTService::new(global,
-                                                         None,
-                                                         true,
-                                                         Uuid::new_v4())),
         }
     }
 
     pub fn new(global: GlobalRef) -> Root<Bluetooth> {
-        reflect_dom_object(box Bluetooth::new_inherited(global),
+        reflect_dom_object(box Bluetooth::new_inherited(),
                            global,
                            BluetoothBinding::Wrap)
     }
+
 }
 
 impl BluetoothMethods for Bluetooth {
-//https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice
-    /*fn RequestMockDevice(&self) -> Root<BluetoothDevice> {
-        Root::from_ref(&*self.mockDevice)
-    }*/
 
     fn RequestDevice(&self) -> Root<BluetoothDevice> {
         let adapter: BTAdapter = BTAdapter::create_adapter();
@@ -107,5 +54,51 @@ impl BluetoothMethods for Bluetooth {
                              device.get_device_id(),
                              None,
                              )
+    }
+
+    fn CreateDevice(&self,
+                    device_id: DOMString,
+                    device_name: DOMString,
+                    //ad_data: egyenlőre legyen None
+                    device_class: u32,
+                    vendor_id_source_string: DOMString,
+                    vendor_id: u32,
+                    product_id: u32,
+                    product_version: u32
+                    //gattServer: itt is None
+                    ) -> Root<BluetoothDevice> {
+        let vendor_id_source = match vendor_id_source_string.trim() {
+            "Bluetooth" => VendorIDSource::Bluetooth,
+            "Usb" => VendorIDSource::Usb,
+            _ => panic!("Wrong type of vendor id seource!")
+        };
+
+        Root::from_ref(&BluetoothDevice::new(self.global().r(),
+                                             device_id,
+                                             device_name,
+                                             None,
+                                             device_class,
+                                             vendor_id_source,
+                                             vendor_id,
+                                             product_id,
+                                             product_version,
+                                             None
+                                             ))
+    }
+
+    fn CanonicalTest(&self, alias: u32) -> DOMString {
+        BluetoothUUID::CanonicalUUID(self.global().r(), alias)
+    }
+
+    fn GetServiceTest(&self, name: StringOrUnsignedLong) -> DOMString {
+        BluetoothUUID::GetService(self.global().r(), name)
+    }
+
+    fn GetCharacteristicTest(&self, name: StringOrUnsignedLong) -> DOMString {
+        BluetoothUUID::GetCharacteristic(self.global().r(), name)   
+    }
+
+    fn GetDescriptorTest(&self, name: StringOrUnsignedLong) -> DOMString {
+        BluetoothUUID::GetDescriptor(self.global().r(), name)
     }
 }

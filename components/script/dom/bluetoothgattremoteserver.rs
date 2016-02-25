@@ -2,14 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding;
 use dom::bindings::codegen::Bindings::BluetoothGATTRemoteServerBinding::BluetoothGATTRemoteServerMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, Root};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
+use dom::bluetoothgattservice::BluetoothGATTService;
 use std::cell::Cell;
+use dom::bindings::cell::DOMRefCell;
+use uuid::Uuid;
+use util::str::DOMString;
+use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{VendorIDSource};
+
+use device::bluetooth::BluetoothAdapter as BTAdapter;
+use device::bluetooth::BluetoothDevice as BTDevice;
 
 #[dom_struct]
 pub struct BluetoothGATTRemoteServer {
@@ -27,16 +34,19 @@ impl BluetoothGATTRemoteServer {
         }
     }
 
-    pub fn new(global: GlobalRef,
-               device: Option<&BluetoothDevice>,
-               connected: bool)
-               -> Root<BluetoothGATTRemoteServer> {
+    pub fn new(global: GlobalRef, device: Option<&BluetoothDevice>, connected: bool) -> Root<BluetoothGATTRemoteServer> {
         reflect_dom_object(box BluetoothGATTRemoteServer::new_inherited(
                            device,
                            connected),
         global,
         BluetoothGATTRemoteServerBinding::Wrap)
     }
+
+    
+    /*pub fn setDevice(&mut self, device: &BluetoothDevice) -> Root<BluetoothGATTRemoteServer>{
+        self.device = Some(JS::from_ref(device));
+        Root::from_ref(&self)
+    }*/
 }
 
 impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
@@ -53,9 +63,11 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
     fn Connected(&self) -> bool {
         self.connected.get()
     }
-    //https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-connect
+
     fn Connect(&self) -> () {
-        //FIXME
+        if !self.connected.get() {
+            self.connected.set(true); 
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothgattremoteserver-disconnect
@@ -65,7 +77,31 @@ impl BluetoothGATTRemoteServerMethods for BluetoothGATTRemoteServer {
             ()
     }
 
-    fn SetDevice(&self, device: &BluetoothDevice) {
+    fn SetDevice(&self, device: &BluetoothDevice){
         *self.device.borrow_mut() = Some(JS::from_ref(device));
+    }
+
+    fn GetPrimaryService(&self) -> Root<BluetoothGATTService>{
+        let adapter: BTAdapter = BTAdapter::create_adapter();
+        let devices: Vec<BTDevice> = adapter.get_devices();
+        let device: &BTDevice = devices.get(0).unwrap();
+        let btdevice = BluetoothDevice::new(self.global().r(),
+                             DOMString::from(device.get_address()),
+                             DOMString::from(device.get_name()),
+                             None,
+                             device.get_class(),
+                             VendorIDSource::Bluetooth,
+                             device.get_vendor_id(),
+                             device.get_product_id(),
+                             device.get_device_id(),
+                             None,
+                             );
+        let uuid: Uuid = Uuid::new_v4(); //<- ennek a mezőnek kellene valahogy értéket adni
+                                         //Stringet tudunk castolni BluetoothUUID::GetService()-el
+
+        BluetoothGATTService::new(self.global().r(),
+                                  Some(&*btdevice),
+                                  true,
+                                  uuid)
     }
 }
