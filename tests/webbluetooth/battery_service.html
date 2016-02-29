@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Battery service test</title>
+</head>
+<body>
+    <button type="button" onclick="onButtonClick()">Test</button>
+    <script>
+    function onButtonClick() {
+        console.log('Requesting Bluetooth Device...');
+        try {
+            var device = window.navigator.bluetooth.requestDevice();
+            console.log('Found a device: ' + device.name + '; ');
+        } catch(e) {
+            console.log('No device found ' + e);
+        }
+
+        console.log('Connecting to GATT Server...');
+        try {
+            var server = device.createGattServer(false);
+            device.connectGATT();
+        } catch(e) {
+            console.log("Can't connect to GATT Server " + e);
+        }
+
+        console.log('Getting Battery Service...');
+        try {
+            var service = server.getPrimaryService();
+            console.log('Service uuid:' + service.uuid);
+        } catch(e) {
+            console.log("Can't get Battery Service " + e);
+        }
+
+        console.log('Getting Battery Level Characteristic...');
+        try {
+            var characteristic = service.getCharacteristic();
+            console.log('Characteristic uuid:' + characteristic.uuid);
+        } catch(e) {
+            console.log("Cant't get Battery Level Characteristic " + e);
+        }
+    }
+    </script>
+</body>
+</html>
