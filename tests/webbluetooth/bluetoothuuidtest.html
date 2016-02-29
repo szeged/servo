@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<title>BluetoothUUID method tests</title>
+<body>
+    <script>
+        function Test() {
+            var bt = window.navigator.bluetooth;
+            console.log("bt.getServiceTest(0x0104):");
+            console.log(bt.getServiceTest(0x0104));
+            console.log("bt.getServiceTest(2000):");
+            console.log(bt.getServiceTest(2000));
+            console.log('bt.getServiceTest("ffffffff-0000-1000-8000-00805f9b34fb"):');
+            console.log(bt.getServiceTest("ffffffff-0000-1000-8000-00805f9b34fb"));
+            console.log('bt.getServiceTest("ffff00ff-0000-1000-8000-00805f9b34fb"):');
+            console.log(bt.getServiceTest("ffff00ff-0000-1000-8000-00805f9b34fb"));
+            console.log('bt.getServiceTest("ffff00f-0000-1000-8000-00805f9b34fb"):');
+            console.log(bt.getServiceTest("ffff00f-0000-1000-8000-00805f9b34fb"));
+            console.log('bt.getServiceTest("1-0000-1000-8000-00805f9b34fb"):');
+            console.log(bt.getServiceTest("1-0000-1000-8000-00805f9b34fb"));
+            console.log('bt.getServiceTest("unknown_service"):');
+            console.log(bt.getServiceTest("unknown_service"));
+
+            console.log('bt.getServiceTest("alert_notification"):');
+            console.log(bt.getServiceTest("alert_notification"));
+            console.log('bt.getServiceTest("automation_io"):');
+            console.log(bt.getServiceTest("automation_io"));
+
+            console.log('bt.getCharacteristicTest("aerobic_heart_rate_lower_limit"):');
+            console.log(bt.getCharacteristicTest("aerobic_heart_rate_lower_limit"));
+            console.log('bt.getCharacteristicTest("aerobic_heart_rate_upper_limit"):');
+            console.log(bt.getCharacteristicTest("aerobic_heart_rate_upper_limit"));
+
+            console.log('bt.getDescriptorTest("gatt.characteristic_extended_properties"):');
+            console.log(bt.getDescriptorTest("gatt.characteristic_extended_properties"));
+            console.log('bt.getDescriptorTest("gatt.characteristic_user_description"):');
+            console.log(bt.getDescriptorTest("gatt.characteristic_user_description"));
+        }
+    </script>
+    <button type="button" onclick="Test()">Start Test</button>
+</body>
+</html>
