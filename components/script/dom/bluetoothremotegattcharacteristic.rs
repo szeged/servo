@@ -7,11 +7,13 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
     BluetoothRemoteGATTCharacteristicMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bindings::str::ByteString;
 use dom::bluetoothcharacteristicproperties::BluetoothCharacteristicProperties;
 use dom::bluetoothremotegattdescriptor::BluetoothRemoteGATTDescriptor;
 use dom::bluetoothremotegattservice::BluetoothRemoteGATTService;
+use ipc_channel::ipc;
+use net_traits::bluetooth_thread::{BluetoothMethodMsg, BluetoothObjectMsg};
 use util::str::DOMString;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothremotegattcharacteristic
@@ -70,8 +72,25 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptor
     fn GetDescriptor(&self) -> Option<Root<BluetoothRemoteGATTDescriptor>> {
-        //UNIMPLEMENTED
-        None
+        let (sender, receiver) = ipc::channel().unwrap();
+        self.global().r().as_window().bluetooth_thread().send(BluetoothMethodMsg::GetDescriptor(sender)).unwrap();
+        let descriptor = receiver.recv().unwrap();
+        match descriptor {
+            BluetoothObjectMsg::BluetoothDescriptor {
+                uuid
+            } => {
+                Some(BluetoothRemoteGATTDescriptor::new(self.global().r(),
+                                                        &self,
+                                                        DOMString::from(uuid)))
+            },
+            BluetoothObjectMsg::Error {
+                error
+            } => {
+                println!("{}", error);
+                None
+            },
+            _ => unreachable!()
+        }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-value

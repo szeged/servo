@@ -6,10 +6,13 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bluetoothdevice::BluetoothDevice;
 use dom::bluetoothremotegattservice::BluetoothRemoteGATTService;
+use ipc_channel::ipc;
+use net_traits::bluetooth_thread::{BluetoothMethodMsg, BluetoothObjectMsg};
 use std::cell::Cell;
+use util::str::DOMString;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothremotegattserver
 #[dom_struct]
@@ -20,18 +23,16 @@ pub struct BluetoothRemoteGATTServer {
 }
 
 impl BluetoothRemoteGATTServer {
-    pub fn new_inherited(device: &BluetoothDevice, is_connected: bool) -> BluetoothRemoteGATTServer {
+    pub fn new_inherited(device: &BluetoothDevice) -> BluetoothRemoteGATTServer {
         BluetoothRemoteGATTServer {
             reflector_: Reflector::new(),
             device: MutHeap::new(device),
-            connected: Cell::new(is_connected),
+            connected: Cell::new(false),
         }
     }
 
-    pub fn new(global: GlobalRef, device: &BluetoothDevice, connected: bool) -> Root<BluetoothRemoteGATTServer> {
-        reflect_dom_object(box BluetoothRemoteGATTServer::new_inherited(
-                           device,
-                           connected),
+    pub fn new(global: GlobalRef, device: &BluetoothDevice) -> Root<BluetoothRemoteGATTServer> {
+        reflect_dom_object(box BluetoothRemoteGATTServer::new_inherited(device),
         global,
         BluetoothRemoteGATTServerBinding::Wrap)
     }
@@ -64,7 +65,26 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-getprimaryservice
     fn GetPrimaryService(&self) -> Option<Root<BluetoothRemoteGATTService>> {
-        //UNIMPLEMENTED
-        None
+        let (sender, receiver) = ipc::channel().unwrap();
+        self.global().r().as_window().bluetooth_thread().send(BluetoothMethodMsg::GetPrimaryService(sender)).unwrap();
+        let service = receiver.recv().unwrap();
+        match service {
+            BluetoothObjectMsg::BluetoothService {
+                uuid,
+                is_primary
+            } => {
+                Some(BluetoothRemoteGATTService::new(self.global().r(),
+                                                     &self.device.get(),
+                                                     DOMString::from(uuid),
+                                                     is_primary))
+            },
+            BluetoothObjectMsg::Error {
+                error
+            } => {
+                println!("{}", error);
+                None
+            },
+            _ => unreachable!()
+        }
     }
 }

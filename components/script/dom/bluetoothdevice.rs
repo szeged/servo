@@ -5,8 +5,8 @@
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::{BluetoothDeviceMethods, VendorIDSource};
 use dom::bindings::global::GlobalRef;
-use dom::bindings::js::{JS, Root, MutHeap};
-use dom::bindings::reflector::{Reflector, reflect_dom_object};
+use dom::bindings::js::{JS, Root, MutHeap, MutNullableHeap};
+use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothremotegattserver::BluetoothRemoteGATTServer;
 use util::str::DOMString;
@@ -23,7 +23,7 @@ pub struct BluetoothDevice {
     vendorID: u32,
     productID: u32,
     productVersion: u32,
-    gatt: MutHeap<JS<BluetoothRemoteGATTServer>>,
+    gatt: MutNullableHeap<JS<BluetoothRemoteGATTServer>>,
 }
 
 impl BluetoothDevice {
@@ -34,8 +34,7 @@ impl BluetoothDevice {
                          vendorIDSource: VendorIDSource,
                          vendorID: u32,
                          productID: u32,
-                         productVersion: u32,
-                         gatt: &BluetoothRemoteGATTServer)
+                         productVersion: u32)
                          -> BluetoothDevice {
         BluetoothDevice {
             reflector_: Reflector::new(),
@@ -47,7 +46,7 @@ impl BluetoothDevice {
             vendorID: vendorID,
             productID: productID,
             productVersion: productVersion,
-            gatt: MutHeap::new(gatt),
+            gatt: Default::default(),
         }
     }
 
@@ -59,8 +58,7 @@ impl BluetoothDevice {
              vendorIDSource: VendorIDSource,
              vendorID: u32,
              productID: u32,
-             productVersion: u32,
-             gatt: &BluetoothRemoteGATTServer)
+             productVersion: u32)
              -> Root<BluetoothDevice> {
         reflect_dom_object(box BluetoothDevice::new_inherited(id,
                                                               name,
@@ -69,8 +67,7 @@ impl BluetoothDevice {
                                                               vendorIDSource,
                                                               vendorID,
                                                               productID,
-                                                              productVersion,
-                                                              gatt),
+                                                              productVersion),
                            global,
                            BluetoothDeviceBinding::Wrap)
     }
@@ -120,6 +117,6 @@ impl BluetoothDeviceMethods for BluetoothDevice {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-gatt
     fn Gatt(&self) -> Root<BluetoothRemoteGATTServer> {
-        self.gatt.get()
+        self.gatt.or_init(|| BluetoothRemoteGATTServer::new(self.global().r(), self))
     }
 }
