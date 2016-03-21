@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<title>Characteristic info</title>
+<body>
+    <button type="button" onclick="onButtonClick()">Get Characteristic Info</button>
+    <pre id="log"></pre>
+    <script>
+    function onButtonClick() {
+        clear();
+        try {
+            log('Requesting Bluetooth Device...');
+            var device = window.navigator.bluetooth.requestDevice();
+            if (!device) throw 'Device not found';
+
+            log('Connecting to GATTserver on device...');
+            var server = device.gatt.connect();
+            if (!server) throw 'Server not found on device';
+            if (!server.connected) throw 'Server not connected';
+
+            log('Requesting Primary Service...');
+            var primaryService = server.getPrimaryService();
+            if (!primaryService) throw 'Primary Service not found';
+
+            log('Requesting Characteristic...');
+            var characteristic = primaryService.getCharacteristic();
+            if (!characteristic) throw 'Characteristic not found';
+
+            log('Found a Characteristic!');
+            log('> Characteristic service: ' + characteristic.service.uuid);
+            log('> Characteristic UUID:    ' + characteristic.uuid);
+            log('> Broadcast:              ' + characteristic.properties.broadcast);
+            log('> Read:                   ' + characteristic.properties.read);
+            log('> Write w/o response:     ' + characteristic.properties.writeWithoutResponse);
+            log('> Write:                  ' + characteristic.properties.write);
+            log('> Notify:                 ' + characteristic.properties.notify);
+            log('> Indicate:               ' + characteristic.properties.indicate);
+            log('> Signed Write:           ' + characteristic.properties.authenticatedSignedWrites);
+            log('> Queued Write:           ' + characteristic.properties.reliableWrite);
+            log('> Writable Auxiliaries:   ' + characteristic.properties.writableAuxiliaries);
+            characteristic.readValue();
+            log('> Characteristic value:   ' + characteristic.value);
+        } catch(err) {
+            log(err);
+        }
+    }
+
+    function clear() {
+        document.getElementById("log").textContent = "";
+    }
+
+    function log(line) {
+        document.getElementById("log").textContent += line + '\n';
+    }
+    </script>
+</body>
+</html>

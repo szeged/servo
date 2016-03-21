@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<title>Primary Service info</title>
+<body>
+    <button type="button" onclick="onButtonClick()">Get Primary Service Info</button>
+    <pre id="log"></pre>
+    <script>
+    function onButtonClick() {
+        clear();
+        try {
+            log('Requesting Bluetooth Device...');
+            var device = window.navigator.bluetooth.requestDevice();
+            if (!device) throw 'Device not found';
+
+            log('Connecting to GATTserver on device...');
+            var server = device.gatt.connect();
+            if (!server) throw 'Server not found on device';
+            if (!server.connected) throw 'Server not connected';
+
+            log('Requesting Primary Service...');
+            var primaryService = server.getPrimaryService();
+            if (!primaryService) throw 'Primary Service not found';
+
+            log('Primary Service found on device: ' + primaryService.device.name);
+            log('> UUID:                          ' + primaryService.uuid);
+            log('> Is primary:                    ' + primaryService.isPrimary);
+        } catch(err) {
+            log(err);
+        }
+    }
+
+    function clear() {
+        document.getElementById("log").textContent = "";
+    }
+
+    function log(line) {
+        document.getElementById("log").textContent += line + '\n';
+    }
+    </script>
+</body>
+</html>

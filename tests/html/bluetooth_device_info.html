@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<title>Device Info</title>
+<body>
+    <button type="button" onclick="onButtonClick()">Get Device Info</button>
+    <pre id="log"></pre>
+    <script>
+    function onButtonClick() {
+        clear();
+        try {
+            log('Requesting Bluetooth Device...');
+            var device = window.navigator.bluetooth.requestDevice();
+            if (!device) throw 'Device not found';
+
+            log('Found a device!');
+            log('> Name:             ' + device.name);
+            log('> Id:               ' + device.id);
+            log('> Device Class:     ' + device.deviceClass);
+            log('> Vendor Id Source: ' + device.vendorIDSource);
+            log('> Vendor Id:        ' + device.vendorID);
+            log('> Product Id:       ' + device.productID);
+            log('> Product Version:  ' + device.productVersion);
+            log('> Appearance:       ' + device.adData.appearance);
+            log('> Tx Power:         ' + device.adData.txPower + ' dBm');
+            log('> RSSI:             ' + device.adData.rssi + ' dBm');
+        } catch(err) {
+            log(err);
+        }
+    }
+
+    function clear() {
+        document.getElementById("log").textContent = "";
+    }
+
+    function log(line) {
+        document.getElementById("log").textContent += line + '\n';
+    }
+    </script>
+</body>
+</html>
