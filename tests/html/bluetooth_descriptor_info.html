@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<title>Descriptor info</title>
+<body>
+    <button type="button" onclick="onButtonClick()">Get Descriptor Info</button>
+    <pre id="log"></pre>
+    <script>
+    function onButtonClick() {
+        clear();
+        try {
+            log('Requesting Bluetooth Device...');
+            var device = window.navigator.bluetooth.requestDevice();
+            if (!device) throw 'Device not found';
+
+            log('Connecting to GATTserver on device...');
+            var server = device.gatt.connect();
+            if (!server) throw 'Server not found on device';
+            if (!server.connected) throw 'Server not connected';
+
+            log('Requesting Primary Service...');
+            var primaryService = server.getPrimaryService();
+            if (!primaryService) throw 'Primary Service not found';
+
+            log('Requesting Characteristic...');
+            var characteristic = primaryService.getCharacteristic();
+            if (!characteristic) throw 'Characteristic not found';
+
+            log('Requesting Descriptor...');
+            var descriptor = characteristic.getDescriptor();
+            if (!descriptor) throw 'No Descriptor found';
+
+            log('Found a Descriptor!');
+            log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
+            log('> Descriptor UUID:           ' + characteristic.uuid);
+            descriptor.readValue();
+            log('> Descriptor value:          ' + characteristic.value);
+        } catch(err) {
+            log(err);
+        }
+    }
+
+    function clear() {
+        document.getElementById("log").textContent = "";
+    }
+
+    function log(line) {
+        document.getElementById("log").textContent += line + '\n';
+    }
+    </script>
+</body>
+</html>
