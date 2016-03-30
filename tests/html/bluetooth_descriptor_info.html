@@ -31,9 +31,9 @@
 
             log('Found a Descriptor!');
             log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
-            log('> Descriptor UUID:           ' + characteristic.uuid);
+            log('> Descriptor UUID:           ' + descriptor.uuid);
             descriptor.readValue();
-            log('> Descriptor value:          ' + characteristic.value);
+            log('> Descriptor value:          ' + descriptor.value);
         } catch(err) {
             log(err);
         }
