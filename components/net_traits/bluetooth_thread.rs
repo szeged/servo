@@ -8,8 +8,10 @@ pub enum BluetoothMethodMsg {
     RequestDevice(IpcSender<BluetoothObjectMsg>),
     GATTServerConnect(String, IpcSender<BluetoothObjectMsg>),
     GATTServerDisconnect(String, IpcSender<BluetoothObjectMsg>),
-    GetPrimaryService(String, IpcSender<BluetoothObjectMsg>),
-    GetCharacteristic(String, IpcSender<BluetoothObjectMsg>),
+    GetPrimaryService(String, String, IpcSender<BluetoothObjectMsg>),
+    GetPrimaryServices(String, Option<String>, IpcSender<BluetoothObjectMsg>),
+    GetCharacteristic(String, String, IpcSender<BluetoothObjectMsg>),
+    GetCharacteristics(String, Option<String>, IpcSender<BluetoothObjectMsg>),
     GetDescriptor(String, IpcSender<BluetoothObjectMsg>),
     ReadValue(String, IpcSender<BluetoothObjectMsg>),
     WriteValue(String, Vec<u8>, IpcSender<BluetoothObjectMsg>),
@@ -40,6 +42,9 @@ pub enum BluetoothObjectMsg {
         is_primary: bool,
         instance_id: String
     },
+    BluetoothServices {
+        services_vec: Vec<BluetoothObjectMsg>
+    },
     BluetoothCharacteristic {
         // Characteristic
         uuid: String,
@@ -54,6 +59,9 @@ pub enum BluetoothObjectMsg {
         authenticated_signed_writes: bool,
         reliable_write: bool,
         writable_auxiliaries: bool
+    },
+    BluetoothCharacteristics {
+        characteristics_vec: Vec<BluetoothObjectMsg>
     },
     BluetoothDescriptor {
         uuid: String,
