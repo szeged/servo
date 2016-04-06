@@ -135,9 +135,8 @@ fn convert_request_device_options(options: &RequestDeviceOptions, global: Global
         return Err(Type(FILTER_EMPTY_ERROR.to_owned()));
     }
 
-    let options = options.clone();
     let mut filters = vec!();
-    for filter in options.filters {
+    for filter in &options.filters {
         match canonicalize_filter(&filter, global) {
             Ok(canonicalized_filter) => filters.push(canonicalized_filter),
             Err(err) => return Err(err),
@@ -145,7 +144,7 @@ fn convert_request_device_options(options: &RequestDeviceOptions, global: Global
     }
 
     let mut optional_services = vec!();
-    if let Some(opt_services) = options.optionalServices {
+    if let Some(opt_services) = options.optionalServices.clone() {
         for opt_service in opt_services {
             match BluetoothUUID::GetService(global, opt_service) {
                 Ok(valid_service) => optional_services.push(valid_service.to_string()),
@@ -216,7 +215,7 @@ impl BluetoothMethods for Bluetooth {
                     _ => unreachable!()
                 }
             },
-            Err(err) => return Err(err),
+            Err(err) => Err(err),
         }
     }
 }
