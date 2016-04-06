@@ -103,10 +103,7 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
                 },
                 BluetoothObjectMsg::Error {
                     error
-                } => {
-                    println!("{}", error);
-                    None
-                },
+                } => return Err(Type(error)),
                 _ => unreachable!()
             };
             *self.value.borrow_mut() = value;
@@ -121,12 +118,11 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
             BluetoothMethodMsg::WriteValue(self.get_instance_id(), value, sender)).unwrap();
         let result = receiver.recv().unwrap();
         match result {
-            BluetoothObjectMsg::BluetoothWriteValue => (),
+            BluetoothObjectMsg::BluetoothWriteValue => Ok(()),
             BluetoothObjectMsg::Error {
                 error
-            } => return Err(Type(error)),
+            } => Err(Type(error)),
             _ => unreachable!()
-        };
-        Ok(())
+        }
     }
 }

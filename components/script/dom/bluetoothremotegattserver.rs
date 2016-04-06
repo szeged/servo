@@ -73,15 +73,13 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
                 connected
             } => {
                 self.connected.set(connected);
+                Ok(Root::from_ref(self))
             },
             BluetoothObjectMsg::Error {
                 error
-            } => {
-                return Err(Type(error));
-            },
+            } => Err(Type(error)),
             _ => unreachable!()
         }
-        Ok(Root::from_ref(self))
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-disconnect
@@ -95,15 +93,13 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
                 connected
             } => {
                 self.connected.set(connected);
+                Ok(())
             },
             BluetoothObjectMsg::Error {
                 error
-            } => {
-                return Err(Type(error));
-            },
+            } => Err(Type(error)),
             _ => unreachable!()
         }
-        Ok(())
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-getprimaryservice
@@ -130,7 +126,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => return Err(Type(error)),
+            } => Err(Type(error)),
             _ => unreachable!(),
         }
     }
@@ -175,7 +171,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => return Err(Type(error)),
+            } => Err(Type(error)),
             _ => unreachable!(),
         }
     }
