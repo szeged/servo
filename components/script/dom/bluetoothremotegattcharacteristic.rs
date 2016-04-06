@@ -9,7 +9,7 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
     BluetoothRemoteGATTCharacteristicMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServiceBinding::BluetoothRemoteGATTServiceMethods;
-use dom::bindings::error::Error::Network;
+use dom::bindings::error::Error::{Network, Type};
 use dom::bindings::error::Fallible;
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
@@ -140,10 +140,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
                 },
                 BluetoothObjectMsg::Error {
                     error
-                } => {
-                    println!("{}", error);
-                    None
-                },
+                } => return Err(Type(error)),
                 _ => unreachable!()
             };
             *self.value.borrow_mut() = value;
@@ -152,19 +149,17 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue
-    fn WriteValue(&self, value: Vec<u8>) {
+    fn WriteValue(&self, value: Vec<u8>) -> Fallible<()> {
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::WriteValue(self.get_instance_id(), value, sender)).unwrap();
         let result = receiver.recv().unwrap();
         match result {
-            BluetoothObjectMsg::BluetoothWriteValue => (),
+            BluetoothObjectMsg::BluetoothWriteValue => Ok(()),
             BluetoothObjectMsg::Error {
                 error
-            } => {
-                println!("{}", error);
-            },
+            } => Err(Type(error)),
             _ => unreachable!()
-        };
+        }
     }
 }
