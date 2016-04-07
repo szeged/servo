@@ -98,8 +98,11 @@ impl BluetoothManager {
                 BluetoothMethodMsg::GetCharacteristics(service_id, uuid, sender) => {
                     self.get_characteristics(service_id, uuid, sender)
                 }
-                BluetoothMethodMsg::GetDescriptor(characteristic_id, sender) => {
-                    self.get_descriptor(characteristic_id, sender)
+                BluetoothMethodMsg::GetDescriptor(characteristic_id, uuid, sender) => {
+                    self.get_descriptor(characteristic_id, uuid, sender)
+                }
+                BluetoothMethodMsg::GetDescriptors(characteristic_id, uuid, sender) => {
+                    self.get_descriptors(characteristic_id, uuid, sender)
                 }
                 BluetoothMethodMsg::ReadValue(id, sender) => {
                     self.read_value(id, sender)
@@ -327,7 +330,6 @@ impl BluetoothManager {
         None
     }
 
-    #[allow(dead_code)]
     fn get_gatt_descriptor_by_uuid(&mut self,
                                    adapter: &mut BluetoothAdapter,
                                    characteristic_id: &str,
@@ -346,6 +348,21 @@ impl BluetoothManager {
             }
         }
         None
+    }
+
+    fn get_gatt_descriptors_by_uuid(&mut self,
+                                    adapter: &mut BluetoothAdapter,
+                                    characteristic_id: &str,
+                                    descriptor_uuid: &str)
+                                    -> Vec<BluetoothGATTDescriptor> {
+        let mut descriptors_vec: Vec<BluetoothGATTDescriptor> = vec!();
+        let descriptors = self.get_gatt_descriptors(adapter, characteristic_id);
+        for descriptor in descriptors {
+            if descriptor.get_uuid().unwrap_or("".to_owned()) == descriptor_uuid {
+                descriptors_vec.push(descriptor.clone());
+            }
+        }
+        descriptors_vec
     }
 
     // Methods
@@ -551,22 +568,52 @@ impl BluetoothManager {
         sender.send(message).unwrap();
     }
 
-    pub fn get_descriptor(&mut self, characteristic_id: String, sender: IpcSender<BluetoothObjectMsg>) {
+    pub fn get_descriptor(&mut self,
+                          characteristic_id: String,
+                          uuid: String,
+                          sender: IpcSender<BluetoothObjectMsg>) {
         let mut adapter = match self.get_adapter() {
             Some(a) => a,
             None => send_error!(sender, "No adapter found"),
         };
 
-        let descriptors = self.get_gatt_descriptors(&mut adapter, &characteristic_id);
-        if descriptors.is_empty() {
-            send_error!(sender, "No descriptor found");
-        }
-
-        let descriptor = &descriptors[0];
+        let descriptor = match self.get_gatt_descriptor_by_uuid(&mut adapter, &characteristic_id, &uuid) {
+            Some(d) => d,
+            None => send_error!(sender, "No descriptor found"),
+        };
         let message = BluetoothObjectMsg::BluetoothDescriptor {
             uuid: descriptor.get_uuid().unwrap_or("".to_owned()),
             instance_id: descriptor.get_object_path(),
         };
+        sender.send(message).unwrap();
+    }
+
+    pub fn get_descriptors(&mut self,
+                           characteristic_id: String,
+                           uuid: Option<String>,
+                           sender: IpcSender<BluetoothObjectMsg>) {
+        let mut adapter = match self.get_adapter() {
+            Some(a) => a,
+            None => send_error!(sender, "No adapter found"),
+        };
+        let descriptors = match uuid {
+            Some(id) => self.get_gatt_descriptors_by_uuid(&mut adapter, &characteristic_id, &id),
+            None => self.get_gatt_descriptors(&mut adapter, &characteristic_id),
+        };
+        if descriptors.is_empty() {
+            send_error!(sender, "No descriptor found");
+        }
+        let mut descriptors_vec: Vec<BluetoothObjectMsg> = vec!();
+        for descriptor in descriptors {
+            descriptors_vec.push(BluetoothObjectMsg::BluetoothDescriptor {
+                uuid: descriptor.get_uuid().unwrap_or("".to_owned()),
+                instance_id: descriptor.get_object_path(),
+            });
+        }
+        if descriptors_vec.is_empty() {
+            send_error!(sender, "No descriptor found");
+        }
+        let message = BluetoothObjectMsg::BluetoothDescriptors { descriptors_vec: descriptors_vec };
         sender.send(message).unwrap();
     }
 
