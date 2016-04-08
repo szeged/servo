@@ -44,7 +44,7 @@
             var characteristic = service.getCharacteristic('battery_level');
 
             log('Reading Battery Level...');
-            var value = fromUTF8(characteristic.readValue());
+            var value = AsciiToDecimal(characteristic.readValue());
             log('> Battery Level is ' + value + '%');
         } catch(err) {
             log(err);
@@ -59,14 +59,12 @@
         document.getElementById("log").textContent += line + '\n';
     }
 
-    function fromUTF8(bytestr) {
-
-        function fromUTF8Array($) {
-            return eval("String.fromCharCode(" + $ + ")");
+    function AsciiToDecimal(bytestr) {
+        var result = [];
+        for(i =0; i < bytestr.lenght; i++) {
+            result[i] = bytestr[i].charCodeAt(0) ;
         }
-
-        clear();
-        result = fromUTF8Array(bytestr);
+        return result;
     }
 
     </script>

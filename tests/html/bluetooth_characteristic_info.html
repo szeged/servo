@@ -44,7 +44,7 @@
             log('> Queued Write:           ' + characteristic.properties.reliableWrite);
             log('> Writable Auxiliaries:   ' + characteristic.properties.writableAuxiliaries);
             characteristic.readValue();
-            log('> Characteristic value:   ' + characteristic.value);
+            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
         } catch(err) {
             log(err);
         }
@@ -56,6 +56,14 @@
 
     function log(line) {
         document.getElementById("log").textContent += line + '\n';
+    }
+
+    function AsciiToDecimal(bytestr) {
+        var result = [];
+        for(i =0; i < bytestr.lenght; i++) {
+            result[i] = bytestr[i].charCodeAt(0) ;
+        }
+        return result;
     }
     </script>
 </body>

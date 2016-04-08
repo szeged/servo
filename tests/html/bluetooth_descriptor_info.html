@@ -44,7 +44,7 @@
             log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
             log('> Descriptor UUID:           ' + descriptor.uuid);
             descriptor.readValue();
-            log('> Descriptor value:          ' + descriptor.value);
+            log('> Descriptor value:          ' + AsciiToDecimal(descriptor.value));
         } catch(err) {
             log(err);
         }
@@ -56,6 +56,14 @@
 
     function log(line) {
         document.getElementById("log").textContent += line + '\n';
+    }
+
+    function AsciiToDecimal(bytestr) {
+        var result = [];
+        for(i =0; i < bytestr.lenght; i++) {
+            result[i] = bytestr[i].charCodeAt(0) ;
+        }
+        return result;
     }
     </script>
 </body>
