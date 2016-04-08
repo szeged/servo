@@ -21,12 +21,12 @@ use net_traits::bluetooth_scanfilter::{RequestDeviceoptions, ServiceUUIDSequence
 use net_traits::bluetooth_thread::{BluetoothMethodMsg, BluetoothObjectMsg};
 use util::str::DOMString;
 
+// 248 is the maximum number of UTF-8 code units in a Bluetooth Device Name.
+const MAX_DEVICE_NAME_LENGTH: usize = 248;
 // A device name can never be longer than 29 bytes. An adv packet is at most
 // 31 bytes long. The length and identifier of the length field take 2 bytes.
 // That least 29 bytes for the name.
 const MAX_FILTER_NAME_LENGTH: usize = 29;
-// 248 is the maximum number of UTF-8 code units in a Bluetooth Device Name.
-const MAX_DEVICE_NAME_LENGTH: usize = 248;
 const FILTER_EMPTY_ERROR: &'static str = "'filters' member must be non - empty to find any devices.";
 const FILTER_ERROR: &'static str = "A filter must restrict the devices in some way.";
 const FILTER_NAME_TOO_LONG_ERROR: &'static str = "A 'name' or 'namePrefix' can't be longer then 29 bytes.";
@@ -79,8 +79,7 @@ impl Clone for RequestDeviceOptions {
     }
 }
 
-fn canonicalize_filter(filter: &BluetoothScanFilter, global: GlobalRef)
-    -> Fallible<BluetoothScanfilter> {
+fn canonicalize_filter(filter: &BluetoothScanFilter, global: GlobalRef) -> Fallible<BluetoothScanfilter> {
     if !(filter.services.is_some() ||
          filter.name.is_some() ||
          filter.namePrefix.is_some()) {
@@ -130,7 +129,7 @@ fn canonicalize_filter(filter: &BluetoothScanFilter, global: GlobalRef)
 }
 
 fn convert_request_device_options(options: &RequestDeviceOptions, global: GlobalRef)
-    -> Fallible<RequestDeviceoptions> {
+                                  -> Fallible<RequestDeviceoptions> {
     if options.filters.is_empty() {
         return Err(Type(FILTER_EMPTY_ERROR.to_owned()));
     }
