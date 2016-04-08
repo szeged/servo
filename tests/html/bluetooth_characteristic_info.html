@@ -2,30 +2,36 @@
 <html>
 <title>Characteristic info</title>
 <body>
+    <input id="service" type="text" autofocus placeholder="Bluetooth Service">
+    <input id="characteristic" type="text" autofocus placeholder="Bluetooth Characteristic">
     <button type="button" onclick="onButtonClick()">Get Characteristic Info</button>
     <pre id="log"></pre>
     <script>
     function onButtonClick() {
         clear();
+        var serviceUuid = document.getElementById('service').value;
+        if (serviceUuid.startsWith('0x')) {
+            serviceUuid = parseInt(serviceUuid, 16);
+        }
+
+        var characteristicUuid = document.getElementById('characteristic').value;
+        if (characteristicUuid.startsWith('0x')) {
+            characteristicUuid = parseInt(characteristicUuid, 16);
+        }
         try {
             log('Requesting Bluetooth Device...');
-            var device = window.navigator.bluetooth.requestDevice();
-            if (!device) throw 'Device not found';
+            var device = window.navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]});
 
             log('Connecting to GATTserver on device...');
             var server = device.gatt.connect();
-            if (!server) throw 'Server not found on device';
-            if (!server.connected) throw 'Server not connected';
 
-            log('Requesting Primary Service...');
-            var primaryService = server.getPrimaryService();
-            if (!primaryService) throw 'Primary Service not found';
+            log('Getting Primary Service...');
+            var primaryService = server.getPrimaryService(serviceUuid);
 
-            log('Requesting Characteristic...');
-            var characteristic = primaryService.getCharacteristic();
-            if (!characteristic) throw 'Characteristic not found';
+            log('Getting Characteristic...');
+            var characteristic = primaryService.getCharacteristic(characteristicUuid);
 
-            log('Found a Characteristic!');
+            log('Characteristic found!');
             log('> Characteristic service: ' + characteristic.service.uuid);
             log('> Characteristic UUID:    ' + characteristic.uuid);
             log('> Broadcast:              ' + characteristic.properties.broadcast);
