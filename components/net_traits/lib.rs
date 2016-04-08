@@ -13,6 +13,7 @@
 
 #![deny(unsafe_code)]
 
+extern crate device;
 extern crate heapsize;
 extern crate hyper;
 extern crate image as piston_image;
@@ -38,6 +39,8 @@ use std::thread;
 use url::Url;
 use websocket::header;
 
+pub mod bluetooth_scanfilter;
+pub mod bluetooth_thread;
 pub mod hosts;
 pub mod image_cache_thread;
 pub mod net_error_list;
