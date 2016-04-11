@@ -17,24 +17,22 @@
         var options = {filters: []};
 
         var filterService = document.getElementById('service').value;
-        if (filterService.startsWith('0x')) {
+        if (filterService.startsWith('0x'))
             filterService = parseInt(filterService, 16);
-        }
-        if (filterService) {
+
+        if (filterService)
             options.filters.push({services: [filterService]});
-        }
 
         var filterName = document.getElementById('name').value;
-        if (filterName) {
+        if (filterName)
             options.filters.push({name: filterName});
-        }
 
         var filterNamePrefix = document.getElementById('namePrefix').value;
-        if (filterNamePrefix) {
+        if (filterNamePrefix)
             options.filters.push({namePrefix: filterNamePrefix});
-        }
 
         bluetoothDevice = null;
+
         try {
             log('Requesting Bluetooth Device...');
             bluetoothDevice = window.navigator.bluetooth.requestDevice(options);
@@ -46,9 +44,9 @@
 
     function onDisconnectButtonClick() {
         clear();
-        if (!bluetoothDevice) {
+        if (!bluetoothDevice)
             return;
-        }
+
         try {
             log('Disconnecting from Bluetooth Device...');
             if (bluetoothDevice.gatt.connected) {
@@ -67,9 +65,8 @@
 
     function onReconnectButtonClick() {
         clear();
-        if (!bluetoothDevice) {
+        if (!bluetoothDevice)
             return;
-        }
         if (bluetoothDevice.gatt.connected) {
             log('> Bluetooth Device is already connected');
             return;
@@ -98,7 +95,6 @@
     function log(line) {
         document.getElementById("log").textContent += line + '\n';
     }
-
     </script>
 </body>
 </html>

@@ -10,14 +10,13 @@
     function onButtonClick() {
         clear();
         var serviceUuid = document.getElementById('service').value;
-        if (serviceUuid.startsWith('0x')) {
+        if (serviceUuid.startsWith('0x'))
             serviceUuid = parseInt(serviceUuid, 16);
-        }
 
         var characteristicUuid = document.getElementById('characteristic').value;
-        if (characteristicUuid.startsWith('0x')) {
+        if (characteristicUuid.startsWith('0x'))
             characteristicUuid = parseInt(characteristicUuid, 16);
-        }
+
         try {
             log('Requesting Bluetooth Device...');
             var device = window.navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]});
