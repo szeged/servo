@@ -79,40 +79,40 @@ impl BluetoothManager {
             match self.receiver.recv().unwrap() {
                 BluetoothMethodMsg::RequestDevice(options, sender) => {
                     self.request_device(options, sender)
-                }
+                },
                 BluetoothMethodMsg::GATTServerConnect(device_id, sender) => {
                     self.gatt_server_connect(device_id, sender)
-                }
+                },
                 BluetoothMethodMsg::GATTServerDisconnect(device_id, sender) => {
                     self.gatt_server_disconnect(device_id, sender)
-                }
+                },
                 BluetoothMethodMsg::GetPrimaryService(device_id, uuid, sender) => {
                     self.get_primary_service(device_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::GetPrimaryServices(device_id, uuid, sender) => {
                     self.get_primary_services(device_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::GetCharacteristic(service_id, uuid, sender) => {
                     self.get_characteristic(service_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::GetCharacteristics(service_id, uuid, sender) => {
                     self.get_characteristics(service_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::GetDescriptor(characteristic_id, uuid, sender) => {
                     self.get_descriptor(characteristic_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::GetDescriptors(characteristic_id, uuid, sender) => {
                     self.get_descriptors(characteristic_id, uuid, sender)
-                }
+                },
                 BluetoothMethodMsg::ReadValue(id, sender) => {
                     self.read_value(id, sender)
-                }
+                },
                 BluetoothMethodMsg::WriteValue(id, value, sender) => {
                     self.write_value(id, value, sender)
-                }
+                },
                 BluetoothMethodMsg::Exit => {
                     break
-                }
+                },
             }
         }
     }
@@ -159,10 +159,7 @@ impl BluetoothManager {
         services
     }
 
-    fn get_gatt_service(&mut self,
-                        adapter: &mut BluetoothAdapter,
-                        service_id: &str)
-                        -> Option<&BluetoothGATTService> {
+    fn get_gatt_service(&mut self, adapter: &mut BluetoothAdapter, service_id: &str) -> Option<&BluetoothGATTService> {
         check_cache!(self.cached_services, service_id);
         let device_id = match self.service_to_device.get_mut(service_id) {
             Some(d) => d.clone(),
@@ -367,9 +364,7 @@ impl BluetoothManager {
 
     // Methods
 
-    fn request_device(&mut self,
-                      options: RequestDeviceoptions,
-                      sender: IpcSender<BluetoothObjectMsg>) {
+    fn request_device(&mut self, options: RequestDeviceoptions, sender: IpcSender<BluetoothObjectMsg>) {
         let mut adapter = match self.get_adapter() {
             Some(a) => a,
             None => send_error!(sender, "No adapter found"),
@@ -568,10 +563,7 @@ impl BluetoothManager {
         sender.send(message).unwrap();
     }
 
-    pub fn get_descriptor(&mut self,
-                          characteristic_id: String,
-                          uuid: String,
-                          sender: IpcSender<BluetoothObjectMsg>) {
+    pub fn get_descriptor(&mut self, characteristic_id: String, uuid: String, sender: IpcSender<BluetoothObjectMsg>) {
         let mut adapter = match self.get_adapter() {
             Some(a) => a,
             None => send_error!(sender, "No adapter found"),

@@ -126,12 +126,12 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     fn GetDescriptors(&self,
                       descriptor: Option<StringOrUnsignedLong>)
                       -> Fallible<Vec<Root<BluetoothRemoteGATTDescriptor>>> {
-        let uuid: Option<String> = match descriptor {
-            Some(d) => match BluetoothUUID::GetDescriptor(self.global().r(), d.clone()) {
-                Ok(domstring) => Some(domstring.to_string()),
+        let mut uuid: Option<String> = None;
+        if let Some(d)= descriptor {
+            match BluetoothUUID::GetCharacteristic(self.global().r(), d.clone()) {
+                Ok(domstring) => uuid = Some(domstring.to_string()),
                 Err(error) => return Err(error),
-            },
-            None => None,
+            }
         };
         let (sender, receiver) = ipc::channel().unwrap();
         let mut descriptors: Vec<Root<BluetoothRemoteGATTDescriptor>> = vec!();
@@ -151,7 +151,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
                             descriptors.push(BluetoothRemoteGATTDescriptor::new(self.global().r(),
                                                                                 &self,
                                                                                 DOMString::from(uuid),
-                                                                                instance_id))
+                                                                                instance_id));
                         },
                         _ => unreachable!(),
                     }

@@ -132,14 +132,15 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-getprimaryservices
-    fn GetPrimaryServices(&self, service: Option<StringOrUnsignedLong>)
+    fn GetPrimaryServices(&self,
+                          service: Option<StringOrUnsignedLong>)
                           -> Fallible<Vec<Root<BluetoothRemoteGATTService>>> {
-        let uuid: Option<String> = match service {
-            Some(s) => match BluetoothUUID::GetService(self.global().r(), s.clone()) {
-                Ok(domstring) => Some(domstring.to_string()),
+        let mut uuid: Option<String> = None;
+        if let Some(s)= service {
+            match BluetoothUUID::GetService(self.global().r(), s.clone()) {
+                Ok(domstring) => uuid = Some(domstring.to_string()),
                 Err(error) => return Err(error),
-            },
-            None => None,
+            }
         };
         let mut services: Vec<Root<BluetoothRemoteGATTService>> = vec!();
         let (sender, receiver) = ipc::channel().unwrap();
@@ -162,7 +163,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
                                                                           &self.device.get(),
                                                                           DOMString::from(uuid),
                                                                           is_primary,
-                                                                          instance_id))
+                                                                          instance_id));
                         },
                         _ => unreachable!(),
                     }
