@@ -40,7 +40,7 @@
             log('Getting Descriptor...');
             var descriptor = characteristic.getDescriptor(descriptorUuid);
 
-            log('Descriptor found');
+            log('Descriptor found!');
             log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
             log('> Descriptor UUID:           ' + descriptor.uuid);
             descriptor.readValue();
