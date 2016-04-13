@@ -11,7 +11,7 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::Bluetoot
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServiceBinding::BluetoothRemoteGATTServiceMethods;
 use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
 use dom::bindings::error::Error::{Network, Type};
-use dom::bindings::error::Fallible;
+use dom::bindings::error::{Fallible, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
 use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
@@ -61,8 +61,8 @@ impl BluetoothRemoteGATTCharacteristic {
                                                                                 uuid,
                                                                                 properties,
                                                                                 instanceID),
-                            global,
-                            BluetoothRemoteGATTCharacteristicBinding::Wrap)
+                           global,
+                           BluetoothRemoteGATTCharacteristicBinding::Wrap)
     }
 
     fn get_bluetooth_thread(&self) -> IpcSender<BluetoothMethodMsg> {
@@ -94,9 +94,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptor
-    fn GetDescriptor(&self,
-                     descriptor: StringOrUnsignedLong)
-                     -> Fallible<Root<BluetoothRemoteGATTDescriptor>> {
+    fn GetDescriptor(&self, descriptor: StringOrUnsignedLong) -> Fallible<Root<BluetoothRemoteGATTDescriptor>> {
         let uuid: String = match BluetoothUUID::GetDescriptor(self.global().r(), descriptor.clone()) {
             Ok(domstring) => domstring.to_string(),
             Err(error) => return Err(error),
@@ -197,7 +195,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue
-    fn WriteValue(&self, value: Vec<u8>) -> Fallible<()> {
+    fn WriteValue(&self, value: Vec<u8>) -> ErrorResult {
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::WriteValue(self.get_instance_id(), value, sender)).unwrap();

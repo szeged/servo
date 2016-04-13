@@ -395,8 +395,8 @@ impl BluetoothManager {
                     },
                 };
                 sender.send(message).unwrap();
-           },
-           None => send_error!(sender, "No device found, that matches the given options"),
+            },
+            None => send_error!(sender, "No device found, that matches the given options"),
         }
     }
 

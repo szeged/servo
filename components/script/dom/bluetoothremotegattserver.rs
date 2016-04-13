@@ -7,7 +7,7 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::codegen::UnionTypes::StringOrUnsignedLong;
 use dom::bindings::error::Error::Type;
-use dom::bindings::error::Fallible;
+use dom::bindings::error::{Fallible, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
 use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
@@ -64,9 +64,8 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-connect
     fn Connect(&self) -> Fallible<Root<BluetoothRemoteGATTServer>> {
         let (sender, receiver) = ipc::channel().unwrap();
-        self.get_bluetooth_thread()
-            .send(BluetoothMethodMsg::GATTServerConnect(String::from(self.Device().Id()), sender))
-            .unwrap();
+        self.get_bluetooth_thread().send(
+            BluetoothMethodMsg::GATTServerConnect(String::from(self.Device().Id()), sender)).unwrap();
         let server = receiver.recv().unwrap();
         match server {
             BluetoothObjectMsg::BluetoothServer {
@@ -83,7 +82,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-disconnect
-    fn Disconnect(&self) -> Fallible<()>{
+    fn Disconnect(&self) -> ErrorResult {
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GATTServerDisconnect(String::from(self.Device().Id()), sender)).unwrap();
@@ -119,10 +118,10 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
                 instance_id,
             } => {
                 Ok(BluetoothRemoteGATTService::new(self.global().r(),
-                                                     &self.device.get(),
-                                                     DOMString::from(uuid),
-                                                     is_primary,
-                                                     instance_id))
+                                                   &self.device.get(),
+                                                   DOMString::from(uuid),
+                                                   is_primary,
+                                                   instance_id))
             },
             BluetoothObjectMsg::Error {
                 error
@@ -144,9 +143,8 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
         };
         let mut services: Vec<Root<BluetoothRemoteGATTService>> = vec!();
         let (sender, receiver) = ipc::channel().unwrap();
-        self.get_bluetooth_thread()
-            .send(BluetoothMethodMsg::GetPrimaryServices(String::from(self.Device().Id()), uuid, sender))
-            .unwrap();
+        self.get_bluetooth_thread().send(
+            BluetoothMethodMsg::GetPrimaryServices(String::from(self.Device().Id()), uuid, sender)).unwrap();
         let services_vec = receiver.recv().unwrap();
         match services_vec {
             BluetoothObjectMsg::BluetoothServices {
