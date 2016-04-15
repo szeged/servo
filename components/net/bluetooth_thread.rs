@@ -132,7 +132,9 @@ impl BluetoothManager {
     fn get_devices(&mut self, adapter: &mut BluetoothAdapter) -> Vec<BluetoothDevice> {
         let devices = adapter.get_devices().unwrap_or(vec!());
         for device in &devices {
-            self.cached_devices.insert(device.get_address().unwrap_or("".to_owned()), device.clone());
+            if let Ok(d) = device.get_address() {
+                self.cached_devices.insert(d, device.clone());
+            }
         }
         devices
     }
@@ -177,15 +179,19 @@ impl BluetoothManager {
                                 service_uuid: &str)
                                 -> Option<BluetoothGATTService> {
         for service in self.cached_services.values() {
-            if service.get_uuid().unwrap_or("".to_owned()) == service_uuid {
-                return Some(service.clone());
+            if let Ok(s) = service.get_uuid() {
+                if s == service_uuid {
+                    return Some(service.clone());
+                } 
             }
         }
         // Update cache
         let services = self.get_gatt_services(adapter, device_id);
         for service in services {
-            if service.get_uuid().unwrap_or("".to_owned()) == service_uuid {
-                return Some(service.clone());
+            if let Ok(s) = service.get_uuid() {
+                if s == service_uuid {
+                    return Some(service.clone());
+                }
             }
         }
         None
@@ -199,8 +205,10 @@ impl BluetoothManager {
         let mut services_vec: Vec<BluetoothGATTService> = vec!();
         let services = self.get_gatt_services(adapter, device_id);
         for service in services {
-            if service.get_uuid().unwrap_or("".to_owned()) == service_uuid {
-                services_vec.push(service.clone());
+            if let Ok(s) = service.get_uuid() {
+                if s == service_uuid {
+                    services_vec.push(service.clone());
+                }
             }
         }
         services_vec
@@ -245,15 +253,19 @@ impl BluetoothManager {
                                        characteristic_uuid: &str)
                                        -> Option<BluetoothGATTCharacteristic> {
         for characteristic in self.cached_characteristics.values() {
-            if characteristic.get_uuid().unwrap_or("".to_owned()) == characteristic_uuid {
-                return Some(characteristic.clone());
+            if let Ok(c) = characteristic.get_uuid() {
+                if c == characteristic_uuid {
+                    return Some(characteristic.clone());
+                }
             }
         }
         // Update cache
         let characteristics = self.get_gatt_characteristics(adapter, service_id);
         for characteristic in characteristics {
-            if characteristic.get_uuid().unwrap_or("".to_owned()) == characteristic_uuid {
-                return Some(characteristic.clone());
+            if let Ok(c) = characteristic.get_uuid() {
+                if c == characteristic_uuid {
+                    return Some(characteristic.clone());
+                }
             }
         }
         None
@@ -267,8 +279,10 @@ impl BluetoothManager {
         let mut characteristics_vec: Vec<BluetoothGATTCharacteristic> = vec!();
         let characteristics = self.get_gatt_characteristics(adapter, service_id);
         for characteristic in characteristics {
-            if characteristic.get_uuid().unwrap_or("".to_owned()) == characteristic_uuid {
-                characteristics_vec.push(characteristic.clone());
+            if let Ok(c) = characteristic.get_uuid() {
+                if c == characteristic_uuid {
+                    characteristics_vec.push(characteristic.clone());
+                }
             }
         }
         characteristics_vec
@@ -333,15 +347,19 @@ impl BluetoothManager {
                                    descriptor_uuid: &str)
                                    -> Option<BluetoothGATTDescriptor> {
         for descriptor in self.cached_descriptors.values() {
-            if descriptor.get_uuid().unwrap_or("".to_owned()) == descriptor_uuid {
-                return Some(descriptor.clone());
+            if let Ok(d) = descriptor.get_uuid() {
+                if d == descriptor_uuid {
+                    return Some(descriptor.clone());
+                }
             }
         }
         // Update cache
         let descriptors = self.get_gatt_descriptors(adapter, characteristic_id);
         for descriptor in descriptors {
-            if descriptor.get_uuid().unwrap_or("".to_owned()) == descriptor_uuid {
-                return Some(descriptor.clone());
+            if let Ok(d) = descriptor.get_uuid() {
+                if d == descriptor_uuid {
+                    return Some(descriptor.clone());
+                }
             }
         }
         None
@@ -355,8 +373,10 @@ impl BluetoothManager {
         let mut descriptors_vec: Vec<BluetoothGATTDescriptor> = vec!();
         let descriptors = self.get_gatt_descriptors(adapter, characteristic_id);
         for descriptor in descriptors {
-            if descriptor.get_uuid().unwrap_or("".to_owned()) == descriptor_uuid {
-                descriptors_vec.push(descriptor.clone());
+            if let Ok(d) = descriptor.get_uuid() {
+                if d == descriptor_uuid {
+                    descriptors_vec.push(descriptor.clone());
+                }
             }
         }
         descriptors_vec
@@ -485,7 +505,12 @@ impl BluetoothManager {
         for service in services {
             if service.is_primary().unwrap_or(false) {
                 services_vec.push(BluetoothObjectMsg::BluetoothService {
-                    uuid: service.get_uuid().unwrap_or("".to_owned()),
+                    uuid: if let Ok(s) = service.get_uuid() {
+                        s
+                    }
+                    else {
+                        send_error!(sender, "No service found");
+                    },
                     is_primary: true,
                     instance_id: service.get_object_path(),
                 });
@@ -509,7 +534,12 @@ impl BluetoothManager {
         };
         let properties = self.get_characteristic_properties(&characteristic);
         let message = BluetoothObjectMsg::BluetoothCharacteristic {
-            uuid: characteristic.get_uuid().unwrap_or("".to_owned()),
+            uuid: if let Ok(c) = characteristic.get_uuid() {
+                c
+            }
+            else {
+                send_error!(sender, "No characteristic found");
+            },
             instance_id: characteristic.get_object_path(),
             broadcast: properties[0],
             read: properties[1],
