@@ -36,7 +36,7 @@
         try {
             log('Requesting Bluetooth Device...');
             bluetoothDevice = window.navigator.bluetooth.requestDevice(options);
-            return connect();
+            connect();
         } catch(err) {
             log(err);
         }
@@ -63,12 +63,12 @@
     function onReconnectButtonClick() {
         clear();
         if (!bluetoothDevice)
-            return;
+            log('> There is no connected Bluetooth Device instance')
         if (bluetoothDevice.gatt.connected) {
             log('> Bluetooth Device is already connected');
             return;
         } else {
-            return connect();
+            connect();
         }
     }
 
