@@ -51,7 +51,7 @@
             log('Disconnecting from Bluetooth Device...');
             if (bluetoothDevice.gatt.connected) {
                 bluetoothDevice.gatt.disconnect();
-                setTimeout(function() {log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected)}, 5000);
+                log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
             } else {
                 log('> Bluetooth Device is already disconnected');
             }
@@ -76,7 +76,7 @@
         try {
             log('Connecting to Bluetooth Device...');
             bluetoothDevice.gatt.connect();
-            setTimeout(function() {log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected)}, 5000);
+            log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
         } catch(err) {
             log(err);
         }
