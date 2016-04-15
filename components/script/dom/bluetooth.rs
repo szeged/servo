@@ -206,7 +206,9 @@ impl BluetoothMethods for Bluetooth {
                     },
                     BluetoothObjectMsg::Error {
                         error
-                    } => return Err(Type(error)),
+                    } => {
+                        Err(Type(error))
+                    },
                     _ => unreachable!()
                 }
             },

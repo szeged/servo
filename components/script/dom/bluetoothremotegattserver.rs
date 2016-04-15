@@ -76,7 +76,9 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => Err(Type(error)),
+            } => {
+                Err(Type(error))
+            },
             _ => unreachable!()
         }
     }
@@ -96,7 +98,9 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => Err(Type(error)),
+            } => {
+                Err(Type(error))
+            },
             _ => unreachable!()
         }
     }
@@ -125,7 +129,9 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => Err(Type(error)),
+            } => {
+                Err(Type(error))
+            },
             _ => unreachable!(),
         }
     }
@@ -170,7 +176,9 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             },
             BluetoothObjectMsg::Error {
                 error
-            } => Err(Type(error)),
+            } => {
+                Err(Type(error))
+            },
             _ => unreachable!(),
         }
     }

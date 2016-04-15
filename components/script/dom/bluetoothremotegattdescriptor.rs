@@ -90,8 +90,7 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
         let (sender, receiver) = ipc::channel().unwrap();
         if !self.Characteristic().Service().Device().Gatt().Connected() {
             Err(Network)
-        }
-        else {
+        } else {
             self.get_bluetooth_thread().send(
                 BluetoothMethodMsg::ReadValue(self.get_instance_id(), sender)).unwrap();
             let result = receiver.recv().unwrap();
@@ -103,7 +102,9 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
                 },
                 BluetoothObjectMsg::Error {
                     error
-                } => return Err(Type(error)),
+                } => {
+                    return Err(Type(error))
+                },
                 _ => unreachable!()
             };
             *self.value.borrow_mut() = value;
@@ -121,7 +122,9 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
             BluetoothObjectMsg::BluetoothWriteValue => Ok(()),
             BluetoothObjectMsg::Error {
                 error
-            } => Err(Type(error)),
+            } => {
+                Err(Type(error))
+            },
             _ => unreachable!()
         }
     }
