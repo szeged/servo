@@ -50,9 +50,8 @@
         try {
             log('Disconnecting from Bluetooth Device...');
             if (bluetoothDevice.gatt.connected) {
-                sleepFor(5000);
                 bluetoothDevice.gatt.disconnect();
-                log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
+                setTimeout(function() {log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected)}, 5000);
             } else {
                 log('> Bluetooth Device is already disconnected');
             }
@@ -76,9 +75,8 @@
     function connect() {
         try {
             log('Connecting to Bluetooth Device...');
-            sleepFor(5000);
             bluetoothDevice.gatt.connect();
-            log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
+            setTimeout(function() {log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected)}, 5000);
         } catch(err) {
             log(err);
         }
@@ -90,11 +88,6 @@
 
     function log(line) {
         document.getElementById("log").textContent += line + '\n';
-    }
-
-    function sleepFor( sleepDuration ){
-        var now = new Date().getTime();
-        while(new Date().getTime() < now + sleepDuration){} 
     }
     </script>
 </body>
