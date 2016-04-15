@@ -132,8 +132,8 @@ impl BluetoothManager {
     fn get_devices(&mut self, adapter: &mut BluetoothAdapter) -> Vec<BluetoothDevice> {
         let devices = adapter.get_devices().unwrap_or(vec!());
         for device in &devices {
-            if let Ok(d) = device.get_address() {
-                self.cached_devices.insert(d, device.clone());
+            if let Ok(address) = device.get_address() {
+                self.cached_devices.insert(address, device.clone());
             }
         }
         devices
@@ -179,8 +179,8 @@ impl BluetoothManager {
                                 service_uuid: &str)
                                 -> Option<BluetoothGATTService> {
         for service in self.cached_services.values() {
-            if let Ok(s) = service.get_uuid() {
-                if s == service_uuid {
+            if let Ok(uuid) = service.get_uuid() {
+                if uuid == service_uuid {
                     return Some(service.clone());
                 } 
             }
@@ -188,8 +188,8 @@ impl BluetoothManager {
         // Update cache
         let services = self.get_gatt_services(adapter, device_id);
         for service in services {
-            if let Ok(s) = service.get_uuid() {
-                if s == service_uuid {
+            if let Ok(uuid) = service.get_uuid() {
+                if uuid == service_uuid {
                     return Some(service.clone());
                 }
             }
@@ -205,8 +205,8 @@ impl BluetoothManager {
         let mut services_vec: Vec<BluetoothGATTService> = vec!();
         let services = self.get_gatt_services(adapter, device_id);
         for service in services {
-            if let Ok(s) = service.get_uuid() {
-                if s == service_uuid {
+            if let Ok(uuid) = service.get_uuid() {
+                if uuid == service_uuid {
                     services_vec.push(service.clone());
                 }
             }
@@ -253,8 +253,8 @@ impl BluetoothManager {
                                        characteristic_uuid: &str)
                                        -> Option<BluetoothGATTCharacteristic> {
         for characteristic in self.cached_characteristics.values() {
-            if let Ok(c) = characteristic.get_uuid() {
-                if c == characteristic_uuid {
+            if let Ok(uuid) = characteristic.get_uuid() {
+                if uuid == characteristic_uuid {
                     return Some(characteristic.clone());
                 }
             }
@@ -262,8 +262,8 @@ impl BluetoothManager {
         // Update cache
         let characteristics = self.get_gatt_characteristics(adapter, service_id);
         for characteristic in characteristics {
-            if let Ok(c) = characteristic.get_uuid() {
-                if c == characteristic_uuid {
+            if let Ok(uuid) = characteristic.get_uuid() {
+                if uuid == characteristic_uuid {
                     return Some(characteristic.clone());
                 }
             }
@@ -279,8 +279,8 @@ impl BluetoothManager {
         let mut characteristics_vec: Vec<BluetoothGATTCharacteristic> = vec!();
         let characteristics = self.get_gatt_characteristics(adapter, service_id);
         for characteristic in characteristics {
-            if let Ok(c) = characteristic.get_uuid() {
-                if c == characteristic_uuid {
+            if let Ok(uuid) = characteristic.get_uuid() {
+                if uuid == characteristic_uuid {
                     characteristics_vec.push(characteristic.clone());
                 }
             }
@@ -347,8 +347,8 @@ impl BluetoothManager {
                                    descriptor_uuid: &str)
                                    -> Option<BluetoothGATTDescriptor> {
         for descriptor in self.cached_descriptors.values() {
-            if let Ok(d) = descriptor.get_uuid() {
-                if d == descriptor_uuid {
+            if let Ok(uuid) = descriptor.get_uuid() {
+                if uuid == descriptor_uuid {
                     return Some(descriptor.clone());
                 }
             }
@@ -356,8 +356,8 @@ impl BluetoothManager {
         // Update cache
         let descriptors = self.get_gatt_descriptors(adapter, characteristic_id);
         for descriptor in descriptors {
-            if let Ok(d) = descriptor.get_uuid() {
-                if d == descriptor_uuid {
+            if let Ok(uuid) = descriptor.get_uuid() {
+                if uuid == descriptor_uuid {
                     return Some(descriptor.clone());
                 }
             }
@@ -373,8 +373,8 @@ impl BluetoothManager {
         let mut descriptors_vec: Vec<BluetoothGATTDescriptor> = vec!();
         let descriptors = self.get_gatt_descriptors(adapter, characteristic_id);
         for descriptor in descriptors {
-            if let Ok(d) = descriptor.get_uuid() {
-                if d == descriptor_uuid {
+            if let Ok(uuid) = descriptor.get_uuid() {
+                if uuid == descriptor_uuid {
                     descriptors_vec.push(descriptor.clone());
                 }
             }
@@ -397,7 +397,12 @@ impl BluetoothManager {
         match devices.into_iter().find(|ref d| matches_filters(d, options.get_filters())) {
             Some(device) => {
                 let message = BluetoothObjectMsg::BluetoothDevice {
-                    id: device.get_address().unwrap_or("".to_owned()),
+                    id: if let Ok(address) = device.get_address() {
+                            address
+                        }
+                        else {
+                            send_error!(sender, "No device found");
+                        },
                     name: device.get_name().ok(),
                     device_class: device.get_class().ok(),
                     vendor_id_source: device.get_vendor_id_source().ok(),
@@ -479,7 +484,12 @@ impl BluetoothManager {
             send_error!(sender, "No primary service found");
         }
         let message = BluetoothObjectMsg::BluetoothService {
-            uuid: service.get_uuid().unwrap_or("".to_owned()),
+            uuid: if let Ok(uuid) = service.get_uuid() {
+                    uuid
+                }
+                else {
+                    send_error!(sender, "No service found");
+                },
             is_primary: true,
             instance_id: service.get_object_path(),
         };
@@ -505,12 +515,12 @@ impl BluetoothManager {
         for service in services {
             if service.is_primary().unwrap_or(false) {
                 services_vec.push(BluetoothObjectMsg::BluetoothService {
-                    uuid: if let Ok(s) = service.get_uuid() {
-                        s
-                    }
-                    else {
-                        send_error!(sender, "No service found");
-                    },
+                    uuid: if let Ok(uuid) = service.get_uuid() {
+                            uuid
+                        }
+                        else {
+                            send_error!(sender, "No service found");
+                        },
                     is_primary: true,
                     instance_id: service.get_object_path(),
                 });
@@ -534,12 +544,12 @@ impl BluetoothManager {
         };
         let properties = self.get_characteristic_properties(&characteristic);
         let message = BluetoothObjectMsg::BluetoothCharacteristic {
-            uuid: if let Ok(c) = characteristic.get_uuid() {
-                c
-            }
-            else {
-                send_error!(sender, "No characteristic found");
-            },
+            uuid: if let Ok(uuid) = characteristic.get_uuid() {
+                    uuid
+                }
+                else {
+                    send_error!(sender, "No characteristic found");
+                },
             instance_id: characteristic.get_object_path(),
             broadcast: properties[0],
             read: properties[1],
@@ -604,7 +614,12 @@ impl BluetoothManager {
             None => send_error!(sender, "No descriptor found"),
         };
         let message = BluetoothObjectMsg::BluetoothDescriptor {
-            uuid: descriptor.get_uuid().unwrap_or("".to_owned()),
+            uuid: if let Ok(uuid) = descriptor.get_uuid() {
+                    uuid
+                }
+                else {
+                    send_error!(sender, "No descriptor found");
+                },
             instance_id: descriptor.get_object_path(),
         };
         sender.send(message).unwrap();
