@@ -32,16 +32,16 @@ impl BluetoothScanfilter {
         }
     }
 
-    pub fn get_name(&self) -> String {
-        self.name.clone()
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
-    pub fn get_name_prefix(&self) -> String {
-        self.name_prefix.clone()
+    pub fn get_name_prefix(&self) -> &str {
+        &self.name_prefix
     }
 
-    pub fn get_services(&self) -> Vec<String> {
-        self.services.0.clone()
+    pub fn get_services(&self) -> &Vec<String> {
+        &self.services.0
     }
 
     pub fn is_empty_or_invalid_filter(&self) -> bool {

@@ -62,7 +62,7 @@ fn matches_filter(device: &BluetoothDevice, filter: &BluetoothScanfilter) -> boo
 
      if !filter.get_name().is_empty() {
         if let Ok(device_name) = device.get_name() {
-            if !device_name.eq(&filter.get_name()) {
+            if !device_name.eq(filter.get_name()) {
                 return false;
             }
         } else {
@@ -72,7 +72,7 @@ fn matches_filter(device: &BluetoothDevice, filter: &BluetoothScanfilter) -> boo
 
     if !filter.get_name_prefix().is_empty() {
         if let Ok(device_name) = device.get_name() {
-            if !device_name.starts_with(&*filter.get_name_prefix()) {
+            if !device_name.starts_with(filter.get_name_prefix()) {
                 return false;
             }
         } else {
@@ -82,8 +82,8 @@ fn matches_filter(device: &BluetoothDevice, filter: &BluetoothScanfilter) -> boo
 
     if !filter.get_services().is_empty() {
         if let Ok(device_uuids) = device.get_uuids() {
-            for service in &filter.get_services() {
-                if device_uuids.iter().find(|x| *x == service).is_none() {
+            for service in filter.get_services() {
+                if device_uuids.iter().find(|x| x == &service).is_none() {
                     return false;
                 }
             }
