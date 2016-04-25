@@ -10,7 +10,7 @@ use std::slice::Iter;
 const MAX_NAME_LENGTH: usize = 29;
 
 #[derive(Deserialize, Serialize)]
-pub struct ServiceUUIDSequence(pub Vec<String>);
+pub struct ServiceUUIDSequence(Vec<String>);
 
 impl ServiceUUIDSequence {
     pub fn new(vec: Vec<String>) -> ServiceUUIDSequence {
