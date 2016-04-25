@@ -178,7 +178,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             BluetoothObjectMsg::BluetoothReadValue {
                 value
             } => {
-                Some(ByteString::new(value))
+                ByteString::new(value)
             },
             BluetoothObjectMsg::Error {
                 error
@@ -187,8 +187,8 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             },
             _ => unreachable!()
         };
-        *self.value.borrow_mut() = value.clone();
-        Ok(value.unwrap())
+        *self.value.borrow_mut() = Some(value.clone());
+        Ok(value)
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue

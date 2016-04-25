@@ -98,7 +98,7 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
             BluetoothObjectMsg::BluetoothReadValue {
                 value
             } => {
-                Some(ByteString::new(value))
+                ByteString::new(value)
             },
             BluetoothObjectMsg::Error {
                 error
@@ -107,8 +107,8 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
             },
             _ => unreachable!()
         };
-        *self.value.borrow_mut() = value.clone();
-        Ok(value.unwrap())
+        *self.value.borrow_mut() = Some(value.clone());
+        Ok(value)
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattdescriptor-writevalue
