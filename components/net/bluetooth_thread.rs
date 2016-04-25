@@ -56,16 +56,12 @@ impl BluetoothThreadFactory for IpcSender<BluetoothMethodMsg> {
 }
 
 fn matches_filter(device: &BluetoothDevice, filter: &BluetoothScanfilter) -> bool {
-    if filter.is_empty_or_invalid_filter() {
+    if filter.is_empty_or_invalid() {
         return false;
     }
 
-     if !filter.get_name().is_empty() {
-        if let Ok(device_name) = device.get_name() {
-            if !device_name.eq(filter.get_name()) {
-                return false;
-            }
-        } else {
+    if !filter.get_name().is_empty() {
+        if device.get_name().ok() != Some(filter.get_name().to_string()) {
             return false;
         }
     }
@@ -97,11 +93,7 @@ fn matches_filters(device: &BluetoothDevice, filters: &BluetoothScanfilterSequen
         return false;
     }
 
-    if filters.0.iter().any(|f| matches_filter(device, f)) {
-        return true;
-    }
-
-    return false;
+    return filters.iter().any(|f| matches_filter(device, f))
 }
 
 pub struct BluetoothManager {

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use std::slice::Iter;
+
 // A device name can never be longer than 29 bytes. An adv packet is at most
 // 31 bytes long. The length and identifier of the length field take 2 bytes.
 // That leaves 29 bytes for the name.
@@ -44,7 +46,7 @@ impl BluetoothScanfilter {
         &self.services.0
     }
 
-    pub fn is_empty_or_invalid_filter(&self) -> bool {
+    pub fn is_empty_or_invalid(&self) -> bool {
         (self.name.is_empty() && self.name_prefix.is_empty() && self.get_services().is_empty()) ||
         self.name.len() > MAX_NAME_LENGTH ||
         self.name_prefix.len() > MAX_NAME_LENGTH
@@ -52,7 +54,7 @@ impl BluetoothScanfilter {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct BluetoothScanfilterSequence(pub Vec<BluetoothScanfilter>);
+pub struct BluetoothScanfilterSequence(Vec<BluetoothScanfilter>);
 
 impl BluetoothScanfilterSequence {
     pub fn new(vec: Vec<BluetoothScanfilter>) -> BluetoothScanfilterSequence {
@@ -61,7 +63,11 @@ impl BluetoothScanfilterSequence {
 
     pub fn has_empty_or_invalid_filter(&self) -> bool {
         self.0.is_empty() ||
-        self.0.iter().any(BluetoothScanfilter::is_empty_or_invalid_filter)
+        self.0.iter().any(BluetoothScanfilter::is_empty_or_invalid)
+    }
+
+    pub fn iter(&self) -> Iter<BluetoothScanfilter> {
+        self.0.iter()
     }
 }
 
