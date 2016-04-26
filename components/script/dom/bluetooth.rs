@@ -26,8 +26,9 @@ const FILTER_ERROR: &'static str = "A filter must restrict the devices in some w
 const FILTER_NAME_TOO_LONG_ERROR: &'static str = "A 'name' or 'namePrefix' can't be longer then 29 bytes.";
 // 248 is the maximum number of UTF-8 code units in a Bluetooth Device Name.
 const MAX_DEVICE_NAME_LENGTH: usize = 248;
-// A device name can never be longer than 29 bytes. An adv packet is at most
-// 31 bytes long. The length and identifier of the length field take 2 bytes.
+// A device name can never be longer than 29 bytes.
+// An advertising packet is at most 31 bytes long.
+// The length and identifier of the length field take 2 bytes.
 // That leaves 29 bytes for the name.
 const MAX_FILTER_NAME_LENGTH: usize = 29;
 const NAME_PREFIX_ERROR: &'static str = "'namePrefix', if present, must be non - empty.";
