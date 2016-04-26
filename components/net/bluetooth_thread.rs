@@ -11,8 +11,8 @@ use ipc_channel::ipc::{self, IpcReceiver, IpcSender};
 use net_traits::bluetooth_scanfilter::{BluetoothScanfilter, BluetoothScanfilterSequence, RequestDeviceoptions};
 use net_traits::bluetooth_thread::{BluetoothCharacteristicMsg, BluetoothCharacteristicsMsg};
 use net_traits::bluetooth_thread::{BluetoothDescriptorMsg, BluetoothDescriptorsMsg};
-use net_traits::bluetooth_thread::{BluetoothDeviceMsg, BluetoothServiceMsg, BluetoothServicesMsg};
-use net_traits::bluetooth_thread::{BluetoothMethodMsg, BluetoothResult};
+use net_traits::bluetooth_thread::{BluetoothDeviceMsg, BluetoothMethodMsg};
+use net_traits::bluetooth_thread::{BluetoothResult, BluetoothServiceMsg, BluetoothServicesMsg};
 use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::string::String;
@@ -405,8 +405,7 @@ impl BluetoothManager {
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
         };
 
-        let message = Ok(connected);
-        let _ = sender.send(message);
+        let _ = sender.send(Ok(connected));
     }
 
     fn gatt_server_disconnect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
@@ -426,8 +425,7 @@ impl BluetoothManager {
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
         };
 
-        let message = Ok(connected);
-        let _ = sender.send(message);
+        let _ = sender.send(Ok(connected));
     }
 
     fn get_primary_service(&mut self,
@@ -445,10 +443,7 @@ impl BluetoothManager {
         for service in services {
             if service.is_primary().unwrap_or(false) {
                 if let Ok(uuid) = service.get_uuid() {
-                    let message = Ok((uuid,
-                                      true,
-                                      service.get_object_path()));
-                    return drop(sender.send(message));
+                    return drop(sender.send(Ok((uuid, true, service.get_object_path()))));
                 }
             }
         }
@@ -474,17 +469,15 @@ impl BluetoothManager {
         for service in services {
             if service.is_primary().unwrap_or(false) {
                 if let Ok(uuid) = service.get_uuid() {
-                    services_vec.push((uuid,
-                                       true,
-                                       service.get_object_path()));
+                    services_vec.push((uuid, true, service.get_object_path()));
                 }
             }
         }
         if services_vec.is_empty() {
             return drop(sender.send(Err(String::from(PRIMARY_SERVICE_ERROR))));
         }
-        let message = Ok(services_vec);
-        let _ = sender.send(message);
+
+        let _ = sender.send(Ok(services_vec));
     }
 
     fn get_characteristic(&mut self,
@@ -554,8 +547,8 @@ impl BluetoothManager {
         if characteristics_vec.is_empty() {
             return drop(sender.send(Err(String::from(CHARACTERISTIC_ERROR))));
         }
-        let message = Ok(characteristics_vec);
-        let _ = sender.send(message);
+
+        let _ = sender.send(Ok(characteristics_vec));
     }
 
     fn get_descriptor(&mut self,
@@ -572,9 +565,7 @@ impl BluetoothManager {
         }
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
-                let message = Ok((uuid,
-                                  descriptor.get_object_path()));
-                return drop(sender.send(message));
+                return drop(sender.send(Ok((uuid, descriptor.get_object_path()))));
             }
         }
         return drop(sender.send(Err(String::from(DESCRIPTOR_ERROR))));
@@ -598,15 +589,14 @@ impl BluetoothManager {
         let mut descriptors_vec = vec!();
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
-                descriptors_vec.push((uuid,
-                                      descriptor.get_object_path()));
+                descriptors_vec.push((uuid, descriptor.get_object_path()));
             }
         }
         if descriptors_vec.is_empty() {
             return drop(sender.send(Err(String::from(DESCRIPTOR_ERROR))));
         }
-        let message = Ok(descriptors_vec);
-        let _ = sender.send(message);
+
+        let _ = sender.send(Ok(descriptors_vec));
     }
 
     fn read_value(&mut self, id: String, sender: IpcSender<BluetoothResult<Vec<u8>>>) {
@@ -622,7 +612,7 @@ impl BluetoothManager {
         }
         let message = match value {
             Some(v) => Ok(v),
-            None => return drop(sender.send(Err(String::from(VALUE_ERROR)))),
+            None => Err(String::from(VALUE_ERROR)),
         };
         let _ = sender.send(message);
     }

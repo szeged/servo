@@ -100,8 +100,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             BluetoothMethodMsg::GetDescriptor(self.get_instance_id(), uuid, sender)).unwrap();
         let descriptor = receiver.recv().unwrap();
         match descriptor {
-            Ok((uuid,
-                instance_id)) => {
+            Ok((uuid, instance_id)) => {
                 Ok(BluetoothRemoteGATTDescriptor::new(self.global().r(),
                                                       self,
                                                       DOMString::from(uuid),
@@ -109,7 +108,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             },
             Err(error) => {
                 Err(Type(error))
-            }
+            },
         }
     }
 
@@ -122,21 +121,18 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             uuid = Some(try!(BluetoothUUID::GetDescriptor(self.global().r(), d)).to_string())
         };
         let (sender, receiver) = ipc::channel().unwrap();
-        let mut descriptors = vec!();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetDescriptors(self.get_instance_id(), uuid, sender)).unwrap();
         let descriptors_vec = receiver.recv().unwrap();
         match descriptors_vec {
             Ok(descriptor_vec) => {
-                for d in descriptor_vec {
-                    let (uuid,
-                         instance_id) = d;
-                    descriptors.push(BluetoothRemoteGATTDescriptor::new(self.global().r(),
-                                                                        self,
-                                                                        DOMString::from(uuid),
-                                                                        instance_id));
-                }
-                Ok(descriptors)
+                Ok(descriptor_vec.into_iter()
+                                 .map(|(uuid, instance_id)|
+                                      BluetoothRemoteGATTDescriptor::new(self.global().r(),
+                                                                         self,
+                                                                         DOMString::from(uuid),
+                                                                         instance_id))
+                                  .collect())
             },
             Err(error) => {
                 Err(Type(error))

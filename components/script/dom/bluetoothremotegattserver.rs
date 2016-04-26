@@ -102,9 +102,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
             BluetoothMethodMsg::GetPrimaryService(String::from(self.Device().Id()), uuid, sender)).unwrap();
         let service = receiver.recv().unwrap();
         match service {
-            Ok((uuid,
-                is_primary,
-                instance_id)) => {
+            Ok((uuid, is_primary, instance_id)) => {
                 Ok(BluetoothRemoteGATTService::new(self.global().r(),
                                                    &self.device.get(),
                                                    DOMString::from(uuid),
@@ -133,9 +131,7 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
         match services_vec {
             Ok(service_vec) => {
                 for service in service_vec {
-                    let (uuid,
-                         is_primary,
-                         instance_id) = service;
+                    let (uuid, is_primary, instance_id) = service;
                     services.push(BluetoothRemoteGATTService::new(self.global().r(),
                                                                   &self.device.get(),
                                                                   DOMString::from(uuid),
