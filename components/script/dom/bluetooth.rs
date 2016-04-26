@@ -141,12 +141,13 @@ impl BluetoothMethods for Bluetooth {
                 name,
                 device_class,
                 vendor_id_source,
-                vendor_id, product_id,
+                vendor_id,
+                product_id,
                 product_version,
                 appearance,
                 tx_power,
                 rssi)) => {
-                let ad_data = &BluetoothAdvertisingData::new(self.global().r(),
+                let ad_data = BluetoothAdvertisingData::new(self.global().r(),
                                                              appearance,
                                                              tx_power,
                                                              rssi);
@@ -155,11 +156,10 @@ impl BluetoothMethods for Bluetooth {
                     "usb" => VendorIDSource::Usb,
                     _ => VendorIDSource::Unknown,
                 });
-                let name = name.map(DOMString::from);
                 Ok(BluetoothDevice::new(self.global().r(),
                                         DOMString::from(id),
-                                        name,
-                                        ad_data,
+                                        name.map(DOMString::from),
+                                        &ad_data,
                                         device_class,
                                         vendor_id_source,
                                         vendor_id,

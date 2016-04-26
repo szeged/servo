@@ -123,22 +123,20 @@ impl BluetoothRemoteGATTServerMethods for BluetoothRemoteGATTServer {
         if let Some(s) = service {
             uuid = Some(try!(BluetoothUUID::GetService(self.global().r(), s)).to_string())
         };
-        let mut services = vec!();
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetPrimaryServices(String::from(self.Device().Id()), uuid, sender)).unwrap();
         let services_vec = receiver.recv().unwrap();
         match services_vec {
             Ok(service_vec) => {
-                for service in service_vec {
-                    let (uuid, is_primary, instance_id) = service;
-                    services.push(BluetoothRemoteGATTService::new(self.global().r(),
-                                                                  &self.device.get(),
-                                                                  DOMString::from(uuid),
-                                                                  is_primary,
-                                                                  instance_id));
-                }
-                Ok(services)
+                Ok(service_vec.into_iter()
+                              .map(|(uuid, is_primary, instance_id)|
+                                   BluetoothRemoteGATTService::new(self.global().r(),
+                                                                   &self.device.get(),
+                                                                   DOMString::from(uuid),
+                                                                   is_primary,
+                                                                   instance_id))
+                              .collect())
             },
             Err(error) => {
                 Err(Type(error))
