@@ -33,6 +33,10 @@ const CHARACTERISTIC_ERROR: &'static str = "No characteristic found";
 const DESCRIPTOR_ERROR: &'static str = "No descriptor found";
 const VALUE_ERROR: &'static str = "No characteristic or descriptor found with that id";
 const SECURITY_ERROR: &'static str = "The operation is insecure";
+const NETWORK_ERROR: &'static str = "A network error occurred";
+// A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
+// https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (p. 480)
+const MAXIMUM_TARNSACTION_TIME: u32 = 30;
 // The discovery session needs some time to find any nearby devices
 const DISCOVERY_TIMEOUT_MS: u64 = 1500;
 #[cfg(target_os = "linux")]
@@ -474,10 +478,21 @@ impl BluetoothManager {
 
         let connected = match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
-                if d.is_connected().unwrap_or(false) {
-                    true
-                } else {
-                    d.connect().is_ok()
+                match d.is_connected().unwrap_or(false) {
+                    true => true,
+                    false => {
+                        let _ = d.connect();
+                        for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                            match d.is_connected().unwrap_or(false) {
+                                true => break,
+                                false => thread::sleep(Duration::from_millis(1000)),
+                            }
+                        }
+                        match d.is_connected().unwrap_or(false) {
+                            true => true,
+                            false => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
+                        }
+                    },
                 }
             },
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
