@@ -4,6 +4,7 @@
 
 use device::bluetooth::BluetoothAdapter;
 use device::bluetooth::BluetoothDevice;
+use device::bluetooth::BluetoothDiscoverySession;
 use device::bluetooth::BluetoothGATTCharacteristic;
 use device::bluetooth::BluetoothGATTDescriptor;
 use device::bluetooth::BluetoothGATTService;
@@ -16,6 +17,8 @@ use net_traits::bluetooth_thread::{BluetoothResult, BluetoothServiceMsg, Bluetoo
 use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::string::String;
+use std::thread;
+use std::time::Duration;
 use util::thread::spawn_named;
 
 const ADAPTER_ERROR: &'static str = "No adapter found";
@@ -355,30 +358,45 @@ impl BluetoothManager {
             Some(a) => a,
             None => return drop(sender.send(Err(String::from(ADAPTER_ERROR)))),
         };
-        let devices = self.get_and_cache_devices(&mut adapter);
-        if devices.is_empty() {
-            return drop(sender.send(Err(String::from(DEVICE_ERROR))));
+        let mut session_time = 5;
+        let session = BluetoothDiscoverySession::create_session(adapter.get_object_path()).ok();
+
+        if let Some(ref s) = session {
+            let _ = s.start_discovery();
+        } else {
+            session_time = 1;
         }
 
-        let matched_devices: Vec<BluetoothDevice> = devices.into_iter()
-                                                           .filter(|d| matches_filters(d, options.get_filters()))
-                                                           .collect();
-        for device in matched_devices {
-            if let Ok(address) = device.get_address() {
-                let message = Ok(BluetoothDeviceMsg {
-                                     id: address,
-                                     name: device.get_name().ok(),
-                                     device_class: device.get_class().ok(),
-                                     vendor_id_source: device.get_vendor_id_source().ok(),
-                                     vendor_id: device.get_vendor_id().ok(),
-                                     product_id: device.get_product_id().ok(),
-                                     product_version: device.get_device_id().ok(),
-                                     appearance: device.get_appearance().ok(),
-                                     tx_power: device.get_tx_power().ok().map(|p| p as i8),
-                                     rssi: device.get_rssi().ok().map(|p| p as i8),
-                                 });
-                return drop(sender.send(message));
+        for _ in 0..session_time {
+            let devices = self.get_and_cache_devices(&mut adapter);
+
+            let matched_devices: Vec<BluetoothDevice> = devices.into_iter()
+                                                               .filter(|d| matches_filters(d, options.get_filters()))
+                                                               .collect();
+            for device in matched_devices {
+                if let Ok(address) = device.get_address() {
+                    let message = Ok(BluetoothDeviceMsg {
+                                         id: address,
+                                         name: device.get_name().ok(),
+                                         device_class: device.get_class().ok(),
+                                         vendor_id_source: device.get_vendor_id_source().ok(),
+                                         vendor_id: device.get_vendor_id().ok(),
+                                         product_id: device.get_product_id().ok(),
+                                         product_version: device.get_device_id().ok(),
+                                         appearance: device.get_appearance().ok(),
+                                         tx_power: device.get_tx_power().ok().map(|p| p as i8),
+                                         rssi: device.get_rssi().ok().map(|p| p as i8),
+                                     });
+                    if let Some(ref s) = session {
+                        let _ = s.stop_discovery();
+                    }
+                    return drop(sender.send(message));
+                }
             }
+            thread::sleep(Duration::from_millis(1000));
+        }
+        if let Some(ref s) = session {
+            let _ = s.stop_discovery();
         }
         return drop(sender.send(Err(String::from(DEVICE_MATCH_ERROR))));
     }
