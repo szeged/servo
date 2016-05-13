@@ -60,6 +60,8 @@ pub enum BluetoothMethodMsg {
     GATTServerDisconnect(String, IpcSender<BluetoothResult<bool>>),
     GetPrimaryService(String, String, IpcSender<BluetoothResult<BluetoothServiceMsg>>),
     GetPrimaryServices(String, Option<String>, IpcSender<BluetoothResult<BluetoothServicesMsg>>),
+    GetIncludedService(String, String, String, IpcSender<BluetoothResult<BluetoothServiceMsg>>),
+    GetIncludedServices(String, String, Option<String>, IpcSender<BluetoothResult<BluetoothServicesMsg>>),
     GetCharacteristic(String, String, IpcSender<BluetoothResult<BluetoothCharacteristicMsg>>),
     GetCharacteristics(String, Option<String>, IpcSender<BluetoothResult<BluetoothCharacteristicsMsg>>),
     GetDescriptor(String, String, IpcSender<BluetoothResult<BluetoothDescriptorMsg>>),
