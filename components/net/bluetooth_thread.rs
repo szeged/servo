@@ -150,11 +150,11 @@ impl BluetoothManager {
                 BluetoothMethodMsg::GetPrimaryServices(device_id, uuid, sender) => {
                     self.get_primary_services(device_id, uuid, sender)
                 },
-                BluetoothMethodMsg::GetIncludedService(device_id, primary_id, uuid, sender) => {
-                    self.get_included_service(device_id, primary_id, uuid, sender)
+                BluetoothMethodMsg::GetIncludedService(device_id, primary_uuid, uuid, sender) => {
+                    self.get_included_service(device_id, primary_uuid, uuid, sender)
                 },
-                BluetoothMethodMsg::GetIncludedServices(device_id, primary_id, uuid, sender) => {
-                    self.get_included_services(device_id, primary_id, uuid, sender)
+                BluetoothMethodMsg::GetIncludedServices(device_id, primary_uuid, uuid, sender) => {
+                    self.get_included_services(device_id, primary_uuid, uuid, sender)
                 },
                 BluetoothMethodMsg::GetCharacteristic(service_id, uuid, sender) => {
                     self.get_characteristic(service_id, uuid, sender)
@@ -487,7 +487,7 @@ impl BluetoothManager {
 
     fn get_included_service(&mut self,
                             device_id: String,
-                            primary_id: String,
+                            primary_uuid: String,
                             uuid: String,
                             sender: IpcSender<BluetoothResult<BluetoothServiceMsg>>) {
         let mut adapter = match self.get_or_create_adapter() {
@@ -500,7 +500,7 @@ impl BluetoothManager {
         }
         for service in services {
             if let Ok(uuid) = service.get_uuid() {
-                if uuid == primary_id {
+                if uuid == primary_uuid {
                     continue;
                 }
                 return drop(sender.send(Ok(BluetoothServiceMsg {
@@ -515,7 +515,7 @@ impl BluetoothManager {
 
     fn get_included_services(&mut self,
                              device_id: String,
-                             primary_id: String,
+                             primary_uuid: String,
                              uuid: Option<String>,
                              sender: IpcSender<BluetoothResult<BluetoothServicesMsg>>) {
         let mut adapter = match self.get_or_create_adapter() {
@@ -532,7 +532,7 @@ impl BluetoothManager {
         let mut services_vec = vec!();
         for service in services {
             if let Ok(uuid) = service.get_uuid() {
-                if uuid == primary_id {
+                if uuid == primary_uuid {
                     continue;
                 }
                 services_vec.push(BluetoothServiceMsg {
