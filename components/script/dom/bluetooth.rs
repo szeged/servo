@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use bluetooth_blacklist::BLUETOOTH_BLACKLIST;
+use bluetooth_blacklist::{Blacklist, uuid_is_blacklisted};
 use core::clone::Clone;
 use dom::bindings::codegen::Bindings::BluetoothBinding;
 use dom::bindings::codegen::Bindings::BluetoothBinding::RequestDeviceOptions;
@@ -72,9 +72,11 @@ fn canonicalize_filter(filter: &BluetoothScanFilter, global: GlobalRef) -> Falli
             return Err(Type(SERVICE_ERROR.to_owned()));
         }
         for service in services {
-            let uuid = try!(BluetoothUUID::GetService(global, service.clone()));
-            return_if_blacklisted!(uuid, is_blacklisted);
-            services_vec.push(uuid.to_string());
+            let uuid = try!(BluetoothUUID::GetService(global, service.clone())).to_string();
+            if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
+                return Err(Security)
+            }
+            services_vec.push(uuid);
         }
     }
 
@@ -122,9 +124,11 @@ fn convert_request_device_options(options: &RequestDeviceOptions,
     let mut optional_services = vec!();
     if let Some(ref opt_services) = options.optionalServices {
         for opt_service in opt_services {
-            let uuid = try!(BluetoothUUID::GetService(global, opt_service.clone()));
-            return_if_blacklisted!(uuid, is_blacklisted);
-            optional_services.push(uuid.to_string());
+            let uuid = try!(BluetoothUUID::GetService(global, opt_service.clone())).to_string();
+            if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
+                return Err(Security)
+            }
+            optional_services.push(uuid);
         }
     }
 

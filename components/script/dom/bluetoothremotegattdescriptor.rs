@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use bluetooth_blacklist::BLUETOOTH_BLACKLIST;
+use bluetooth_blacklist::{Blacklist, uuid_is_blacklisted};
 use dom::bindings::cell::DOMRefCell;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::BluetoothDeviceMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
@@ -86,7 +86,9 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattdescriptor-readvalue
     fn ReadValue(&self) -> Fallible<ByteString> {
-        return_if_blacklisted!(self.Uuid(), is_blacklisted_for_reads);
+        if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Reads) {
+            return Err(Security)
+        }
         let (sender, receiver) = ipc::channel().unwrap();
         if !self.Characteristic().Service().Device().Gatt().Connected() {
             return Err(Network)
@@ -108,7 +110,9 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattdescriptor-writevalue
     fn WriteValue(&self, value: Vec<u8>) -> ErrorResult {
-        return_if_blacklisted!(self.Uuid(), is_blacklisted_for_writes);
+        if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Writes) {
+            return Err(Security)
+        }
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::WriteValue(self.get_instance_id(), value, sender)).unwrap();

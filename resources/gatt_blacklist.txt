@@ -1,9 +1,7 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
 # Source:
 # https://github.com/WebBluetoothCG/registries/blob/master/gatt_blacklist.txt
+# License:
+# https://github.com/WebBluetoothCG/registries/blob/master/LICENSE
 
 # This file holds a list of GATT UUIDs that websites using the Web
 # Bluetooth API are forbidden from accessing.
