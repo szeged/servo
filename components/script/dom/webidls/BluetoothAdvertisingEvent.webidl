@@ -12,11 +12,25 @@ interface BluetoothServiceDataMap {
   readonly maplike<UUID, DataView>;
 };*/
 
-[Pref="dom.bluetooth.enabled"]
-interface BluetoothAdvertisingData {
+[Constructor(DOMString type, BluetoothAdvertisingEventInit init)]
+interface BluetoothAdvertisingEvent : Event {
+  readonly attribute BluetoothDevice device;
+  // readonly attribute FrozenArray<UUID> uuids;
+  readonly attribute DOMString? name;
   readonly attribute unsigned short? appearance;
   readonly attribute byte? txPower;
   readonly attribute byte? rssi;
   // readonly attribute BluetoothManufacturerDataMap manufacturerData;
   // readonly attribute BluetoothServiceDataMap serviceData;
+};
+
+dictionary BluetoothAdvertisingEventInit : EventInit {
+  required BluetoothDevice device;
+  // sequence<(DOMString or unsigned long)> uuids;
+  DOMString name;
+  unsigned short appearance;
+  byte txPower;
+  byte rssi;
+  // Map manufacturerData;
+  // Map serviceData;
 };

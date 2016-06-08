@@ -56,6 +56,8 @@ pub type BluetoothResult<T> = Result<T, String>;
 #[derive(Deserialize, Serialize)]
 pub enum BluetoothMethodMsg {
     RequestDevice(RequestDeviceoptions, IpcSender<BluetoothResult<BluetoothDeviceMsg>>),
+    WatchAdvertisements(String, IpcSender<BluetoothResult<bool>>),
+    UnwatchAdvertisements(String, IpcSender<BluetoothResult<bool>>),
     GATTServerConnect(String, IpcSender<BluetoothResult<bool>>),
     GATTServerDisconnect(String, IpcSender<BluetoothResult<bool>>),
     GetPrimaryService(String, String, IpcSender<BluetoothResult<BluetoothServiceMsg>>),

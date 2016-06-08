@@ -33,6 +33,7 @@ const CHARACTERISTIC_ERROR: &'static str = "No characteristic found";
 const DESCRIPTOR_ERROR: &'static str = "No descriptor found";
 const VALUE_ERROR: &'static str = "No characteristic or descriptor found with that id";
 const SECURITY_ERROR: &'static str = "The operation is insecure";
+const NOT_SUPPORTED: &'static str = "This feature is not supported yet";
 // The discovery session needs some time to find any nearby devices
 const DISCOVERY_TIMEOUT_MS: u64 = 1500;
 #[cfg(target_os = "linux")]
@@ -165,6 +166,12 @@ impl BluetoothManager {
             match msg {
                 BluetoothMethodMsg::RequestDevice(options, sender) => {
                     self.request_device(options, sender)
+                },
+                BluetoothMethodMsg::WatchAdvertisements(id, sender) => {
+                    self.watch_advertising(id, sender)
+                },
+                BluetoothMethodMsg::UnwatchAdvertisements(id, sender) => {
+                    self.unwatch_advertising(id, sender)
                 },
                 BluetoothMethodMsg::GATTServerConnect(device_id, sender) => {
                     self.gatt_server_connect(device_id, sender)
@@ -467,6 +474,14 @@ impl BluetoothManager {
             }
         }
         return drop(sender.send(Err(String::from(DEVICE_MATCH_ERROR))));
+    }
+
+    fn watch_advertising(&self, _id: String, sender: IpcSender<BluetoothResult<bool>>) {
+        return drop(sender.send(Err(String::from(NOT_SUPPORTED))));
+    }
+
+    fn unwatch_advertising(&self, _id: String, sender: IpcSender<BluetoothResult<bool>>) {
+        return drop(sender.send(Err(String::from(NOT_SUPPORTED))));
     }
 
     fn gatt_server_connect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
