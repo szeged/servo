@@ -13,7 +13,6 @@ use dom::bindings::global::GlobalRef;
 use dom::bindings::js::Root;
 use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
 use dom::bindings::str::DOMString;
-use dom::bluetoothadvertisingdata::BluetoothAdvertisingData;
 use dom::bluetoothdevice::BluetoothDevice;
 use dom::bluetoothuuid::BluetoothUUID;
 use ipc_channel::ipc::{self, IpcSender};
@@ -144,14 +143,9 @@ impl BluetoothMethods for Bluetooth {
         let device = receiver.recv().unwrap();
         match device {
             Ok(device) => {
-                let ad_data = BluetoothAdvertisingData::new(self.global().r(),
-                                                            device.appearance,
-                                                            device.tx_power,
-                                                            device.rssi);
                 Ok(BluetoothDevice::new(self.global().r(),
                                         DOMString::from(device.id),
-                                        device.name.map(DOMString::from),
-                                        &ad_data))
+                                        device.name.map(DOMString::from)))
             },
             Err(error) => {
                 Err(Type(error))

@@ -8,9 +8,15 @@
 interface BluetoothDevice {
     readonly attribute DOMString id;
     readonly attribute DOMString? name;
-    readonly attribute BluetoothAdvertisingData adData;
     readonly attribute BluetoothRemoteGATTServer gatt;
     // readonly attribute FrozenArray[] uuids;
+
+    [Throws]
+    void watchAdvertisements();
+    // Promise<void> watchAdvertisements();
+    [Throws]
+    void unwatchAdvertisements();
+    readonly attribute boolean watchingAdvertisements;
 };
 
 // BluetoothDevice implements EventTarget;
