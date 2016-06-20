@@ -37,6 +37,7 @@ const NETWORK_ERROR: &'static str = "A network error occurred";
 // A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
 // https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (p. 480)
 const MAXIMUM_TARNSACTION_TIME: u32 = 30;
+const CONNECTION_TIMEOUT_MS: u64 = 1000;
 // The discovery session needs some time to find any nearby devices
 const DISCOVERY_TIMEOUT_MS: u64 = 1500;
 #[cfg(target_os = "linux")]
@@ -481,16 +482,20 @@ impl BluetoothManager {
                 match d.is_connected().unwrap_or(false) {
                     true => true,
                     false => {
-                        let _ = d.connect();
-                        for _ in 0..MAXIMUM_TARNSACTION_TIME {
-                            match d.is_connected().unwrap_or(false) {
-                                true => break,
-                                false => thread::sleep(Duration::from_millis(1000)),
-                            }
-                        }
-                        match d.is_connected().unwrap_or(false) {
-                            true => true,
-                            false => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
+                        match d.connect() {
+                            Ok(_) => true,
+                            Err(_) => {
+                                for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                                    match d.is_connected().unwrap_or(false) {
+                                        true => break,
+                                        false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                                    }
+                                }
+                                match d.is_connected().unwrap_or(false) {
+                                    true => true,
+                                    false => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
+                                }
+                            },
                         }
                     },
                 }
@@ -506,10 +511,25 @@ impl BluetoothManager {
 
         let connected = match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
-                if d.is_connected().unwrap_or(false) {
-                    d.disconnect().is_ok()
-                } else {
-                    false
+                match d.is_connected().unwrap_or(true) {
+                    false => false,
+                    true => {
+                        match d.disconnect() {
+                            Ok(_) => false,
+                            Err(_) => {
+                                for i in 0..MAXIMUM_TARNSACTION_TIME {
+                                    match d.is_connected().unwrap_or(true) {
+                                        false => break,
+                                        true => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                                    }
+                                }
+                                match d.is_connected().unwrap_or(true) {
+                                    false => false,
+                                    true => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
+                                }
+                            },
+                        }
+                    },
                 }
             },
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
