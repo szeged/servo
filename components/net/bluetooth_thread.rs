@@ -477,65 +477,43 @@ impl BluetoothManager {
     fn gatt_server_connect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
-        let connected = match self.get_device(&mut adapter, &device_id) {
+        match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
-                match d.is_connected().unwrap_or(false) {
-                    true => true,
-                    false => {
-                        match d.connect() {
-                            Ok(_) => true,
-                            Err(_) => {
-                                for _ in 0..MAXIMUM_TARNSACTION_TIME {
-                                    match d.is_connected().unwrap_or(false) {
-                                        true => break,
-                                        false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
-                                    }
-                                }
-                                match d.is_connected().unwrap_or(false) {
-                                    true => true,
-                                    false => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
-                                }
-                            },
-                        }
-                    },
+                if d.is_connected().unwrap_or(false) {
+                    return drop(sender.send(Ok(true)));
                 }
+                let _ = d.connect();
+                for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                    match d.is_connected().unwrap_or(false) {
+                        true => return drop(sender.send(Ok(true))),
+                        false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                    }
+                }
+                return drop(sender.send(Err(String::from(NETWORK_ERROR))));
             },
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
-        };
-
-        let _ = sender.send(Ok(connected));
+        }
     }
 
     fn gatt_server_disconnect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
-        let connected = match self.get_device(&mut adapter, &device_id) {
+        match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
-                match d.is_connected().unwrap_or(true) {
-                    false => false,
-                    true => {
-                        match d.disconnect() {
-                            Ok(_) => false,
-                            Err(_) => {
-                                for i in 0..MAXIMUM_TARNSACTION_TIME {
-                                    match d.is_connected().unwrap_or(true) {
-                                        false => break,
-                                        true => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
-                                    }
-                                }
-                                match d.is_connected().unwrap_or(true) {
-                                    false => false,
-                                    true => return drop(sender.send(Err(String::from(NETWORK_ERROR)))),
-                                }
-                            },
-                        }
-                    },
+                if !d.is_connected().unwrap_or(true) {
+                    return drop(sender.send(Ok(false)));
                 }
+                let _ = d.disconnect();
+                for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                    match d.is_connected().unwrap_or(true) {
+                        false => return drop(sender.send(Ok(false))),
+                        true => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                    }
+                }
+                return drop(sender.send(Err(String::from(NETWORK_ERROR))));
             },
             None => return drop(sender.send(Err(String::from(DEVICE_ERROR)))),
-        };
-
-        let _ = sender.send(Ok(connected));
+        }
     }
 
     fn get_primary_service(&mut self,
