@@ -483,7 +483,7 @@ impl BluetoothManager {
                     return drop(sender.send(Ok(true)));
                 }
                 let _ = d.connect();
-                while (0..MAXIMUM_TARNSACTION_TIME).next().is_some() {
+                for _ in 0..MAXIMUM_TARNSACTION_TIME {
                     match d.is_connected().unwrap_or(false) {
                         true => return drop(sender.send(Ok(true))),
                         false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
@@ -504,7 +504,7 @@ impl BluetoothManager {
                     return drop(sender.send(Ok(false)));
                 }
                 let _ = d.disconnect();
-                while (0..MAXIMUM_TARNSACTION_TIME).next().is_some() {
+                for _ in 0..MAXIMUM_TARNSACTION_TIME {
                     match d.is_connected().unwrap_or(true) {
                         true => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
                         false => return drop(sender.send(Ok(false))),
