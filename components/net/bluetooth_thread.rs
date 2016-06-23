@@ -35,7 +35,7 @@ const VALUE_ERROR: &'static str = "No characteristic or descriptor found with th
 const SECURITY_ERROR: &'static str = "The operation is insecure";
 const NETWORK_ERROR: &'static str = "A network error occurred";
 // A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
-// https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (p. 480)
+// https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 ([Vol 3, Part F] page 480)
 const MAXIMUM_TARNSACTION_TIME: u32 = 30;
 const CONNECTION_TIMEOUT_MS: u64 = 1000;
 // The discovery session needs some time to find any nearby devices
@@ -483,7 +483,7 @@ impl BluetoothManager {
                     return drop(sender.send(Ok(true)));
                 }
                 let _ = d.connect();
-                for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                while (0..MAXIMUM_TARNSACTION_TIME).next().is_some() {
                     match d.is_connected().unwrap_or(false) {
                         true => return drop(sender.send(Ok(true))),
                         false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
@@ -504,10 +504,10 @@ impl BluetoothManager {
                     return drop(sender.send(Ok(false)));
                 }
                 let _ = d.disconnect();
-                for _ in 0..MAXIMUM_TARNSACTION_TIME {
+                while (0..MAXIMUM_TARNSACTION_TIME).next().is_some() {
                     match d.is_connected().unwrap_or(true) {
-                        false => return drop(sender.send(Ok(false))),
                         true => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                        false => return drop(sender.send(Ok(false))),
                     }
                 }
                 return drop(sender.send(Err(String::from(NETWORK_ERROR))));
