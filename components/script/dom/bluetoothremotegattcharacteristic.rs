@@ -4,13 +4,15 @@
 
 use bluetooth_blacklist::{Blacklist, uuid_is_blacklisted};
 use dom::bindings::cell::DOMRefCell;
+use dom::bindings::codegen::Bindings::BluetoothCharacteristicPropertiesBinding::
+    BluetoothCharacteristicPropertiesMethods;
 use dom::bindings::codegen::Bindings::BluetoothDeviceBinding::BluetoothDeviceMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
     BluetoothRemoteGATTCharacteristicMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServiceBinding::BluetoothRemoteGATTServiceMethods;
-use dom::bindings::error::Error::{Network, Security, Type};
+use dom::bindings::error::Error::{Network, NotSupported, Security, Type};
 use dom::bindings::error::{Fallible, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
@@ -159,6 +161,9 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
         let (sender, receiver) = ipc::channel().unwrap();
         if !self.Service().Device().Gatt().Connected() {
             return Err(Network)
+        }
+        if !self.Properties().Read() {
+            return Err(NotSupported)
         }
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::ReadValue(self.get_instance_id(), sender)).unwrap();
