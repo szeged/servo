@@ -10,7 +10,7 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
     BluetoothRemoteGATTCharacteristicMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServiceBinding::BluetoothRemoteGATTServiceMethods;
-use dom::bindings::error::Error::{Network, Security, Type};
+use dom::bindings::error::Error::{Network, NoModificationAllowed, Security, Type};
 use dom::bindings::error::{Fallible, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
@@ -22,6 +22,9 @@ use dom::bluetoothremotegattservice::BluetoothRemoteGATTService;
 use dom::bluetoothuuid::{BluetoothDescriptorUUID, BluetoothUUID};
 use ipc_channel::ipc::{self, IpcSender};
 use net_traits::bluetooth_thread::BluetoothMethodMsg;
+
+// Maximum length of an attribute value.
+const MAXIMUM_ATTRIBUTE_LENGTH: usize = 512;
 
 // https://webbluetoothcg.github.io/web-bluetooth/#bluetoothremotegattcharacteristic
 #[dom_struct]
@@ -179,6 +182,12 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     fn WriteValue(&self, value: Vec<u8>) -> ErrorResult {
         if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Writes) {
             return Err(Security)
+        }
+        if value.len() > MAXIMUM_ATTRIBUTE_LENGTH {
+            return Err(NoModificationAllowed)
+        }
+        if !self.Service().Device().Gatt().Connected() {
+            return Err(Network)
         }
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
