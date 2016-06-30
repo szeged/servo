@@ -35,7 +35,7 @@ const VALUE_ERROR: &'static str = "No characteristic or descriptor found with th
 const SECURITY_ERROR: &'static str = "The operation is insecure";
 const NETWORK_ERROR: &'static str = "A network error occurred";
 // A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
-// https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 ([Vol 3, Part F] page 480)
+// https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (Vol. 3, page 480)
 const MAXIMUM_TARNSACTION_TIME: u32 = 30;
 const CONNECTION_TIMEOUT_MS: u64 = 1000;
 // The discovery session needs some time to find any nearby devices
