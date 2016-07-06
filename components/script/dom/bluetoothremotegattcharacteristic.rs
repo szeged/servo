@@ -12,7 +12,7 @@ use dom::bindings::codegen::Bindings::BluetoothRemoteGATTCharacteristicBinding::
     BluetoothRemoteGATTCharacteristicMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServerBinding::BluetoothRemoteGATTServerMethods;
 use dom::bindings::codegen::Bindings::BluetoothRemoteGATTServiceBinding::BluetoothRemoteGATTServiceMethods;
-use dom::bindings::error::Error::{Network, NoModificationAllowed, NotSupported, Security, Type};
+use dom::bindings::error::Error::{InvalidModification, Network, NotSupported, Security, Type};
 use dom::bindings::error::{Fallible, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::{JS, MutHeap, Root};
@@ -190,7 +190,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             return Err(Security)
         }
         if value.len() > MAXIMUM_ATTRIBUTE_LENGTH {
-            return Err(NoModificationAllowed)
+            return Err(InvalidModification)
         }
         if !self.Service().Device().Gatt().Connected() {
             return Err(Network)
