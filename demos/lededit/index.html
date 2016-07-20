@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>LEDEdit</title>
+	<script type="text/javascript" src="lededit.js"></script>
+	<link rel="stylesheet" type="text/css" href="lededit.css">
+</head>
+<body>
+
+<h1>Adafruit 16x8 LED Matrix Editor</h1>
+
+<div id="draw-container">
+<canvas id="draw" width="640" height="320"></canvas>
+</div>
+<label for="result_field">byte array:</label>
+<input type="text" id="result_field" readonly><br>
+<button onclick="reset()">clear matrix</button>
+<button onclick="rotate()">rotate</button>
+<button onclick="flip()">flip</button>
+
+<br>
+<br>
+
+<h3>Bluetooth connection</h3>
+<div id="btconnect">
+<input id="service" type="text" autofocus placeholder="BT service" value="battery_service">
+<input id="characteristic" type="text" placeholder="BT characteristic"  value="battery_level">
+<div onclick="bt_connect()">Connect Device</div>
+</div>
+<br>
+<textarea id="log" readonly></textarea>
+
+
+<div id="footer">Created by Mátyás Mustoha, 2016</div>
+
+</body>
+</html>

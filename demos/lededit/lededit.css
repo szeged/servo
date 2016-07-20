@@ -1,0 +1,89 @@
+html {
+	font-family: "Droid Sans", sans-serif;
+	background-color: #f9f9f9;
+}
+
+input {
+	padding: 5px;
+	font-size: 1em;
+	font-family: monospace;
+}
+
+#result_field {
+	border: 0;
+	margin: 1em 0;
+	width: 320px;
+}
+
+#draw {
+	position: absolute;
+	top: 80px;
+	transform-origin: 160px 160px;
+}
+
+#draw.rotated {
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+}
+
+#draw-container {
+	width: 640px;
+	height: 320px;
+}
+
+#draw-container.rotated {
+	height: 640px;
+}
+
+#draw,
+#draw-container {
+	-webkit-transition: all 0.5s ease-in-out;
+	-moz-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+#btconnect input {
+	margin-bottom: 5px;
+	border: 1px solid black;
+	float: left;
+	clear: both;
+	width: 220px;
+}
+
+#btconnect div {
+	color: white;
+	width: 220px;
+	height: 75px;
+	line-height: 80px;
+	text-align: center;
+	font-size: 1.2em;
+	padding: 5px;
+	background-color: #5bc0de;
+	border-bottom: 5px solid #428bca;
+	margin-left: 240px;
+	cursor: pointer;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#btconnect div:hover {
+	background-color: #37b2d7;
+}
+
+textarea {
+	width: 465px;
+	height: 10em;
+}
+
+#footer {
+	margin-top: 100px;
+}

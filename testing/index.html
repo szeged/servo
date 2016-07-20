@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>WebBluetooth Tests</title>
+    <link rel="icon" type="image/png" href="https://download.servo.org/doge-tiny.png">
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body>
+    <a href="..">
+      <div class="jumbotron wbt-jumbotron">
+        <div class="container">
+          <img src="../images/doge_badge.png" class="img-responsive center-block" style="width:300px;height:300px;">
+          <p class="text-primary">WebBluetooth Tests</p>
+        </div>
+      </div>
+    </a>
+  <div class="col-md-2"></div>
+  <div class="container col-md-8">
+
+    <h2 id="intro">Introduction</h2>
+    <p>Currently we are using HTML pages to manually test the WebBluetooth features, because there is no test API implementation yet.</p>
+    
+    <p><a class="btn btn-default" href="https://docs.google.com/spreadsheets/d/1Nx4bxhBA9S58k6eP7v1AJ0Hxe40vG35_WIXrmG-Enag/pubhtml" target="_blank" role="button">View table &raquo;</a></p>
+    <h2 id="overview-table">Overview</h2>
+    <p>A table with all the testable DOM functions is defined in the specification. <br>
+    Each function name is linked to it’s corresponding test table.</p>
+    <p>Notation:</p>
+    <ul>
+      <li>Green: implemented in Servo</li>
+      <li>Red: not implemented yet</li>
+    </ul>
+
+    <h2 id="function-table">Functions</h2>
+    <p>Function names are linked to the Web Bluetooth specification.</p>
+    <p>Columns:</p>
+
+    <ol>
+      <li>Step number from the specification.</li>
+      <li>Name of the used HTML test for the step.</li>
+      <li>Values, which we used as arguments for the DOM functions.</li>
+      <li>Expected results (described in spec).</li>
+      <li>What our implementation returns.</li>
+    </ol>
+
+    <p>Notation</p>
+    <ul>
+      <li>Green:  The expected behavior and the result matches for that step.</li>
+      <li>Red: Testable, but not imlemented yet.</li>
+      <li>Blue: Testable, but not working correctly.</li>
+      <li>Yellow: Not testable step.</li>
+    </ul>
+    <h2 id="tests">Tests</h2>
+    <p>For each test case a button is created. By pressing these buttons, a test will run with the corresponding input values. <br>
+
+    <p><a class="btn btn-default" href="tests" role="button">View tests &raquo;</a></p>
+
+    <hr>
+
+    <footer>
+      <div class="row">
+        <div class="col-md-6">
+          <p>&copy; 2016 University of Szeged, DSE</p>
+        </div>
+        <div class="col-md-6 license-button-container">
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+            <img src="https://licensebuttons.net/l/by-sa/4.0/88x31.png">
+          </a>
+        </div>
+      </div>
+    </footer>
+    </div> <!-- /container -->
+    <div class="col-md-2"></div>
+
+  </body>
+</html>

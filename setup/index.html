@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>WebBluetooth Setup</title>
+    <link rel="icon" type="../image/png" href="https://download.servo.org/doge-tiny.png">
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body>
+    <a href="..">
+        <div class="jumbotron wbt-jumbotron">
+          <div class="container">
+            <img src="../images/doge_worker.png" class="img-responsive center-block" style="width:300px;height:300px;">
+            <p class="text-primary">WebBluetooth Setup</p>
+          </div>
+        </div>
+    </a>
+  <div class="col-md-2"></div>
+  <div class="container col-md-8">
+<h2 id="environment-setup">Introduction</h2>
+<p>
+On <b>Linux</b> based systems we use BlueZ.<br>
+On <b>Android</b> the only prerequisite is Android 4.3 (Jelly Bean).</p>
+<p>For simulating a BLE Device we use a <b>Raspberry Pi 3</b>, since it has a built in bluetooth adapter.</p>
+<p>You will also need a <b>bluetooth adapter</b> (4.0 or above) for the desktop machine.</p>
+<h2 id="bluez">BlueZ</h2>
+<i>Note: the following instructions are based on <a href="https://learn.adafruit.com/install-bluez-on-the-raspberry-pi/installation" target="_blank">this</a> article.</i>
+<br>
+<br>
+To <b>get and build bluez 5.39</b>:</p>
+<pre class="prettyprint">
+<code class=" hljs lasso">
+cd ~
+
+wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.39.tar.xz
+
+xzcat bluez-5.39.tar.xz | tar -xv
+
+cd bluez-5.39
+
+sudo apt-get update
+sudo apt-get install -y libusb-dev libdbus-1-dev libglib2.0-dev libudev-dev libical-dev libreadline-dev
+
+./configure CFLAGS="$CFLAGS -Wno-sign-compare -fPIC" --enable-experimental --enable-maintainer-mode
+
+make
+
+sudo make install
+
+# search for the "ExecStart=/usr/local/libexec/bluetooth/bluetoothd" line
+# append " -E" at the end
+# in nano you can save with ctrl-o and exit with ctrl-x
+sudo nano /lib/systemd/system/bluetooth.service
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart bluetooth
+</code>
+</pre>
+
+<h2 id="pi-3">Raspberry Pi (Raspbian)</h2>
+<p><i>Note: We used a RPi 3 because it has a built in adapter, but you can use any previous version with a bluetooth adapter (4.0 and above) as well.<br>
+Also, you will need BlueZ 5.39+ installed. (described <a href="#bluez">above</a>)</i></p>
+
+<p>You can download our gatt server scripts from <a href="https://github.com/dati91/gatt_server.git" target="_blank">here</a>.</p>
+<p>You can use our predefined ones (e.g. <code>sudo python heart-battery.py</code>)</p>
+<p>Or you can define custom services, characteristics and descriptors.</p>
+
+<h2 id="desktop">Desktop (Linux)</h2>
+<p><i>Note: You will need BlueZ 5.39+ installed. (described <a href="#bluez">above</a>)</i></p>
+<p>You can download Servo from the <a href="https://download.servo.org/">official site</a>.</p>
+<p>The WebBluetooth support is aleady included, you just need to run in with <code>./runservo.sh</code>.
+
+<h2 id="tests">Test</h2>
+<p>You can test it with <a href="../testing">these</a> tests.</p>
+
+      <hr>
+
+      <footer>
+        <div class="row">
+          <div class="col-md-6">
+            <p>&copy; 2016 University of Szeged, DSE</p>
+          </div>
+          <div class="col-md-6 license-button-container">
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+              <img src="https://licensebuttons.net/l/by-sa/4.0/88x31.png">
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div> <!-- /container -->
+    <div class="col-md-2"></div>
+
+  </body>
+</html>

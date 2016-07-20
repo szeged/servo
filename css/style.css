@@ -1,0 +1,46 @@
+footer {
+  border-top: 1px solid #efefef;
+  margin-top: 5em;
+}
+
+.wbt-jumbotron {
+  text-align: center;
+}
+
+.info {
+  font-size: 1.5em;
+  color: gray;
+}
+
+.btn {
+  margin-top: 1em;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+h2 {
+  font-size: 2.3em;
+}
+
+h3 {
+  font-size: 1.7em;
+}
+
+th {
+    background-color: #337ab7;
+    color: white;
+    vertical-align: center;
+    text-align: center;
+}
+
+.license-button-container {
+    text-align: right;
+}
+
+.impl-status-cell {
+    vertical-align: center;
+    text-align: center;
+    font-weight: bold;
+}

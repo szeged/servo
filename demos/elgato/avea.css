@@ -1,0 +1,74 @@
+body {
+	text-align: center;
+	background-color: #4c004c;
+	font-family: sans-serif;
+	color: #333;
+}
+
+textarea {
+	display: none;
+}
+
+h1 {
+	font-family: 'Merienda', cursive;
+	margin-bottom: 0;
+	font-size: 2em;
+	color: #eee;
+}
+
+h2 {
+	font-size: 1em;
+	font-family: sans-serif;
+	margin: 0;
+	color: #eee;
+}
+
+#connect div,
+#presets div {
+	font-weight: bold;
+	display: inline-block;
+	width: 120px;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 5px;
+	cursor: pointer;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#connect div {
+	padding: 20px;
+	margin: 80px 0;
+
+	background-color: #5bc0de;
+	border-bottom: 5px solid #428bca;
+}
+
+#connect div:hover {
+	background-color: #37b2d7;
+}
+
+#presets div {
+	padding: 10px;
+	margin: 10px 15px 10px 0;
+	display: inline-block;
+}
+
+#presets div:hover {
+	padding: 8px;
+	border: 2px solid white;
+}
+
+#presets div.red { background-color: red; }
+#presets div.green { background-color: green; }
+#presets div.blue { background-color: blue; color: #ccc; }
+#presets div.white { background-color: white; border-color: red; }
+#presets div.yellow { background-color: yellow; border-color: cyan; }
+#presets div.cyan { background-color: cyan; }
+#presets div.magenta { background-color: magenta; }
+#presets div.off { background-color: black; color: white; }
