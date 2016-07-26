@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 use dom::bindings::error::Error;
-use net_traits::bluetooth_thread::BluetoothError;
 use regex::Regex;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -123,14 +122,4 @@ fn parse_blacklist() -> Option<HashMap<String, Blacklist>> {
     }
     // Step 5
     return Some(result);
-}
-
-pub fn handle_bluetooth_error(error: BluetoothError) -> Error {
-    match error {
-        BluetoothError::Type(message) => Error::Type(message),
-        BluetoothError::Network => Error::Network,
-        BluetoothError::NotFound => Error::NotFound,
-        BluetoothError::NotSupported => Error::NotSupported,
-        BluetoothError::Security => Error::Security,
-    }
 }
