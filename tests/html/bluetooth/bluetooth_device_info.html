@@ -11,7 +11,7 @@
     <script>
     function onButtonClick() {
         clear();
-        var options = {filters: [], optionalServices: []};
+        var options = {filters: [{services: ['battery_service']}], optionalServices: []};
 
         var filterService = document.getElementById('service').value;
         if (filterService) {

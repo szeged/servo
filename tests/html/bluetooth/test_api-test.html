@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<title>GetPrimaryService Test Cases</title>
+<body>
+    <button type="button" onclick="onButtonClick()">Get service</button>
+    <pre id="log"></pre>
+    <script src="bluetooth_functions.js"></script>
+    <script>
+    function onButtonClick(testNumber) {
+        clear();
+    	window.testRunner.setBluetoothMockDataSet('MissingCharacteristicGenericAccessAdapter');
+        try {
+            log('Requesting Bluetooth Device...');
+            var heart_rate_device = window.navigator.bluetooth.requestDevice(
+		        { filters: [{ name: 'Heart Rate Device', services: ['generic_access', 'heart_rate'] }]}
+		    );
+
+            log('Connecting to GATTserver on device...');
+            var server = heart_rate_device.gatt.connect();
+
+            log('Getting Primary Service...');
+            var generic_access_service = server.getPrimaryService(0x1800);
+
+            log('Primary Service found on device: ' + generic_access_service.device.name);
+            log('> UUID:                          ' + generic_access_service.uuid);
+            log('> Is primary:                    ' + generic_access_service.isPrimary);
+        } catch(err) {
+            log(err);
+        }
+    }
+    </script>
+</body>
+</html>

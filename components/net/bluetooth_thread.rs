@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use bluetooth_test;
 use device::bluetooth::BluetoothAdapter;
 use device::bluetooth::BluetoothDevice;
 use device::bluetooth::BluetoothGATTCharacteristic;
@@ -17,13 +18,18 @@ use rand::{self, Rng};
 use std::borrow::ToOwned;
 use std::collections::{HashMap, HashSet};
 use std::string::String;
+use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT, Ordering};
 use std::thread;
 use std::time::Duration;
 #[cfg(target_os = "linux")]
 use tinyfiledialogs;
 use util::thread::spawn_named;
 
+static TESTING: AtomicBool = ATOMIC_BOOL_INIT;
+
 const ADAPTER_ERROR: &'static str = "No adapter found";
+
+const ADAPTER_NOT_POWERED_ERROR: &'static str = "Bluetooth adapter not powered";
 
 // A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
 // https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (Vol. 3, page 480)
@@ -63,8 +69,22 @@ macro_rules! return_if_cached(
 macro_rules! get_adapter_or_return_error(
     ($bl_manager:expr, $sender:expr) => (
         match $bl_manager.get_or_create_adapter() {
-            Some(adapter) => adapter,
+            Some(adapter) => {
+                if !adapter.is_powered().unwrap() {
+                    return drop($sender.send(Err(BluetoothError::Type(ADAPTER_NOT_POWERED_ERROR.to_string()))))
+                }
+                adapter
+            },
             None => return drop($sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+        }
+    );
+);
+
+macro_rules! set_attribute_or_return_error(
+    ($function:expr, $sender:expr) => (
+        match $function {
+            Ok(_) => (),
+            Err(_) => return drop($sender.send(Err(BluetoothError::Type(FAILED_SET_ERROR.to_string())))),
         }
     );
 );
@@ -198,6 +218,9 @@ impl BluetoothManager {
                 BluetoothMethodMsg::WriteValue(id, value, sender) => {
                     self.write_value(id, value, sender)
                 },
+                BluetoothMethodMsg::Test(data_set_name, sender) => {
+                    self.test(data_set_name, sender)
+                }
                 BluetoothMethodMsg::Exit => {
                     break
                 },
@@ -205,13 +228,31 @@ impl BluetoothManager {
         }
     }
 
+    // Test
+
+    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<()>>) {
+        TESTING.fetch_or(true, Ordering::Relaxed);
+        self.adapter = BluetoothAdapter::init().ok();
+        bluetooth_test::test(self, data_set_name, sender);
+    }
+
     // Adapter
 
-    fn get_or_create_adapter(&mut self) -> Option<BluetoothAdapter> {
+    pub fn get_or_create_adapter(&mut self) -> Option<BluetoothAdapter> {
         let adapter_valid = self.adapter.as_ref().map_or(false, |a| a.get_address().is_ok());
         if !adapter_valid {
             self.adapter = BluetoothAdapter::init().ok();
         }
+
+        let adapter = match self.adapter.as_ref() {
+            Some(adapter) => adapter,
+            None => return None,
+        };
+
+        if TESTING.load(Ordering::Relaxed) && !adapter.is_present().unwrap_or(true) {
+            return None;
+        }
+
         self.adapter.clone()
     }
 
@@ -241,6 +282,14 @@ impl BluetoothManager {
 
     #[cfg(target_os = "linux")]
     fn select_device(&mut self, devices: Vec<BluetoothDevice>) -> Option<String> {
+        if TESTING.load(Ordering::Relaxed) {
+            for device in devices {
+                if let Ok(address) = device.get_address() {
+                    return Some(address);
+                }
+            }
+            return None;
+        }
         let mut dialog_rows: Vec<String> = vec!();
         for device in devices {
             dialog_rows.extend_from_slice(&[device.get_address().unwrap_or("".to_string()),
@@ -270,7 +319,7 @@ impl BluetoothManager {
         None
     }
 
-    fn generate_device_id(&mut self) -> String {
+    pub fn generate_device_id(&mut self) -> String {
         let mut device_id;
         let mut rng = rand::thread_rng();
         loop {
@@ -432,8 +481,10 @@ impl BluetoothManager {
                       sender: IpcSender<BluetoothResult<BluetoothDeviceMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
         if let Ok(ref session) = adapter.create_discovery_session() {
-            if session.start_discovery().is_ok() {
-                thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS));
+            match session.start_discovery() {
+                Ok(_) => thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS)),
+                //TODO: Add a new error to BluetoothError or a new static error string
+                Err(err) => return drop(sender.send(Err(BluetoothError::Type(err.description().to_owned())))),
             }
             let _ = session.stop_discovery();
         }
@@ -477,7 +528,12 @@ impl BluetoothManager {
                 for _ in 0..MAXIMUM_TRANSACTION_TIME {
                     match d.is_connected().unwrap_or(false) {
                         true => return drop(sender.send(Ok(true))),
-                        false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                        false => {
+                            if TESTING.load(Ordering::Relaxed) {
+                                break;
+                            }
+                            thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS));
+                        },
                     }
                 }
                 return drop(sender.send(Err(BluetoothError::Network)));

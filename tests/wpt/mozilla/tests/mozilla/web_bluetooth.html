@@ -1,0 +1,178 @@
+<!doctype html>
+<meta charset="utf-8">
+<title></title>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script>
+var str = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var filters = [];
+for (var i = 0; i < str.length; ++i) {
+    filters.push({ namePrefix: str.charAt(i)});
+}
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('NotPresentAdapter');
+    assert_throws(new TypeError(), function () {
+        window.navigator.bluetooth.requestDevice({filters});
+    });
+}, 'NotPresentAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('NotPoweredAdapter');
+    assert_throws(new TypeError(), function () {
+        window.navigator.bluetooth.requestDevice({filters});
+    });
+}, 'NotPoweredAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('EmptyAdapter');
+    assert_throws('NotFoundError', function () {
+        window.navigator.bluetooth.requestDevice({filters});
+    });
+}, 'EmptyAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('FailStartDiscoveryAdapter');
+    assert_throws(new TypeError(), function () {
+        window.navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'T' }]});
+    });
+}, 'FailStartDiscoveryAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('GlucoseHeartRateAdapter');
+    var glucose_device = window.navigator.bluetooth.requestDevice(
+        { filters: [{ namePrefix: 'G', services: ['glucose'] }]}
+    );
+    assert_true(glucose_device instanceof BluetoothDevice);
+    assert_equals(glucose_device.name, 'Glucose Device');
+    assert_true(glucose_device.gatt instanceof BluetoothRemoteGATTServer);
+    assert_false(glucose_device.gatt.connected);
+    assert_equals(glucose_device.gatt.device, glucose_device);
+    assert_throws('NetworkError', function () {
+        glucose_device.gatt.connect()
+    });
+    assert_throws('NotFoundError', function () {
+        glucose_device.gatt.getPrimaryService('glucose');
+    });
+    assert_throws('SecurityError', function () {
+        glucose_device.gatt.getPrimaryService('heart_rate');
+    });
+
+    var heart_rate_device = window.navigator.bluetooth.requestDevice(
+        { filters: [{ name: 'Heart Rate Device', services: ['generic_access', 'heart_rate'] }]}
+    );
+    assert_true(heart_rate_device instanceof BluetoothDevice);
+    assert_equals(heart_rate_device.name, 'Heart Rate Device');
+    assert_true(heart_rate_device.gatt instanceof BluetoothRemoteGATTServer);
+    assert_false(heart_rate_device.gatt.connected);
+    assert_true(heart_rate_device.gatt.connect() instanceof BluetoothRemoteGATTServer);
+    assert_throws('SecurityError', function () {
+        heart_rate_device.gatt.getPrimaryService('battery_service');
+    });
+    assert_throws('NotFoundError', function () {
+        heart_rate_device.gatt.getPrimaryService('heart_rate');
+    });
+    assert_throws('NotFoundError', function () {
+        heart_rate_device.gatt.getPrimaryService('generic_access');
+    });
+}, 'GlucoseHeartRateAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('UnicodeDeviceAdapter');
+    var unicode_device = window.navigator.bluetooth.requestDevice({ filters: [{ namePrefix: '❤' }]});
+    assert_true(unicode_device instanceof BluetoothDevice);
+    assert_equals(unicode_device.name, '❤❤❤❤❤❤❤❤❤');
+    assert_true(unicode_device.gatt instanceof BluetoothRemoteGATTServer);
+    assert_false(unicode_device.gatt.connected);
+    assert_throws('NetworkError', function () {
+        unicode_device.gatt.connect()
+    });
+}, 'UnicodeDeviceAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('BlacklistedServicesAdapter');
+    assert_throws('SecurityError', function() {
+        window.navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'B',
+            services: ['00001812-0000-1000-8000-00805f9b34fb',
+                       '00001530-1212-efde-1523-785feabcd123',
+                       'f000ffc0-0451-4000-b000-000000000000'] 
+        }]});
+    });
+}, 'BlacklistedServicesAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('MissingCharacteristicGenericAccessAdapter');
+
+    var heart_rate_device = window.navigator.bluetooth.requestDevice(
+        { filters: [{ name: 'Heart Rate Device', services: ['generic_access', 'heart_rate'] }]}
+    );
+    assert_true(heart_rate_device instanceof BluetoothDevice);
+    assert_equals(heart_rate_device.name, 'Heart Rate Device');
+    assert_true(heart_rate_device.gatt instanceof BluetoothRemoteGATTServer);
+    assert_false(heart_rate_device.gatt.connected);
+    var server = heart_rate_device.gatt.connect();
+    assert_true(server instanceof BluetoothRemoteGATTServer);
+    assert_throws('SecurityError', function () {
+        heart_rate_device.gatt.getPrimaryService('battery_service');
+    });
+    assert_equals(server.device, heart_rate_device);
+
+    setTimeout(function() {}, 3000);
+    var generic_access_service = server.getPrimaryService(0x1800);
+    var uuid = generic_access_service.uuid;
+    assert_true(uuid == '00001800-0000-1000-8000-00805f9b34fb');
+    assert_true(generic_access_service instanceof BluetoothRemoteGATTService);
+    assert_throws('NotFoundError', function () {
+        generic_access_service.getCharacteristics();
+    });
+
+    var heart_rate_service = heart_rate_device.gatt.getPrimaryService('heart_rate');
+    assert_true(heart_rate_service instanceof BluetoothRemoteGATTService);
+    assert_equals(heart_rate_service.uuid, "0000180d-0000-1000-8000-00805f9b34fb");
+    assert_throws('NotFoundError', function () {
+        heart_rate_service.getCharacteristics();
+    });
+}, 'MissingCharacterisGenericAccessAdapter Test');
+
+test(function() {
+    window.testRunner.setBluetoothMockDataSet('MissingDescriptorGenericAccessAdapter');
+
+    var heart_rate_device = window.navigator.bluetooth.requestDevice(
+        { filters: [{ name: 'Heart Rate Device', services: ['generic_access', 'heart_rate'] }]}
+    );
+    assert_true(heart_rate_device instanceof BluetoothDevice);
+    assert_equals(heart_rate_device.name, 'Heart Rate Device');
+    assert_true(heart_rate_device.gatt instanceof BluetoothRemoteGATTServer);
+    assert_false(heart_rate_device.gatt.connected);
+    var server = heart_rate_device.gatt.connect();
+    assert_true(server instanceof BluetoothRemoteGATTServer);
+    assert_throws('SecurityError', function () {
+        heart_rate_device.gatt.getPrimaryService('battery_service');
+    });
+    assert_equals(server.device, heart_rate_device);
+
+    var generic_access_service = server.getPrimaryService('generic_access');
+    assert_true(generic_access_service instanceof BluetoothRemoteGATTService);
+    assert_equals(generic_access_service.uuid, "00001800-0000-1000-8000-00805f9b34fb");
+    var heart_rate_service = heart_rate_device.gatt.getPrimaryService('heart_rate');
+    assert_true(heart_rate_device.gatt.getPrimaryService('heart_rate') instanceof BluetoothRemoteGATTService);
+    assert_equals(heart_rate_service.uuid, "0000180d-0000-1000-8000-00805f9b34fb");
+
+    var device_name_characteristic = generic_access_service.getCharacteristic(0x2a00);
+    assert_true(device_name_characteristic instanceof BluetoothRemoteGATTCharacteristic);
+    var pheripheral_privacy_flag_characteristic = generic_access_service.getCharacteristic(0x2a02);
+    assert_true(pheripheral_privacy_flag_characteristic instanceof BluetoothRemoteGATTCharacteristic);
+
+
+
+
+
+
+
+
+
+
+
+
+}, 'MissingDescriptorGenericAccessAdapter Test');
+</script>
