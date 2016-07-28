@@ -55,7 +55,7 @@
                 log('> #' + (i+1));
                 log('> UUID:                      ' + descriptors[i].uuid);
                     descriptors[i].readValue();
-                log('> Descriptor value:          ' + AsciiToDecimal(descriptors[i].value));
+                log('> Descriptor value:          ' + asciiToDecimal(descriptors[i].value));
             }
         } catch(err) {
             log(err);

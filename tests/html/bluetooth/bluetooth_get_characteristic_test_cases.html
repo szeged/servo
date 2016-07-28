@@ -70,8 +70,7 @@
             log('> Queued Write:           ' + characteristic.properties.reliableWrite);
             log('> Writable Auxiliaries:   ' + characteristic.properties.writableAuxiliaries);
             characteristic.readValue();
-            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
-
+            log('> Characteristic value:   ' + asciiToDecimal(characteristic.value));
         } catch(err) {
             log(err);
         }

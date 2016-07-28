@@ -54,8 +54,7 @@
             log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
             log('> Descriptor UUID:           ' + descriptor.uuid);
             descriptor.readValue();
-            log('> Descriptor value:          ' + AsciiToDecimal(descriptor.value));
-
+            log('> Descriptor value:          ' + asciiToDecimal(descriptor.value));
         } catch(err) {
             log(err);
         }

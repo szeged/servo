@@ -45,8 +45,7 @@
             }
             log("Reading descriptor's value...");
             descriptor.readValue();
-            log('> Descriptor value:          ' + AsciiToDecimal(descriptor.value));
-
+            log('> Descriptor value:          ' + asciiToDecimal(descriptor.value));
         } catch(err) {
             log(err);
         }

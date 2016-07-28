@@ -13,7 +13,7 @@
         var serviceUuid = document.getElementById('service').value;
         var characteristicUuid = document.getElementById('characteristic').value;
 
-        if(!(serviceUuid) || !(characteristicUuid)) {
+        if (!serviceUuid || !characteristicUuid) {
             return log('All input field must be filled!');
         }
         if (serviceUuid.startsWith('0x'))
@@ -48,7 +48,7 @@
             log('> Queued Write:           ' + characteristic.properties.reliableWrite);
             log('> Writable Auxiliaries:   ' + characteristic.properties.writableAuxiliaries);
             characteristic.readValue();
-            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
+            log('> Characteristic value:   ' + asciiToDecimal(characteristic.value));
         } catch(err) {
             log(err);
         }

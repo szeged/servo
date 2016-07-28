@@ -47,15 +47,14 @@
 
             log('Characteristic found!');
 
-            if(testCases[testNumber].mustDisconnect){
+            if (testCases[testNumber].mustDisconnect) {
                 log('Disconnecting from server...');
                 device.gatt.disconnect();
             }
 
             log('Reading the value of the Characteristic...');
             characteristic.readValue();
-            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
-
+            log('> Characteristic value:   ' + asciiToDecimal(characteristic.value));
         } catch(err) {
             log(err);
         }

@@ -51,24 +51,24 @@
 
             log('Reading the old value of the Characteristic...');
             characteristic.readValue();
-            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
+            log('> Characteristic value:   ' + asciiToDecimal(characteristic.value));
 
-            if(testCases[testNumber].mustDisconnect){
+            if (testCases[testNumber].mustDisconnect) {
                 log('Disconnecting from server...');
                 device.gatt.disconnect();
             }
 
-            if (testNumber !== 1)
+            if (testNumber !== 1) {
                 log('Writing the value of the Characteristic with: ' + testCases[testNumber].valueToWrite + '...');
-            else
+            } else {
                 log('Writing the value of the Characteristic with a 513 long array...');
+            }
 
             characteristic.writeValue(testCases[testNumber].valueToWrite);
 
             log('Reading the new value of the Characteristic...');
             characteristic.readValue();
-            log('> Characteristic value:   ' + AsciiToDecimal(characteristic.value));
-
+            log('> Characteristic value:   ' + asciiToDecimal(characteristic.value));
         } catch(err) {
             log(err);
         }

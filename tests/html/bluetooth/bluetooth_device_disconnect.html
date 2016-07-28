@@ -34,52 +34,52 @@
 
         try {
             clear();
-            log(timeStamp() + 'Requesting Bluetooth Device...');
+            log('Requesting Bluetooth Device...');
             bluetoothDevice = window.navigator.bluetooth.requestDevice(options);
-            log(timeStamp() + 'Connecting to Bluetooth Device...');
+            log('Connecting to Bluetooth Device...');
             connect();
         } catch(err) {
-            log(timeStamp() + err);
+            log(err);
         }
     }
 
     function onDisconnectButtonClick() {
         clear();
         if (!bluetoothDevice)
-            return log(timeStamp() + '> There is no connected Bluetooth Device instance, from which we can disconnect');
+            return log('> There is no connected Bluetooth Device instance, from which we can disconnect');
 
         try {
-            log(timeStamp() + 'Disconnecting from Bluetooth Device...');
+            log('Disconnecting from Bluetooth Device...');
             if (bluetoothDevice.gatt.connected) {
                 bluetoothDevice.gatt.disconnect();
-                log(timeStamp() + '> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
+                log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
             } else {
-                log(timeStamp() + '> Bluetooth Device is already disconnected');
+                log('> Bluetooth Device is already disconnected');
             }
         } catch(err) {
-            log(timeStamp() + err);
+            log(err);
         }
     }
 
     function onReconnectButtonClick() {
         clear();
         if (!bluetoothDevice)
-            log(timeStamp() + '> There is no connected Bluetooth Device instance, so we cannot reconnect')
+            log('> There is no connected Bluetooth Device instance, so we cannot reconnect')
         if (bluetoothDevice.gatt.connected) {
-            log(timeStamp() + '> Bluetooth Device is already connected');
+            log('> Bluetooth Device is already connected');
             return;
         } else {
-            log(timeStamp() + 'Connecting to Bluetooth Device...');
+            log('Connecting to Bluetooth Device...');
             connect();
         }
     }
 
     function connect() {
         try {
-            log(timeStamp() + 'Result of the connect() method of the GATT Server: ' + bluetoothDevice.gatt.connect());
-            log(timeStamp() + '> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
+            log('Result of the connect() method of the GATT Server: ' + bluetoothDevice.gatt.connect());
+            log('> Bluetooth Device connected: ' + bluetoothDevice.gatt.connected);
         } catch(err) {
-            log(timeStamp() + err);
+            log(err);
         }
     }
     </script>

@@ -15,7 +15,7 @@
         var characteristicUuid = document.getElementById('characteristic').value;
         var descriptorUuid = document.getElementById('descriptor').value;
 
-        if(!(serviceUuid) || !(characteristicUuid) || !(descriptorUuid)) {
+        if (!serviceUuid || !characteristicUuid || !descriptorUuid) {
             return log('All input field must be filled!');
         }
         if (serviceUuid.startsWith('0x'))
@@ -47,7 +47,7 @@
             log('> Descriptor characteristic: ' + descriptor.characteristic.uuid);
             log('> Descriptor UUID:           ' + descriptor.uuid);
             descriptor.readValue();
-            log('> Descriptor value:          ' + AsciiToDecimal(descriptor.value));
+            log('> Descriptor value:          ' + asciiToDecimal(descriptor.value));
         } catch(err) {
             log(err);
         }

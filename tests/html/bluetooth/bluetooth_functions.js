@@ -3,19 +3,19 @@ function clear() {
 }
 
 function log(line) {
-    document.getElementById("log").textContent += line + '\n';
+    document.getElementById("log").textContent += timeStamp() + line + '\n';
 }
 
-function AsciiToDecimal(bytestr) {
+function asciiToDecimal(bytestr) {
     var result = [];
     for(i = 0; i < bytestr.length; i++) {
-        result[i] = bytestr[i].charCodeAt(0) ;
+        result[i] = bytestr.charCodeAt(i) ;
     }
     return result;
 }
 
 function populate(testCases){
-	for(i = 0; i < testCases.length; ++i) {
+    for(i = 0; i < testCases.length; ++i) {
         var btn = document.createElement('button');
         btn.setAttribute('onclick','onButtonClick(' + i + ')');
         btn.innerHTML = 'Test '+ (i+1);
@@ -24,5 +24,9 @@ function populate(testCases){
 }
 
 function timeStamp() {
-    return '(' + Math.round(new Date().getTime()/1000) + ') ';
+    var date = new Date;
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2) + ' ';
 }
