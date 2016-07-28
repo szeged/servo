@@ -501,10 +501,9 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/servo/devices#6d40b1412fb496b0d9434ee2f46e9dfc4dc67ae7"
+source = "git+https://github.com/zakorgy/devices?branch=refactor#7f7c6dd778aa889229c84d2c57de466e153b5789"
 dependencies = [
- "blurdroid 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "blurz 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "fake_bluruz 0.1.0 (git+https://github.com/fokinv/fake-blurz.git)",
 ]
 
 [[package]]
@@ -699,6 +698,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cmake 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "pkg-config 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "fake_bluruz"
+version = "0.1.0"
+source = "git+https://github.com/fokinv/fake-blurz.git#6afcefe4246fd6b093818cce2c733b675564892a"
+dependencies = [
+ "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1437,7 +1444,7 @@ dependencies = [
  "brotli 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "content-blocker 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cookie 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "device 0.0.1 (git+https://github.com/servo/devices)",
+ "device 0.0.1 (git+https://github.com/zakorgy/devices?branch=refactor)",
  "devtools_traits 0.0.1",
  "flate2 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
