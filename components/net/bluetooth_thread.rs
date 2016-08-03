@@ -15,6 +15,7 @@ use net_traits::bluetooth_thread::{BluetoothDeviceMsg, BluetoothError, Bluetooth
 use net_traits::bluetooth_thread::{BluetoothResult, BluetoothServiceMsg, BluetoothServicesMsg};
 use rand::{self, Rng};
 use std::borrow::ToOwned;
+use std::cell::Cell;
 use std::collections::{HashMap, HashSet};
 use std::string::String;
 use std::thread;
@@ -137,6 +138,7 @@ pub struct BluetoothManager {
     cached_characteristics: HashMap<String, BluetoothGATTCharacteristic>,
     cached_descriptors: HashMap<String, BluetoothGATTDescriptor>,
     allowed_services: HashMap<String, HashSet<String>>,
+    is_testing: Cell<bool>,
 }
 
 impl BluetoothManager {
@@ -153,6 +155,7 @@ impl BluetoothManager {
             cached_characteristics: HashMap::new(),
             cached_descriptors: HashMap::new(),
             allowed_services: HashMap::new(),
+            is_testing: Cell::new(false),
         }
     }
 
@@ -198,11 +201,59 @@ impl BluetoothManager {
                 BluetoothMethodMsg::WriteValue(id, value, sender) => {
                     self.write_value(id, value, sender)
                 },
+                BluetoothMethodMsg::Test(data_set_name, sender) => {
+                    self.test(data_set_name, sender)
+                }
                 BluetoothMethodMsg::Exit => {
                     break
                 },
             }
         }
+    }
+
+    // Test
+
+    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<bool>>) {
+        match data_set_name.as_str() {
+            "NotPresentAdapter" => {
+
+            },
+            "NotPoweredAdapter" => {
+
+            },
+            "EmptyAdapter" => {
+                //self.adapter = BluetoothAdapter::create_adapter(String::from("org.bluetooth.mock_adapter")).ok();
+            },
+            "FailStartDiscoveryAdapter" => {
+
+            },
+            "FailStopDiscoveryAdapter" => {
+
+            },
+            "GlucoseHeartRateAdapter" => {
+
+            },
+            "SecondDiscoveryFindsHeartRateAdapter" => {
+
+            },
+            "MissingServiceGenericAccessAdapter" => {
+
+            },
+            "MissingCharacteristicGenericAccessAdapter" => {
+
+            },
+            "MissingDescriptorGenericAccessAdapter" => {
+
+            },
+            "GenericAccessAdapter" => {
+
+            },
+            "FailingGATTOperationsAdapter" => {
+
+            },
+            _ => unreachable!(),
+        }
+        self.is_testing.set(true);
     }
 
     // Adapter
