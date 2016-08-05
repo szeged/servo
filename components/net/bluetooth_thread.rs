@@ -15,7 +15,6 @@ use net_traits::bluetooth_thread::{BluetoothDeviceMsg, BluetoothError, Bluetooth
 use net_traits::bluetooth_thread::{BluetoothResult, BluetoothServiceMsg, BluetoothServicesMsg};
 use rand::{self, Rng};
 use std::borrow::ToOwned;
-use std::cell::Cell;
 use std::collections::{HashMap, HashSet};
 use std::string::String;
 use std::thread;
@@ -138,7 +137,6 @@ pub struct BluetoothManager {
     cached_characteristics: HashMap<String, BluetoothGATTCharacteristic>,
     cached_descriptors: HashMap<String, BluetoothGATTDescriptor>,
     allowed_services: HashMap<String, HashSet<String>>,
-    is_testing: Cell<bool>,
 }
 
 impl BluetoothManager {
@@ -155,7 +153,6 @@ impl BluetoothManager {
             cached_characteristics: HashMap::new(),
             cached_descriptors: HashMap::new(),
             allowed_services: HashMap::new(),
-            is_testing: Cell::new(false),
         }
     }
 
@@ -213,7 +210,7 @@ impl BluetoothManager {
 
     // Test
 
-    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<bool>>) {
+    fn test(&mut self, data_set_name: String, _sender: IpcSender<BluetoothResult<bool>>) {
         match data_set_name.as_str() {
             "NotPresentAdapter" => {
 
@@ -222,7 +219,20 @@ impl BluetoothManager {
 
             },
             "EmptyAdapter" => {
-                //self.adapter = BluetoothAdapter::create_adapter(String::from("org.bluetooth.mock_adapter")).ok();
+                self.adapter = BluetoothAdapter::init().ok();
+                match self.adapter.as_ref().unwrap().set_name(String::from("Empty Adapter")) {
+                    Ok(_) => println!("siker"),
+                    Err(err) => println!("{:?}",err),
+                }
+                let test_device_1 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 1"));
+                let result = test_device_1.set_address(String::from("address_1"));
+                println!("{:?}",result);
+                let test_device_2 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 2"));
+                test_device_2.set_address(String::from("address_2"));                
+                let test_device_3 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 3"));
+                test_device_3.set_address(String::from("address_3")); 
+                let test_device_4 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 4"));
+                test_device_4.set_address(String::from("address_4"));                 
             },
             "FailStartDiscoveryAdapter" => {
 
@@ -253,7 +263,7 @@ impl BluetoothManager {
             },
             _ => unreachable!(),
         }
-        self.is_testing.set(true);
+        println!("{:?}", self.adapter.as_ref().unwrap().get_name().unwrap());
     }
 
     // Adapter
@@ -272,6 +282,7 @@ impl BluetoothManager {
         let devices = adapter.get_devices().unwrap_or(vec!());
         for device in &devices {
             if let Ok(address) = device.get_address() {
+                println!("{:?}",address);
                 if !self.address_to_id.contains_key(&address) {
                     let generated_id = self.generate_device_id();
                     self.address_to_id.insert(address, generated_id.clone());

@@ -501,9 +501,9 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/zakorgy/devices?branch=refactor#7f7c6dd778aa889229c84d2c57de466e153b5789"
+source = "git+https://github.com/zakorgy/devices?branch=refactor#e373550117f3cdfc790d89d4bb49b5e23519c503"
 dependencies = [
- "fake_bluruz 0.1.0 (git+https://github.com/fokinv/fake-blurz.git)",
+ "fake_bluruz 0.1.0 (git+https://github.com/zakorgy/fake-blurz.git?branch=mutex)",
 ]
 
 [[package]]
@@ -703,7 +703,7 @@ dependencies = [
 [[package]]
 name = "fake_bluruz"
 version = "0.1.0"
-source = "git+https://github.com/fokinv/fake-blurz.git#6afcefe4246fd6b093818cce2c733b675564892a"
+source = "git+https://github.com/zakorgy/fake-blurz.git?branch=mutex#63b1363bef8690a026d3b0c4ffb819ebc7a14319"
 dependencies = [
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
