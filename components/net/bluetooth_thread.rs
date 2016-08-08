@@ -597,6 +597,7 @@ impl BluetoothManager {
         let _ = sender.send(Ok(services_vec));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattservice-getincludedservice
     fn get_included_service(&mut self,
                             service_id: String,
                             uuid: String,
@@ -605,11 +606,15 @@ impl BluetoothManager {
             Some(a) => a,
             None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
         };
+
+        // Step 4.
         let primary_service = match self.get_gatt_service(&mut adapter, &service_id) {
             Some(s) => s,
             None => return drop(sender.send(Err(BluetoothError::NotFound))),
         };
         let services = primary_service.get_includes().unwrap_or(vec!());
+
+        // Step 5.
         for service in services {
             if let Ok(service_uuid) = service.get_uuid() {
                 if uuid == service_uuid {
@@ -624,6 +629,7 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattservice-getincludedservices
     fn get_included_services(&mut self,
                              service_id: String,
                              uuid: Option<String>,
@@ -632,11 +638,15 @@ impl BluetoothManager {
             Some(a) => a,
             None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
         };
+
+        // Step 4.
         let primary_service = match self.get_gatt_service(&mut adapter, &service_id) {
             Some(s) => s,
             None => return drop(sender.send(Err(BluetoothError::NotFound))),
         };
         let services = primary_service.get_includes().unwrap_or(vec!());
+
+        // Step 5.
         let mut services_vec = vec!();
         for service in services {
             if let Ok(service_uuid) = service.get_uuid() {
@@ -657,15 +667,18 @@ impl BluetoothManager {
         let _ = sender.send(Ok(services_vec));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattservice-getcharacteristic
     fn get_characteristic(&mut self,
                           service_id: String,
                           uuid: String,
                           sender: IpcSender<BluetoothResult<BluetoothCharacteristicMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // Step 4.
         let characteristics = self.get_gatt_characteristics_by_uuid(&mut adapter, &service_id, &uuid);
         if characteristics.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+        // Step 5.
         for characteristic in characteristics {
             if let Ok(uuid) = characteristic.get_uuid() {
                 let properties = self.get_characteristic_properties(&characteristic);
@@ -688,11 +701,13 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattservice-getcharacteristic
     fn get_characteristics(&mut self,
                            service_id: String,
                            uuid: Option<String>,
                            sender: IpcSender<BluetoothResult<BluetoothCharacteristicsMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // Step 4.
         let characteristics = match uuid {
             Some(id) => self.get_gatt_characteristics_by_uuid(&mut adapter, &service_id, &id),
             None => self.get_and_cache_gatt_characteristics(&mut adapter, &service_id),
@@ -700,6 +715,7 @@ impl BluetoothManager {
         if characteristics.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+        // Step 5.
         let mut characteristics_vec = vec!();
         for characteristic in characteristics {
             if let Ok(uuid) = characteristic.get_uuid() {

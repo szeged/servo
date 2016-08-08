@@ -88,14 +88,25 @@ impl BluetoothRemoteGATTServiceMethods for BluetoothRemoteGATTService {
     fn GetCharacteristic(&self,
                          characteristic: BluetoothCharacteristicUUID)
                          -> Fallible<Root<BluetoothRemoteGATTCharacteristic>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let uuid = try!(BluetoothUUID::GetCharacteristic(self.global().r(), characteristic)).to_string();
+
+        // Step 2.
+        // TODO(#4282): Reject promise.
         if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
             return Err(Security)
         }
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_characteristic function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetCharacteristic(self.get_instance_id(), uuid, sender)).unwrap();
         let characteristic = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match characteristic {
             Ok(characteristic) => {
                 let properties = BluetoothCharacteristicProperties::new(self.global().r(),
@@ -124,20 +135,30 @@ impl BluetoothRemoteGATTServiceMethods for BluetoothRemoteGATTService {
     fn GetCharacteristics(&self,
                           characteristic: Option<BluetoothCharacteristicUUID>)
                           -> Fallible<Vec<Root<BluetoothRemoteGATTCharacteristic>>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let mut uuid: Option<String> = None;
         if let Some(c) = characteristic {
             uuid = Some(try!(BluetoothUUID::GetCharacteristic(self.global().r(), c)).to_string());
             if let Some(ref uuid) = uuid {
+                // Step 2.
+                // TODO(#4282): Reject promise.
                 if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
                     return Err(Security)
                 }
             }
         };
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_characteristics function.
         let mut characteristics = vec!();
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetCharacteristics(self.get_instance_id(), uuid, sender)).unwrap();
         let characteristics_vec = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match characteristics_vec {
             Ok(characteristic_vec) => {
                 for characteristic in characteristic_vec {
@@ -169,16 +190,27 @@ impl BluetoothRemoteGATTServiceMethods for BluetoothRemoteGATTService {
     fn GetIncludedService(&self,
                           service: BluetoothServiceUUID)
                           -> Fallible<Root<BluetoothRemoteGATTService>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let uuid = try!(BluetoothUUID::GetService(self.global().r(), service)).to_string();
+
+        // Step 2.
+        // TODO(#4282): Reject promise.
         if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
             return Err(Security)
         }
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_included_service function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetIncludedService(self.get_instance_id(),
                                                    uuid,
                                                    sender)).unwrap();
         let service = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match service {
             Ok(service) => {
                 Ok(BluetoothRemoteGATTService::new(self.global().r(),
@@ -197,21 +229,31 @@ impl BluetoothRemoteGATTServiceMethods for BluetoothRemoteGATTService {
     fn GetIncludedServices(&self,
                           service: Option<BluetoothServiceUUID>)
                           -> Fallible<Vec<Root<BluetoothRemoteGATTService>>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let mut uuid: Option<String> = None;
         if let Some(s) = service {
             uuid = Some(try!(BluetoothUUID::GetService(self.global().r(), s)).to_string());
             if let Some(ref uuid) = uuid {
+                // Step 2.
+                // TODO(#4282): Reject promise.
                 if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
                     return Err(Security)
                 }
             }
         };
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_included_services function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetIncludedServices(self.get_instance_id(),
                                                     uuid,
                                                     sender)).unwrap();
         let services_vec = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match services_vec {
             Ok(service_vec) => {
                 Ok(service_vec.into_iter()
