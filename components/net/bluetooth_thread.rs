@@ -466,11 +466,16 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-connect
     fn gatt_server_connect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
+        // Step 1.
         match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
+                // TODO: Step 2-3: ATT Bearer.
+
+                // Step 4.2.
                 if d.is_connected().unwrap_or(false) {
                     return drop(sender.send(Ok(true)));
                 }
@@ -481,20 +486,26 @@ impl BluetoothManager {
                         false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
                     }
                 }
+
+                // Step 4.1.
                 return drop(sender.send(Err(BluetoothError::Network)));
             },
             None => return drop(sender.send(Err(BluetoothError::NotFound))),
         }
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-disconnect
     fn gatt_server_disconnect(&mut self, device_id: String, sender: IpcSender<BluetoothResult<bool>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
         match self.get_device(&mut adapter, &device_id) {
             Some(d) => {
+                // Step 1.
                 if !d.is_connected().unwrap_or(true) {
                     return drop(sender.send(Ok(false)));
                 }
+
+                // Step 3.
                 let _ = d.disconnect();
                 for _ in 0..MAXIMUM_TRANSACTION_TIME {
                     match d.is_connected().unwrap_or(true) {
@@ -508,18 +519,26 @@ impl BluetoothManager {
         }
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-getprimaryservice
     fn get_primary_service(&mut self,
                            device_id: String,
                            uuid: String,
                            sender: IpcSender<BluetoothResult<BluetoothServiceMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+
+        // Step 1.
+        // TODO: Check if allowedServices is "all" services.
         if !self.allowed_services.get(&device_id).map_or(false, |s| s.contains(&uuid)) {
             return drop(sender.send(Err(BluetoothError::Security)));
         }
+
+        // Step 2.4.
         let services = self.get_gatt_services_by_uuid(&mut adapter, &device_id, &uuid);
         if services.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+
+        // Step 2.4-2.5.
         for service in services {
             if service.is_primary().unwrap_or(false) {
                 if let Ok(uuid) = service.get_uuid() {
@@ -534,20 +553,28 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-getprimaryservices
     fn get_primary_services(&mut self,
                             device_id: String,
                             uuid: Option<String>,
                             sender: IpcSender<BluetoothResult<BluetoothServicesMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+
         let services = match uuid {
             Some(ref id) => {
+                // Step 1.
+                // TODO: Check if allowedServices is "all" services.
                 if !self.allowed_services.get(&device_id).map_or(false, |s| s.contains(id)) {
                     return drop(sender.send(Err(BluetoothError::Security)))
                 }
+
+                // Step 2.4.
                 self.get_gatt_services_by_uuid(&mut adapter, &device_id, id)
             },
             None => self.get_and_cache_gatt_services(&mut adapter, &device_id),
         };
+
+        // Step 2.4-2.5.
         if services.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
