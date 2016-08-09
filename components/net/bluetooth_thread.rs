@@ -743,15 +743,18 @@ impl BluetoothManager {
         let _ = sender.send(Ok(characteristics_vec));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptor
     fn get_descriptor(&mut self,
                       characteristic_id: String,
                       uuid: String,
                       sender: IpcSender<BluetoothResult<BluetoothDescriptorMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // Step 4.
         let descriptors = self.get_gatt_descriptors_by_uuid(&mut adapter, &characteristic_id, &uuid);
         if descriptors.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+        // Step 5.
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
                 return drop(sender.send(Ok(BluetoothDescriptorMsg {
@@ -763,11 +766,13 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptors
     fn get_descriptors(&mut self,
                        characteristic_id: String,
                        uuid: Option<String>,
                        sender: IpcSender<BluetoothResult<BluetoothDescriptorsMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // Step 4.
         let descriptors = match uuid {
             Some(id) => self.get_gatt_descriptors_by_uuid(&mut adapter, &characteristic_id, &id),
             None => self.get_and_cache_gatt_descriptors(&mut adapter, &characteristic_id),
@@ -775,6 +780,7 @@ impl BluetoothManager {
         if descriptors.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+        // Step 5.
         let mut descriptors_vec = vec!();
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
@@ -792,6 +798,8 @@ impl BluetoothManager {
 
     fn read_value(&mut self, id: String, sender: IpcSender<BluetoothResult<Vec<u8>>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-readvalue
+        // Step 4.2.
         let mut value = self.get_gatt_characteristic(&mut adapter, &id)
                             .map(|c| c.read_value().unwrap_or(vec![]));
         if value.is_none() {
@@ -803,6 +811,8 @@ impl BluetoothManager {
 
     fn write_value(&mut self, id: String, value: Vec<u8>, sender: IpcSender<BluetoothResult<bool>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
+        // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-readvalue
+        // Step 6.2.
         let mut result = self.get_gatt_characteristic(&mut adapter, &id)
                              .map(|c| c.write_value(value.clone()));
         if result.is_none() {

@@ -99,14 +99,25 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptor
     fn GetDescriptor(&self, descriptor: BluetoothDescriptorUUID) -> Fallible<Root<BluetoothRemoteGATTDescriptor>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let uuid = try!(BluetoothUUID::GetDescriptor(self.global().r(), descriptor)).to_string();
+
+        // Step 2.
+        // TODO(#4282): Reject promise.
         if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
             return Err(Security)
         }
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_descriptor function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetDescriptor(self.get_instance_id(), uuid, sender)).unwrap();
         let descriptor = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match descriptor {
             Ok(descriptor) => {
                 Ok(BluetoothRemoteGATTDescriptor::new(self.global().r(),
@@ -124,19 +135,29 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
     fn GetDescriptors(&self,
                       descriptor: Option<BluetoothDescriptorUUID>)
                       -> Fallible<Vec<Root<BluetoothRemoteGATTDescriptor>>> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         let mut uuid: Option<String> = None;
         if let Some(d) = descriptor {
             uuid = Some(try!(BluetoothUUID::GetDescriptor(self.global().r(), d)).to_string());
             if let Some(ref uuid) = uuid {
+                //Step 2.
+                // TODO(#4282): Reject promise.
                 if uuid_is_blacklisted(uuid.as_ref(), Blacklist::All) {
                     return Err(Security)
                 }
             }
         };
+
+        // Note: Step 4 and a part of the Step 5 are implemented in
+        // components/net/bluetooth_thread.rs in get_descriptors function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::GetDescriptors(self.get_instance_id(), uuid, sender)).unwrap();
         let descriptors_vec = receiver.recv().unwrap();
+
+        // Step 5.
+        // TODO(#4282): Transforming promise.
         match descriptors_vec {
             Ok(descriptor_vec) => {
                 Ok(descriptor_vec.into_iter()
@@ -159,16 +180,26 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-readvalue
     fn ReadValue(&self) -> Fallible<ByteString> {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Reads) {
             return Err(Security)
         }
         let (sender, receiver) = ipc::channel().unwrap();
+
+        // Step 2.
+        // TODO(#4282): Reject promise.
         if !self.Service().Device().Gatt().Connected() {
             return Err(Network)
         }
+
+        // TODO(#4282): Step 4: connection-checking-wraper.
+
+        // Step 4.1.
         if !self.Properties().Read() {
             return Err(NotSupported)
         }
+        // Note: Step 4.2 is implemented in components/net/bluetooth_thread.rs in read_value function.
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::ReadValue(self.get_instance_id(), sender)).unwrap();
         let result = receiver.recv().unwrap();
@@ -176,37 +207,74 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             Ok(val) => {
                 ByteString::new(val)
             },
+
+            // Step 4.3.
+            // TODO(#4282): Reject promise.
             Err(error) => {
                 return Err(Error::from(error))
             },
         };
+
+        // TODO(#4282): Step 4.4.1: activeAlgorithms.
+
+        // Step 4.4.2.
+        // TODO(#9530, #5014): DataView, ArrayBuffer.
         *self.value.borrow_mut() = Some(value.clone());
+
+        // TODO: Step 4.4.3: Fire characteristicvaluechanged event.
+
+        // Step 4.4.4.
+        // TODO(#4282): Resolve promise.
         Ok(value)
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue
     fn WriteValue(&self, value: Vec<u8>) -> ErrorResult {
+        // Step 1.
+        // TODO(#4282): Reject promise.
         if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Writes) {
             return Err(Security)
         }
+
+        // TODO(#5014): Step 3: ArrayBuffer.
+
+        // Step 4.
+        // TODO(#4282): Reject promise.
         if value.len() > MAXIMUM_ATTRIBUTE_LENGTH {
             return Err(InvalidModification)
         }
+
+        // Step 5.
+        // TODO(#4282): Reject promise.
         if !self.Service().Device().Gatt().Connected() {
             return Err(Network)
         }
 
+        // TODO(#4282): Step 6: connection-checking-wraper.
+
+        // Step 6.1.
+        // TODO(#4282): Reject promise.
         if !(self.Properties().Write() ||
              self.Properties().WriteWithoutResponse() ||
              self.Properties().AuthenticatedSignedWrites()) {
             return Err(NotSupported)
         }
+        // Note: Step 6.2 is implemented in components/net/bluetooth_thread.rs in write_value function.
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::WriteValue(self.get_instance_id(), value, sender)).unwrap();
         let result = receiver.recv().unwrap();
+
+        // TODO(#4282): Step 6.4.1: activeAlgorithms.
+
         match result {
+            // Step 6.4.3.
+            // TODO(#4282): Resolve promise.
             Ok(_) => Ok(()),
+            // TODO(#9530, #5014): Step 6.4.2: DataView, ArrayBuffer.
+
+            // Step 6.3.
+            // TODO(#4282): Reject promise.
             Err(error) => {
                 Err(Error::from(error))
             },
