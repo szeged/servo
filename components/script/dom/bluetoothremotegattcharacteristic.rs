@@ -185,7 +185,6 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
         if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Reads) {
             return Err(Security)
         }
-        let (sender, receiver) = ipc::channel().unwrap();
 
         // Step 2.
         // TODO(#4282): Reject promise.
@@ -200,6 +199,7 @@ impl BluetoothRemoteGATTCharacteristicMethods for BluetoothRemoteGATTCharacteris
             return Err(NotSupported)
         }
         // Note: Step 4.2 is implemented in components/net/bluetooth_thread.rs in read_value function.
+        let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::ReadValue(self.get_instance_id(), sender)).unwrap();
         let result = receiver.recv().unwrap();

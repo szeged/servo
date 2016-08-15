@@ -91,7 +91,6 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
         if uuid_is_blacklisted(self.uuid.as_ref(), Blacklist::Reads) {
             return Err(Security)
         }
-        let (sender, receiver) = ipc::channel().unwrap();
         // Step 2.
         // TODO(#4282): Reject promise.
         if !self.Characteristic().Service().Device().Gatt().Connected() {
@@ -101,6 +100,7 @@ impl BluetoothRemoteGATTDescriptorMethods for BluetoothRemoteGATTDescriptor {
         // TODO(#4282): Step 4: connection-checking-wraper.
 
         // Note: Step 4.1 is implemented in components/net/bluetooth_thread.rs in write_value function.
+        let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(
             BluetoothMethodMsg::ReadValue(self.get_instance_id(), sender)).unwrap();
         let result = receiver.recv().unwrap();
