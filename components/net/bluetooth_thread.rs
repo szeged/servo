@@ -222,17 +222,26 @@ impl BluetoothManager {
                 self.adapter = BluetoothAdapter::init().ok();
                 match self.adapter.as_ref().unwrap().set_name(String::from("Empty Adapter")) {
                     Ok(_) => println!("siker"),
-                    Err(err) => println!("{:?}",err),
+                    Err(err) => println!("set address result: {:?}",err),
                 }
-                let test_device_1 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 1"));
-                let result = test_device_1.set_address(String::from("address_1"));
-                println!("{:?}",result);
-                let test_device_2 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 2"));
-                test_device_2.set_address(String::from("address_2"));                
-                let test_device_3 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 3"));
-                test_device_3.set_address(String::from("address_3")); 
-                let test_device_4 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test Device 4"));
-                test_device_4.set_address(String::from("address_4"));                 
+                let test_device_1 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_1"));
+                test_device_1.set_address(String::from("Test_address_1"));
+                test_device_1.set_name(String::from("Test_device_1"));
+                test_device_1.set_tx_power(100);
+                test_device_1.set_appearance(4);
+                let uuids = vec!["0x180F".to_owned()];
+                let test_service_1 = BluetoothGATTService::new_mock(test_device_1, "test_service_1_id".to_owned());
+                test_device_1.set_uuids()
+
+                let test_device_2 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_2"));
+                test_device_2.set_address(String::from("Test_address_2"));
+                test_device_2.set_name(String::from("Test_device_2"));
+                let test_device_3 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_3"));
+                test_device_3.set_address(String::from("Test_address_3"));
+                test_device_3.set_name(String::from("Test_device_3"));
+                let test_device_4 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_4"));
+                test_device_4.set_address(String::from("Test_address_4"));
+                test_device_4.set_name(String::from("Test_device_4"));
             },
             "FailStartDiscoveryAdapter" => {
 
@@ -263,7 +272,6 @@ impl BluetoothManager {
             },
             _ => unreachable!(),
         }
-        println!("{:?}", self.adapter.as_ref().unwrap().get_name().unwrap());
     }
 
     // Adapter
@@ -282,7 +290,6 @@ impl BluetoothManager {
         let devices = adapter.get_devices().unwrap_or(vec!());
         for device in &devices {
             if let Ok(address) = device.get_address() {
-                println!("{:?}",address);
                 if !self.address_to_id.contains_key(&address) {
                     let generated_id = self.generate_device_id();
                     self.address_to_id.insert(address, generated_id.clone());
