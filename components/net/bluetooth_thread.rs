@@ -237,34 +237,24 @@ impl BluetoothManager {
                 let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
             },
             "EmptyAdapter" => {
-
             },
             "FailStartDiscoveryAdapter" => {
-
             },
             "FailStopDiscoveryAdapter" => {
-
             },
             "GlucoseHeartRateAdapter" => {
-
             },
             "SecondDiscoveryFindsHeartRateAdapter" => {
-
             },
             "MissingServiceGenericAccessAdapter" => {
-
             },
             "MissingCharacteristicGenericAccessAdapter" => {
-
             },
             "MissingDescriptorGenericAccessAdapter" => {
-
             },
             "GenericAccessAdapter" => {
-
             },
             "FailingGATTOperationsAdapter" => {
-
             },
             _ => unreachable!(),
         }
