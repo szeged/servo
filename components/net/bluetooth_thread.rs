@@ -17,13 +17,18 @@ use rand::{self, Rng};
 use std::borrow::ToOwned;
 use std::collections::{HashMap, HashSet};
 use std::string::String;
+use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT, Ordering};
 use std::thread;
 use std::time::Duration;
 #[cfg(target_os = "linux")]
 use tinyfiledialogs;
 use util::thread::spawn_named;
 
+static TESTING: AtomicBool = ATOMIC_BOOL_INIT;
+
 const ADAPTER_ERROR: &'static str = "No adapter found";
+
+const ADAPTER_NOT_POWERED_ERROR: &'static str = "Bluetooth adapter not powered";
 
 // A transaction not completed within 30 seconds shall time out. Such a transaction shall be considered to have failed.
 // https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439 (Vol. 3, page 480)
@@ -63,7 +68,12 @@ macro_rules! return_if_cached(
 macro_rules! get_adapter_or_return_error(
     ($bl_manager:expr, $sender:expr) => (
         match $bl_manager.get_or_create_adapter() {
-            Some(adapter) => adapter,
+            Some(adapter) => {
+                if !adapter.is_powered().unwrap() {
+                    return drop($sender.send(Err(BluetoothError::Type(ADAPTER_NOT_POWERED_ERROR.to_string()))))
+                }
+                adapter
+            },
             None => return drop($sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
         }
     );
@@ -211,37 +221,23 @@ impl BluetoothManager {
     // Test
 
     fn test(&mut self, data_set_name: String, _sender: IpcSender<BluetoothResult<bool>>) {
+        TESTING.fetch_or(true, Ordering::Relaxed);
+
         match data_set_name.as_str() {
             "NotPresentAdapter" => {
-
+                self.adapter = BluetoothAdapter::init().ok();
+                let _ = self.adapter.as_ref().unwrap().set_name(String::from("NotPresentAdapter"));
+                let _ = self.adapter.as_ref().unwrap().set_present(false);
+                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
+                let _ = self.adapter.as_ref().unwrap().set_powered(true);
             },
             "NotPoweredAdapter" => {
-
+                self.adapter = BluetoothAdapter::init().ok();
+                let _ = self.adapter.as_ref().unwrap().set_name(String::from("NotPoweredAdapter"));
+                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
             },
             "EmptyAdapter" => {
-                self.adapter = BluetoothAdapter::init().ok();
-                match self.adapter.as_ref().unwrap().set_name(String::from("Empty Adapter")) {
-                    Ok(_) => println!("siker"),
-                    Err(err) => println!("set address result: {:?}",err),
-                }
-                let test_device_1 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_1"));
-                test_device_1.set_address(String::from("Test_address_1"));
-                test_device_1.set_name(String::from("Test_device_1"));
-                test_device_1.set_tx_power(100);
-                test_device_1.set_appearance(4);
-                let uuids = vec!["0x180F".to_owned()];
-                let test_service_1 = BluetoothGATTService::new_mock(test_device_1, "test_service_1_id".to_owned());
-                test_device_1.set_uuids()
 
-                let test_device_2 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_2"));
-                test_device_2.set_address(String::from("Test_address_2"));
-                test_device_2.set_name(String::from("Test_device_2"));
-                let test_device_3 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_3"));
-                test_device_3.set_address(String::from("Test_address_3"));
-                test_device_3.set_name(String::from("Test_device_3"));
-                let test_device_4 = BluetoothDevice::create_device(self.adapter.clone().unwrap(), String::from("Test_id_4"));
-                test_device_4.set_address(String::from("Test_address_4"));
-                test_device_4.set_name(String::from("Test_device_4"));
             },
             "FailStartDiscoveryAdapter" => {
 
@@ -281,6 +277,11 @@ impl BluetoothManager {
         if !adapter_valid {
             self.adapter = BluetoothAdapter::init().ok();
         }
+
+        if TESTING.load(Ordering::Relaxed) && !self.adapter.as_ref().unwrap().is_present().unwrap() {
+            return None;
+        }
+
         self.adapter.clone()
     }
 

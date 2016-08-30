@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<title>Test API Device Info</title>
+<title>Not Present Adapter Test</title>
 <body>
     <button type="button" onclick="onButtonClick()">Get Bluetooth Device Info</button>
     <pre id="log"></pre>
@@ -9,8 +9,8 @@
     function onButtonClick() {
         clear();
         try {
-            log('Setting up empty adapter...');
-            window.testRunner.setBluetoothMockDataSet("EmptyAdapter");
+            log('Setting up not presented adapter...');
+            window.testRunner.setBluetoothMockDataSet("NotPresentAdapter");
             log('Requesting Bluetooth Device...');
             var device = window.navigator.bluetooth.requestDevice({
                           filters: [
