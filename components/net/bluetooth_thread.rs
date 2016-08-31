@@ -243,6 +243,9 @@ impl BluetoothManager {
                 let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
             },
             "FailStartDiscoveryAdapter" => {
+                self.adapter = BluetoothAdapter::init().ok();
+                let _ = self.adapter.as_ref().unwrap().set_name(String::from("FailStartDiscoveryAdapter"));
+                let _ = self.adapter.as_ref().unwrap().set_powered(true);
             },
             "FailStopDiscoveryAdapter" => {
             },
