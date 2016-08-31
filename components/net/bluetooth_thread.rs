@@ -237,6 +237,10 @@ impl BluetoothManager {
                 let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
             },
             "EmptyAdapter" => {
+                self.adapter = BluetoothAdapter::init().ok();
+                let _ = self.adapter.as_ref().unwrap().set_name(String::from("EmptyAdapter"));
+                let _ = self.adapter.as_ref().unwrap().set_powered(true);
+                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
             },
             "FailStartDiscoveryAdapter" => {
             },
