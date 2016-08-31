@@ -247,9 +247,28 @@ impl BluetoothManager {
                 let _ = self.adapter.as_ref().unwrap().set_name(String::from("FailStartDiscoveryAdapter"));
                 let _ = self.adapter.as_ref().unwrap().set_powered(true);
             },
-            "FailStopDiscoveryAdapter" => {
-            },
+            //"FailStopDiscoveryAdapter" => {
+            //},
             "GlucoseHeartRateAdapter" => {
+                self.adapter = BluetoothAdapter::init().ok();
+                let _ = self.adapter.as_ref().unwrap().set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
+                let _ = self.adapter.as_ref().unwrap().set_powered(true);
+                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
+                let glucose_device = BluetoothDevice::create_device(self.adapter.clone().unwrap(), self.generate_device_id());
+                let _ = glucose_device.set_name("Glucose Device".to_owned());
+                let _ = glucose_device.set_address("00:00:00:00:00:02".to_owned());
+                // Generic Acces, Glucose UUID, Tx Power
+                let _ = glucose_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                      "00001808-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                      "00001804-0000-1000-8000-00805f9b34fb".to_owned()));
+                let heart_rate_device = BluetoothDevice::create_device(self.adapter.clone().unwrap(), self.generate_device_id());
+                let _ = heart_rate_device.set_name("Heart Rate Device".to_owned());
+                let _ = heart_rate_device.set_address("00:00:00:00:00:01".to_owned());
+                let _ = heart_rate_device.set_connectable(true);
+                // Generic Acces, Heart Rate UUID
+                let _ = heart_rate_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                         "0000180d-0000-1000-8000-00805f9b34fb".to_owned()));
+
             },
             "SecondDiscoveryFindsHeartRateAdapter" => {
             },

@@ -199,7 +199,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "blurmock"
 version = "0.1.0"
-source = "git+https://github.com/zakorgy/fake-blurz.git?branch=blurmock#6885f0dfa75723f16cb8e7e6c0b2a448008cbefd"
+source = "git+https://github.com/zakorgy/fake-blurz.git?branch=blurmock#a63e10f638b939ef4c53d6147581cbe476c5cf85"
 dependencies = [
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -500,7 +500,7 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/zakorgy/devices?branch=test-api#771a4ce43266fd49e5978c520693d13a741ba160"
+source = "git+https://github.com/zakorgy/devices?branch=test-api#e08bc0b0ce9a9fc449dcf27dcd347a909c27fd3b"
 dependencies = [
  "blurmock 0.1.0 (git+https://github.com/zakorgy/fake-blurz.git?branch=blurmock)",
 ]
