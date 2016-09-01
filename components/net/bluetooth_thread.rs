@@ -220,60 +220,92 @@ impl BluetoothManager {
 
     // Test
 
-    fn test(&mut self, data_set_name: String, _sender: IpcSender<BluetoothResult<bool>>) {
+    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<bool>>) {
         TESTING.fetch_or(true, Ordering::Relaxed);
         self.adapter = BluetoothAdapter::init().ok();
         match data_set_name.as_str() {
             "NotPresentAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("NotPresentAdapter"));
-                let _ = self.adapter.as_ref().unwrap().set_present(false);
-                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
+                match self.adapter.as_ref() {
+                    Some(ref adapter) => {
+                        let _ = adapter.set_name(String::from("NotPresentAdapter"));
+                        let _ = adapter.set_present(false);
+                        let _ = adapter.set_discoverable(true);
+                        let _ = adapter.set_powered(true);
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
             },
             "NotPoweredAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("NotPoweredAdapter"));
-                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
+                match self.adapter.as_ref() {
+                    Some(ref adapter) => {
+                        let _ = adapter.set_name(String::from("NotPoweredAdapter"));
+                        let _ = adapter.set_discoverable(true);
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
             },
             "EmptyAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("EmptyAdapter"));
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
-                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
+                match self.adapter.as_ref() {
+                    Some(ref adapter) => {
+                        let _ = adapter.set_name(String::from("EmptyAdapter"));
+                        let _ = adapter.set_powered(true);
+                        let _ = adapter.set_discoverable(true);
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
             },
             "FailStartDiscoveryAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("FailStartDiscoveryAdapter"));
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
+                match self.adapter.as_ref() {
+                    Some(ref adapter) => {
+                        let _ = adapter.set_name(String::from("FailStartDiscoveryAdapter"));
+                        let _ = adapter.set_discoverable(true);
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
             },
             //"FailStopDiscoveryAdapter" => {
             //},
             "GlucoseHeartRateAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
-                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
-                let glucose_device = BluetoothDevice::create_device(self.adapter.clone().unwrap(), self.generate_device_id());
-                let _ = glucose_device.set_name("Glucose Device".to_owned());
-                let _ = glucose_device.set_address("00:00:00:00:00:01".to_owned());
-                // Generic Acces, Glucose UUID, Tx Power
-                let _ = glucose_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
-                                                      "00001808-0000-1000-8000-00805f9b34fb".to_owned(),
-                                                      "00001804-0000-1000-8000-00805f9b34fb".to_owned()));
-                let heart_rate_device = BluetoothDevice::create_device(self.adapter.clone().unwrap(), self.generate_device_id());
-                let _ = heart_rate_device.set_name("Heart Rate Device".to_owned());
-                let _ = heart_rate_device.set_address("00:00:00:00:00:02".to_owned());
-                let _ = heart_rate_device.set_connectable(true);
-                // Generic Acces, Heart Rate UUID
-                let _ = heart_rate_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
-                                                         "0000180d-0000-1000-8000-00805f9b34fb".to_owned()));
+                let random_id_1 = self.generate_device_id();
+                let random_id_2 = self.generate_device_id();
+                match self.adapter.as_ref() {
+                    Some(adapter) => {
+                        let _ = adapter.set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
+                        let _ = adapter.set_powered(true);
+                        let _ = adapter.set_discoverable(true);
+                        let glucose_device = BluetoothDevice::create_device(adapter.clone(), random_id_1);
+                        let _ = glucose_device.set_name("Glucose Device".to_owned());
+                        let _ = glucose_device.set_address("00:00:00:00:00:01".to_owned());
+                        // Generic Acces, Glucose UUID, Tx Power
+                        let _ = glucose_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                              "00001808-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                              "00001804-0000-1000-8000-00805f9b34fb".to_owned()));
+                        let heart_rate_device = BluetoothDevice::create_device(adapter.clone(), random_id_2);
+                        let _ = heart_rate_device.set_name("Heart Rate Device".to_owned());
+                        let _ = heart_rate_device.set_address("00:00:00:00:00:02".to_owned());
+                        let _ = heart_rate_device.set_connectable(true);
+                        // Generic Acces, Heart Rate UUID
+                        let _ = heart_rate_device.set_uuids(vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned(),
+                                                                 "0000180d-0000-1000-8000-00805f9b34fb".to_owned()));
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
 
             },
 
             "UnicodeDeviceAdapter" => {
-                let _ = self.adapter.as_ref().unwrap().set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
-                let _ = self.adapter.as_ref().unwrap().set_discoverable(true);
-                let _ = self.adapter.as_ref().unwrap().set_powered(true);
-                let unicode_device = BluetoothDevice::create_device(self.adapter.clone().unwrap(), self.generate_device_id());
-                let _ = unicode_device.set_name("❤❤❤❤❤❤❤❤❤".to_owned());
-                let _ = unicode_device.set_address("00:00:00:00:00:03".to_owned());                
+                let random_id = self.generate_device_id();
+                match self.adapter.as_ref() {
+                    Some(adapter) => {
+                        let _ = adapter.set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
+                        let _ = adapter.set_powered(true);
+                        let _ = adapter.set_discoverable(true);
+                        let unicode_device = BluetoothDevice::create_device(adapter.clone(), random_id);
+                        let _ = unicode_device.set_name("❤❤❤❤❤❤❤❤❤".to_owned());
+                        let _ = unicode_device.set_address("00:00:00:00:00:03".to_owned());
+                    },
+                    None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
+                }
             }
             "SecondDiscoveryFindsHeartRateAdapter" => {
             },
@@ -299,7 +331,12 @@ impl BluetoothManager {
             self.adapter = BluetoothAdapter::init().ok();
         }
 
-        if TESTING.load(Ordering::Relaxed) && !self.adapter.as_ref().unwrap().is_present().unwrap() {
+        let adapter = match self.adapter.as_ref() {
+            Some(adapter) => adapter,
+            None => return None,
+        };
+
+        if TESTING.load(Ordering::Relaxed) && !adapter.is_present().unwrap_or(true) {
             return None;
         }
 
@@ -523,8 +560,10 @@ impl BluetoothManager {
                       sender: IpcSender<BluetoothResult<BluetoothDeviceMsg>>) {
         let mut adapter = get_adapter_or_return_error!(self, sender);
         if let Ok(ref session) = adapter.create_discovery_session() {
-            if session.start_discovery().is_ok() {
-                thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS));
+            match session.start_discovery() {
+                Ok(_) => thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS)),
+                //TODO: Add a new error to BluetoothError or a new static error string
+                Err(err) => return drop(sender.send(Err(BluetoothError::Type(err.description().to_owned())))),
             }
             let _ = session.stop_discovery();
         }
