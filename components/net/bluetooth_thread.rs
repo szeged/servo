@@ -297,7 +297,7 @@ impl BluetoothManager {
                 let random_id = self.generate_device_id();
                 match self.adapter.as_ref() {
                     Some(adapter) => {
-                        let _ = adapter.set_name(String::from("GlucoseHeartRateAdapter".to_owned()));
+                        let _ = adapter.set_name(String::from("UnicodeDeviceAdapter".to_owned()));
                         let _ = adapter.set_powered(true);
                         let _ = adapter.set_discoverable(true);
                         let unicode_device = BluetoothDevice::create_device(adapter.clone(), random_id);
@@ -369,6 +369,14 @@ impl BluetoothManager {
 
     #[cfg(target_os = "linux")]
     fn select_device(&mut self, devices: Vec<BluetoothDevice>) -> Option<String> {
+        if TESTING.load(Ordering::Relaxed) {
+            for device in devices {
+                if let Ok(address) = device.get_address() {
+                    return Some(address);
+                }
+            }
+            return None;
+        }
         let mut dialog_rows: Vec<String> = vec!();
         for device in devices {
             dialog_rows.extend_from_slice(&[device.get_address().unwrap_or("".to_string()),
@@ -607,7 +615,12 @@ impl BluetoothManager {
                 for _ in 0..MAXIMUM_TRANSACTION_TIME {
                     match d.is_connected().unwrap_or(false) {
                         true => return drop(sender.send(Ok(true))),
-                        false => thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS)),
+                        false => {
+                            if TESTING.load(Ordering::Relaxed) {
+                                break;
+                            }
+                            thread::sleep(Duration::from_millis(CONNECTION_TIMEOUT_MS));
+                        },
                     }
                 }
                 return drop(sender.send(Err(BluetoothError::Network)));
