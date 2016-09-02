@@ -500,7 +500,7 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/zakorgy/devices?branch=test-api#e08bc0b0ce9a9fc449dcf27dcd347a909c27fd3b"
+source = "git+https://github.com/zakorgy/devices?branch=test-api#7dc70343f53751988cdc851052ebcdcb9596ba46"
 dependencies = [
  "blurmock 0.1.0 (git+https://github.com/zakorgy/fake-blurz.git?branch=blurmock)",
 ]
