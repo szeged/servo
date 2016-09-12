@@ -44,6 +44,7 @@ websocket = "0.17"
 
 [dependencies.device]
 git = "https://github.com/zakorgy/devices"
+#path = "/home/fokin/work/device-api/devices"
 branch = "test-api"
 default_features = false
 features = ["bluetooth-test"]

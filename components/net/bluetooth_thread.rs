@@ -230,7 +230,7 @@ impl BluetoothManager {
 
     // Test
 
-    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<bool>>) {
+    fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<()>>) {
         TESTING.fetch_or(true, Ordering::Relaxed);
         self.adapter = BluetoothAdapter::init().ok();
         bluetooth_test::test(self, data_set_name, sender);

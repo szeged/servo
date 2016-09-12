@@ -4,7 +4,7 @@
 
 use dom::bindings::codegen::Bindings::TestRunnerBinding;
 use dom::bindings::codegen::Bindings::TestRunnerBinding::TestRunnerMethods;
-use dom::bindings::error::Fallible;
+use dom::bindings::error::{Error, ErrorResult};
 use dom::bindings::global::GlobalRef;
 use dom::bindings::js::Root;
 use dom::bindings::reflector::{Reflectable, Reflector, reflect_dom_object};
@@ -36,60 +36,22 @@ impl TestRunner {
         let global_ref = global_root.r();
         global_ref.as_window().bluetooth_thread()
     }
-
-    /*fn not_present_adapter() {
-
-    }
-
-    fn not_powered_adapter() {
-
-    }
-
-    fn empty_adapter() {
-
-    }
-
-    fn fail_start_discovery_adapter() {
-
-    }
-
-    fn fail_stop_discovery_adapter() {
-
-    }
-
-    fn glucose_heart_rate_adapter() {
-
-    }
-
-    fn second_discovery_finds_heart_rate_adapter() {
-
-    }
-
-    fn missing_service_generix_access_adapter() {
-
-    }
-
-    fn missing_characteristic_generic_access_adapter() {
-
-    }
-
-    fn missing_descriptor_generic_access_adapter() {
-
-    }
-
-    fn generic_acceess_adapter() {
-
-    }
-
-    fn failing_gatt_operations_adapter() {
-
-    }*/
 }
 
 impl TestRunnerMethods for TestRunner {
     // https://webbluetoothcg.github.io/web-bluetooth/tests/#setBluetoothMockDataSet
-    fn SetBluetoothMockDataSet(&self, dataSetName: DOMString) {
+    fn SetBluetoothMockDataSet(&self, dataSetName: DOMString) -> ErrorResult {
         let (sender, receiver) = ipc::channel().unwrap();
         self.get_bluetooth_thread().send(BluetoothMethodMsg::Test(String::from(dataSetName), sender)).unwrap();
+
+        let result = receiver.recv().unwrap();
+        match result {
+            Ok(()) => {
+                Ok(())
+            },
+            Err(error) => {
+                Err(Error::from(error))
+            },
+        }
     }
 }
