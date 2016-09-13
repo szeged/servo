@@ -141,14 +141,14 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                              "f000ffc0-0451-4000-b000-000000000000".to_owned())),
                                                    sender);
                     let _human_interface_service =
-                        BluetoothGATTService::new_mock(blacklisted_services_device.clone(),
-                                                       "00001812-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTService::create_service(blacklisted_services_device.clone(),
+                                                             "00001812-0000-1000-8000-00805f9b34fb".to_owned());
                     let _firmware_update_service =
-                        BluetoothGATTService::new_mock(blacklisted_services_device.clone(),
-                                                       "00001530-1212-efde-1523-785feabcd123".to_owned());
+                        BluetoothGATTService::create_service(blacklisted_services_device.clone(),
+                                                             "00001530-1212-efde-1523-785feabcd123".to_owned());
                     let _over_the_air_download_service =
-                        BluetoothGATTService::new_mock(blacklisted_services_device.clone(),
-                                                       "f000ffc0-0451-4000-b000-000000000000".to_owned());
+                        BluetoothGATTService::create_service(blacklisted_services_device.clone(),
+                                                             "f000ffc0-0451-4000-b000-000000000000".to_owned());
                 },
                 None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
             }
@@ -176,13 +176,13 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                              "0000180d-0000-1000-8000-00805f9b34fb".to_owned())),
                                                    sender);
                     let generic_access_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       random_id_service1.to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             random_id_service1.to_owned());
                     set_attribute_or_return_error!(generic_access_service.set_uuid("00001800-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(generic_access_service.set_primary(true), sender);
                     let heart_rate_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       random_id_service2.to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             random_id_service2.to_owned());
                     set_attribute_or_return_error!(heart_rate_service.set_uuid("0000180d-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(heart_rate_service.set_primary(true), sender);
                 },
@@ -217,46 +217,46 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                              "0000180d-0000-1000-8000-00805f9b34fb".to_owned())),
                                                    sender);
                     let generic_access_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       random_id_service1.to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             random_id_service1.to_owned());
                     set_attribute_or_return_error!(generic_access_service.set_uuid("00001800-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(generic_access_service.set_primary(true), sender);
                     let heart_rate_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       random_id_service2.to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             random_id_service2.to_owned());
                     set_attribute_or_return_error!(heart_rate_service.set_uuid("0000180d-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(heart_rate_service.set_primary(true), sender);
 
                     let device_name_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(generic_access_service.clone(),
-                                                              random_id_characteristic1.to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(generic_access_service.clone(),
+                                                                           random_id_characteristic1.to_owned());
                     set_attribute_or_return_error!(device_name_characteristic.set_uuid("00002a00-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(device_name_characteristic.write_value(vec![1]), sender);
 
                     let pheripheral_privacy_flag_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(generic_access_service.clone(),
-                                                              random_id_characteristic2.to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(generic_access_service.clone(),
+                                                                           random_id_characteristic2.to_owned());
                     set_attribute_or_return_error!(pheripheral_privacy_flag_characteristic.set_uuid("00002a02-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(pheripheral_privacy_flag_characteristic.write_value(vec![2]),
                                                    sender);
 
                     let heart_rate_measurement_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              random_id_characteristic3.to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           random_id_characteristic3.to_owned());
                     set_attribute_or_return_error!(heart_rate_measurement_characteristic.set_uuid("00002a37-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(heart_rate_measurement_characteristic.write_value(vec![3]),
                                                    sender);
 
                     let body_sensor_location_characteristic_1 =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              random_id_characteristic4.to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           random_id_characteristic4.to_owned());
                     set_attribute_or_return_error!(body_sensor_location_characteristic_1.set_uuid("00002a38-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(body_sensor_location_characteristic_1.write_value(vec![4]),
                                                    sender);
 
                     let body_sensor_location_characteristic_2 =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              random_id_characteristic5.to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           random_id_characteristic5.to_owned());
                     set_attribute_or_return_error!(body_sensor_location_characteristic_2.set_uuid("00002a38-0000-1000-8000-00805f9b34fb".to_owned()), sender);
                     set_attribute_or_return_error!(body_sensor_location_characteristic_2.write_value(vec![5]),
                                                    sender);
@@ -282,12 +282,12 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                         vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned())),
                                                    sender);
                     let service =
-                        BluetoothGATTService::new_mock(device.clone(),
-                                                       "00001800-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTService::create_service(device.clone(),
+                                                             "00001800-0000-1000-8000-00805f9b34fb".to_owned());
 
                     let pheripheral_privacy_flag_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(service.clone(),
-                                                              "00002a02-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(service.clone(),
+                                                                           "00002a02-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(pheripheral_privacy_flag_characteristic.write_value(vec![8]),
                                                    sender);
                 },
@@ -312,18 +312,18 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                         vec!("00001800-0000-1000-8000-00805f9b34fb".to_owned())),
                                                    sender);
                     let service =
-                        BluetoothGATTService::new_mock(device.clone(),
-                                                       "00001800-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTService::create_service(device.clone(),
+                                                             "00001800-0000-1000-8000-00805f9b34fb".to_owned());
 
                     let reconnection_address_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(service.clone(),
-                                                              "00002a03-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(service.clone(),
+                                                                           "00002a03-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(reconnection_address_characteristic.write_value(vec![6]),
                                                    sender);
 
                     let serial_number_string_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(service.clone(),
-                                                              "00002a25-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(service.clone(),
+                                                                           "00002a25-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(serial_number_string_characteristic.write_value(vec![7]),
                                                    sender);
                 },
@@ -350,50 +350,50 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                              "0000180d-0000-1000-8000-00805f9b34fb".to_owned())),
                                                    sender);
                     let generic_access_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       "00001800-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             "00001800-0000-1000-8000-00805f9b34fb".to_owned());
                     let heart_rate_service =
-                        BluetoothGATTService::new_mock(heart_rate_device.clone(),
-                                                       "0000180d-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTService::create_service(heart_rate_device.clone(),
+                                                             "0000180d-0000-1000-8000-00805f9b34fb".to_owned());
 
                     let device_name_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(generic_access_service.clone(),
-                                                              "00002A00-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(generic_access_service.clone(),
+                                                                           "00002A00-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(device_name_characteristic.write_value(vec![9]), sender);
 
                     let pheripheral_privacy_flag_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(generic_access_service.clone(),
-                                                              "00002A02-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(generic_access_service.clone(),
+                                                                           "00002A02-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(pheripheral_privacy_flag_characteristic.write_value(vec![10]),
                                                    sender);
 
                     let heart_rate_measurement_characteristic =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              "00002a37-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           "00002a37-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(heart_rate_measurement_characteristic.write_value(vec![11]),
                                                    sender);
 
                     let body_sensor_location_characteristic_1 =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              "00002a38-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           "00002a38-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(body_sensor_location_characteristic_1.write_value(vec![12]),
                                                    sender);
 
                     let body_sensor_location_characteristic_2 =
-                        BluetoothGATTCharacteristic::new_mock(heart_rate_service.clone(),
-                                                              "00002a38-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTCharacteristic::create_characteristic(heart_rate_service.clone(),
+                                                                           "00002a38-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(body_sensor_location_characteristic_2.write_value(vec![13]),
                                                    sender);
 
                     let desc_for_hrmeasurement_descriptor =
-                        BluetoothGATTDescriptor::new_mock(heart_rate_measurement_characteristic.clone(),
-                                                          "00002901-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTDescriptor::create_descriptor(heart_rate_measurement_characteristic.clone(),
+                                                                   "00002901-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(desc_for_hrmeasurement_descriptor.write_value(vec![14]),
                                                    sender);
 
                     let desc_for_bslocation_descriptor =
-                        BluetoothGATTDescriptor::new_mock(body_sensor_location_characteristic_1.clone(),
-                                                          "00002901-0000-1000-8000-00805f9b34fb".to_owned());
+                        BluetoothGATTDescriptor::create_descriptor(body_sensor_location_characteristic_1.clone(),
+                                                                   "00002901-0000-1000-8000-00805f9b34fb".to_owned());
                     set_attribute_or_return_error!(desc_for_bslocation_descriptor.write_value(vec![15]),
                                                    sender);
                 },
