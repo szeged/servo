@@ -95,7 +95,7 @@ test(function() {
         window.navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'B',
             services: ['00001812-0000-1000-8000-00805f9b34fb',
                        '00001530-1212-efde-1523-785feabcd123',
-                       'f000ffc0-0451-4000-b000-000000000000'] 
+                       'f000ffc0-0451-4000-b000-000000000000']
         }]});
     });
 }, 'BlacklistedServicesAdapter Test');
@@ -117,7 +117,6 @@ test(function() {
     });
     assert_equals(server.device, heart_rate_device);
 
-    setTimeout(function() {}, 3000);
     var generic_access_service = server.getPrimaryService(0x1800);
     var uuid = generic_access_service.uuid;
     assert_true(uuid == '00001800-0000-1000-8000-00805f9b34fb');
