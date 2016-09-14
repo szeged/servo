@@ -9384,12 +9384,6 @@
             "url": "/_mozilla/mozilla/weakref.html"
           }
         ],
-        "mozilla/web_bluetooth.html": [
-          {
-            "path": "mozilla/web_bluetooth.html",
-            "url": "/_mozilla/mozilla/web_bluetooth.html"
-          }
-        ],
         "mozilla/webgl/bufferData.html": [
           {
             "path": "mozilla/webgl/bufferData.html",
