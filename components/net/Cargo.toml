@@ -44,7 +44,6 @@ websocket = "0.17"
 [dependencies.device]
 git = "https://github.com/szeged/devices"
 branch = "test-api"
-default_features = false
 features = ["bluetooth-test"]
 
 [dependencies.webrender_traits]

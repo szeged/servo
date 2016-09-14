@@ -482,7 +482,11 @@ impl BluetoothManager {
         let mut adapter = get_adapter_or_return_error!(self, sender);
         if let Ok(ref session) = adapter.create_discovery_session() {
             match session.start_discovery() {
-                Ok(_) => thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS)),
+                Ok(_) => {
+                    if !TESTING.load(Ordering::Relaxed) {
+                        thread::sleep(Duration::from_millis(DISCOVERY_TIMEOUT_MS));
+                    }
+                },
                 //TODO: Add a new error to BluetoothError or a new static error string
                 Err(err) => return drop(sender.send(Err(BluetoothError::Type(err.description().to_owned())))),
             }
