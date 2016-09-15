@@ -17,9 +17,8 @@ dictionary RequestDeviceOptions {
 
 [Pref="dom.bluetooth.enabled", Exposed=(Window,Worker)]
 interface Bluetooth {
-    // Promise<BluetoothDevice> requestDevice(RequestDeviceOptions options);
     [Throws]
-    BluetoothDevice requestDevice(RequestDeviceOptions options);
+    Promise<BluetoothDevice> requestDevice(RequestDeviceOptions options);
 };
 
 // Bluetooth implements EventTarget;
