@@ -7,6 +7,6 @@
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
     return promise_rejects(
-      t, new TypeError(), window.navigator.bluetooth.requestDevice({filters: [{}]}));
-}, 'A filter must restrict the devices in some way.');
+      t, 'DOMException', window.navigator.bluetooth.requestDevice([{}, {optionalServices: ['wrong_service']}]));
+}, 'RequestDeviceOptions requires a |filters| member.');
 </script>

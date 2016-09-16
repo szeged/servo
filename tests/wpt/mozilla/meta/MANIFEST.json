@@ -6510,10 +6510,40 @@
             "url": "/_mozilla/mozilla/binding_keyword.html"
           }
         ],
+        "mozilla/bluetooth/getPrimaryServices/no-permission-absent-service-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getPrimaryServices/no-permission-absent-service-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getPrimaryServices/no-permission-absent-service-with-uuid.html"
+          }
+        ],
         "mozilla/bluetooth/idl-Bluetooth.html": [
           {
             "path": "mozilla/bluetooth/idl-Bluetooth.html",
             "url": "/_mozilla/mozilla/bluetooth/idl-Bluetooth.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/adapter-not-present.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/adapter-not-present.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/adapter-not-present.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/adapter-off.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/adapter-off.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/adapter-off.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/blacklisted-service-in-optionalServices.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/blacklisted-service-in-optionalServices.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/blacklisted-service-in-optionalServices.html"
           }
         ],
         "mozilla/bluetooth/requestDevice/canonicalizeFilter/empty-filter.html": [
@@ -6546,22 +6576,190 @@
             "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-device-name-name.html"
           }
         ],
-        "mozilla/bluetooth/requestDevice/adapter-not-present.html": [
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-device-name-namePrefix.html": [
           {
-            "path": "mozilla/bluetooth/requestDevice/adapter-not-present.html",
-            "url": "/_mozilla/mozilla/bluetooth/requestDevice/adapter-not-present.html"
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-device-name-namePrefix.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-device-name-namePrefix.html"
           }
         ],
-        "mozilla/bluetooth/requestDevice/adapter-off.html": [
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-name.html": [
           {
-            "path": "mozilla/bluetooth/requestDevice/adapter-off.html",
-            "url": "/_mozilla/mozilla/bluetooth/requestDevice/adapter-off.html"
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-name.html"
           }
         ],
-        "mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html": [
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-namePrefix.html": [
           {
-            "path": "mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html",
-            "url": "/_mozilla/mozilla/bluetooth/requestDevice/blacklisted-service-in-filter.html"
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-namePrefix.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/max-length-for-name-in-adv-namePrefix.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/no-arguments.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/no-arguments.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/no-arguments.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/no-filters-member.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/no-filters-member.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/no-filters-member.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-name.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-name.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-namePrefix.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-namePrefix.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-device-name-namePrefix.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-name.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-name.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-namePrefix.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-namePrefix.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-max-length-for-name-in-adv-namePrefix.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-name.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-name.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-namePrefix.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-namePrefix.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/unicode-valid-length-name-namePrefix.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-optionalServices-member.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-optionalServices-member.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-optionalServices-member.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-services-member.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-services-member.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/canonicalizeFilter/wrong-service-in-services-member.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/correct-uuids.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/correct-uuids.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/correct-uuids.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/discovery-succeeds.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/discovery-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/discovery-succeeds.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/filter-does-not-match.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/filter-does-not-match.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/filter-does-not-match.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/filter-matches.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/filter-matches.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/filter-matches.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-empty-device-from-name-empty-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-empty-device-from-name-empty-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-empty-device-from-name-empty-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-empty-device-from-name-prefix-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-empty-device-from-name-prefix-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-empty-device-from-name-prefix-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-empty-device-from-name-wrong-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-empty-device-from-name-wrong-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-empty-device-from-name-wrong-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-empty-device-from-service-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-empty-device-from-service-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-empty-device-from-service-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-empty-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-empty-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-empty-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-missing-device-from-name-empty-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-missing-device-from-name-empty-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-missing-device-from-name-empty-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-missing-device-from-name-prefix-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-missing-device-from-name-prefix-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-missing-device-from-name-prefix-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-missing-device-from-name-wrong-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-missing-device-from-name-wrong-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-missing-device-from-name-wrong-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/name-missing-device-from-service-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/name-missing-device-from-service-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/name-missing-device-from-service-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/no-devices.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/no-devices.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/no-devices.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/same-device.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/same-device.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/same-device.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/single-filter-single-service.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/single-filter-single-service.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/single-filter-single-service.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/single-filter-two-services-fails.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/single-filter-two-services-fails.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/single-filter-two-services-fails.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/single-filter-two-services-succeeds.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/single-filter-two-services-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/single-filter-two-services-succeeds.html"
           }
         ],
         "mozilla/bluetooth/requestDevice/two-filters.html": [

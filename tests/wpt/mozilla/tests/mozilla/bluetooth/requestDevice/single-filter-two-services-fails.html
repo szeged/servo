@@ -1,0 +1,14 @@
+<!doctype html>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script src="/bluetooth/bluetooth-helpers.js"></script>
+<script>
+'use strict';
+promise_test(t => {
+    // Both devices support the Heart Rate service, but things need to
+    // support both services to pass the filter, and neither has a Battery
+    // service.
+    window.testRunner.setBluetoothMockDataSet(adapter_type.glucose_heart_rate);
+    return promise_rejects(t, 'NotFoundError', window.navigator.bluetooth.requestDevice({ filters: [{services: ['heart_rate', 'battery_service'] }]}));
+}, 'Too-strict filters do prevent matching.');
+</script>

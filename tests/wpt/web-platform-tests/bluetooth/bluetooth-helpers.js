@@ -15,8 +15,12 @@ var adapter_type = {
   not_present: 'NotPresentAdapter',
   not_powered: 'NotPoweredAdapter',
   empty: 'EmptyAdapter',
-  /*heart_rate: 'HeartRateAdapter',*/
-  glucose_heart_rate: 'GlucoseHeartRateAdapter'
+  heart_rate: 'HeartRateAdapter',
+  glucose_heart_rate: 'GlucoseHeartRateAdapter',
+  unicode_device: 'UnicodeDeviceAdapter',
+  blacklist: 'BlacklistTestAdapter',
+  empty_name_heart_rate: 'EmptyNameHeartRateAdapter',
+  no_name_heart_rate: 'NoNameHeartRateAdapter'
 };
 
 // Sometimes we need to test that using either the name, alias, or UUID
