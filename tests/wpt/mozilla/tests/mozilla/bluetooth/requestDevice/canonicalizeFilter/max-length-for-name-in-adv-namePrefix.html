@@ -5,8 +5,10 @@
 <script>
 'use strict';
 promise_test(t => {
+    let name_too_long = 'a'.repeat(30);
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
     return promise_rejects(
-      t, new TypeError(), window.navigator.bluetooth.requestDevice({filters: [{}]}));
-}, 'A filter must restrict the devices in some way.');
+        t, 'NotFoundError', window.navigator.bluetooth.requestDevice({filters: [{namePrefix: name_too_long}]}),
+        'Device name longer than 29');
+}, 'A device name prefix longer than 29 must reject.');
 </script>
