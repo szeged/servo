@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
+<script src="/bluetooth/bluetooth-helpers.js"></script>
 <script>
 'use strict';
-test(function() {
-    window.testRunner.setBluetoothMockDataSet('NotPresentAdapter');
-    assert_throws(new TypeError(), function () {
-        window.navigator.bluetooth.requestDevice({filters: [{services: ['generic_access']}]});
-    });
-}, 'Reject with TypeError if the adapter is not present.');
+promise_test(t => {
+    window.testRunner.setBluetoothMockDataSet(adapter_type.not_present);
+    return promise_rejects(t, 'NotFoundError', window.navigator.bluetooth.requestDevice({filters: [{services: [generic_access.name]}]}),
+        'Bluetooth adapter is not present.');
+}, 'Reject with NotFoundError if the adapter is not present.');
 </script>
