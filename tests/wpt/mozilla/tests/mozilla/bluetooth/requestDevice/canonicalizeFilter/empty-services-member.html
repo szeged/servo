@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
+<script src="/bluetooth/bluetooth-helpers.js"></script>
 <script>
 'use strict';
 
@@ -26,12 +27,14 @@ filters: [{ services: [] }]
     optionalServices: ['heart_rate']
   }];
 
-test(function() {
-    window.testRunner.setBluetoothMockDataSet('EmptyAdapter');
+promise_test(t => {
+    window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
+    let test_promises = Promise.resolve();
     test_specs.forEach(args => {
-        assert_throws(new TypeError(), function () {
-            window.navigator.bluetooth.requestDevice(args);
-        });
+      test_promises = test_promises
+        .then(() => promise_rejects(
+          t, new TypeError(), window.navigator.bluetooth.requestDevice(args)));
     });
+    return test_promises;
 }, 'Services member must contain at least one service.');
 </script>

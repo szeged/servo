@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <script src="/resources/testharness.js"></script>
 <script src="/resources/testharnessreport.js"></script>
+<script src="/bluetooth/bluetooth-helpers.js"></script>
 <script>
 'use strict';
-test(function() {
-    window.testRunner.setBluetoothMockDataSet('EmptyAdapter');
-    assert_throws('SecurityError', function () {
-        window.navigator.bluetooth.requestDevice({filters: [{services: ['human_interface_device']}]});
-    });
+promise_test(t => {
+    window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
+    return promise_rejects(t, 'SecurityError', window.navigator.bluetooth.requestDevice({filters: [{services: [human_interface_device.name]}]}),
+        'Requesting blacklisted service rejects.');
 }, 'Reject with SecurityError if requesting a blacklisted service.');
 </script>
