@@ -66,108 +66,127 @@
         <div class="col-md-8">
           <h2>Implementation Status</h2>
           <table class="table table-bordered">
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <th>Feature</th>
               <th>Description</th>
-              <th>Status*</th>
+              <th>Linux</th>
+              <th>Android</th>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Discovery</td>
               <td>Discover nearby devices with specific filters.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Chooser UI</td>
               <td>Shows a dialog, which allows the user to choose from the discovered devices.</td>
               <td class="success">Done</td>
+              <td class="danger">No progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td><a href="https://www.w3.org/TR/permissions/">Permission API</a> integration</td>
               <td>Provides a uniform way for websites to request permissions from users and query which permissions they have.</td>
               <td class="danger">No progress</td>
+              <td class="danger">No progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Per origin handling</td>
               <td>The UA handles devices per origin.</td>
               <td class="warning">In progress</td>
-            </tr>
-            <tr rowspan="3" class="impl-status-cell">
-              <td>Blacklist</td>
-              <td>Filter blacklisted UUID.</td>
               <td class="warning">In progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
+              <td>Blacklist</td>
+              <td>Filter blacklisted UUID.</td>
+              <td class="success">Done</td>
+              <td class="success">Done</td>
+            </tr>
+            <tr rowspan="4" class="impl-status-cell">
               <td>GATT Server Connect</td>
               <td>Connect to the GATT server of the chosen device.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>GATT Server Disconnect</td>
               <td>Disconnect from the GATT server.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>GATT Notifications</td>
               <td>Handle GATT notifications.</td>
               <td class="danger">No progress</td>
+              <td class="danger">No progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>GATT Advertising event</td>
               <td>Handle GATT advertisements.</td>
-              <td class="warning">In progress</td>
+              <td class="danger">No progress</td>
+              <td class="danger">No progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Get Primary Services List</td>
               <td>Retrieve a list of every available Primary Service on a device.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Get Included Services List</td>
               <td>Retrieve a list of every Service included by a specific Primary Service.</td>
               <td class="warning">In progress</td>
+              <td class="warning">In progress</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Get Characteristics List</td>
               <td>Retrieve a list of every Characteristic of a specific Service.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Characteristic Properties</td>
               <td>Provide detailed information about a Characteristic.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Read Characteristic</td>
               <td>Read the Characteristic's value (if it's allowed).</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Write Characteristic</td>
               <td>Write the Characteristic's value (if it's allowed).</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Get Descriptors List</td>
               <td>Retrieve a list of every Descriptor of a specific Characteristic.</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Read Descriptor</td>
               <td>Read the Descriptor's value (if it's allowed).</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Write Descriptor</td>
               <td>Write the Descriptor's value (if it's allowed).</td>
               <td class="success">Done</td>
+              <td class="success">Done</td>
             </tr>
-            <tr rowspan="3" class="impl-status-cell">
+            <tr rowspan="4" class="impl-status-cell">
               <td>Device Disconnected Event</td>
               <td>Handle disconnections from the gatt server.</td>
               <td class="danger">No progress</td>
+              <td class="danger">No progress</td>
             </tr>
           </table>
-          *On linux
           <hr>
           <table class="table table-bordered">
             <tr rowspan="3" class="impl-status-cell">
@@ -186,7 +205,7 @@
             <tr rowspan="3" class="impl-status-cell">
               <td>Android</td>
               <td>Android 4.3 (Jelly Bean)</td>
-              <td class="warning">In progress</td>
+              <td class="success">Done</td>
             </tr>
             <tr rowspan="3" class="impl-status-cell">
               <td>Windows</td>
