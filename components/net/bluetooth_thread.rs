@@ -633,17 +633,16 @@ impl BluetoothManager {
             Some(a) => a,
             None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
         };
-        let device;
-        {
+        let device = {
             let device_id = match self.service_to_device.get(service_id.as_str()) {
                 Some(id) => id,
                 None => return drop(sender.send(Err(BluetoothError::NotFound))),
             };
-            device = match self.cached_devices.get(device_id) {
+            match self.cached_devices.get(device_id) {
                 Some(d) => d.clone(),
                 None => return drop(sender.send(Err(BluetoothError::NotFound))),
-            };
-        }
+            }
+        };
         let primary_service = match self.get_gatt_service(&mut adapter, &service_id) {
             Some(s) => s,
             None => return drop(sender.send(Err(BluetoothError::NotFound))),
@@ -671,17 +670,16 @@ impl BluetoothManager {
             Some(a) => a,
             None => return drop(sender.send(Err(BluetoothError::Type(ADAPTER_ERROR.to_string())))),
         };
-        let device;
-        {
+        let device = {
             let device_id = match self.service_to_device.get(service_id.as_str()) {
                 Some(id) => id,
                 None => return drop(sender.send(Err(BluetoothError::NotFound))),
             };
-            device = match self.cached_devices.get(device_id) {
+            match self.cached_devices.get(device_id) {
                 Some(d) => d.clone(),
                 None => return drop(sender.send(Err(BluetoothError::NotFound))),
-            };
-        }
+            }
+        };
         let primary_service = match self.get_gatt_service(&mut adapter, &service_id) {
             Some(s) => s,
             None => return drop(sender.send(Err(BluetoothError::NotFound))),

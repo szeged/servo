@@ -199,7 +199,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "blurmock"
 version = "0.1.0"
-source = "git+https://github.com/szeged/blurmock.git#14e82cb4dace51b8a0c07fb51158cd4037ccdb21"
+source = "git+https://github.com/szeged/blurmock.git#82c2b6bd3cbb91900dd4c5218f020a9265697336"
 dependencies = [
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/szeged/devices?branch=test-api#c8bc81d064be9e2ae1e7d4549eb15bd60f0e2372"
+source = "git+https://github.com/szeged/devices?branch=test-api#8d5546bd3cb3d65045664b29f109b72a126bdbac"
 dependencies = [
  "blurdroid 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "blurmock 0.1.0 (git+https://github.com/szeged/blurmock.git)",
