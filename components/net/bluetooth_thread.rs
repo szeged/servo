@@ -232,6 +232,15 @@ impl BluetoothManager {
 
     fn test(&mut self, data_set_name: String, sender: IpcSender<BluetoothResult<()>>) {
         TESTING.fetch_or(true, Ordering::Relaxed);
+        self.address_to_id.clear();
+        self.service_to_device.clear();
+        self.characteristic_to_service.clear();
+        self.descriptor_to_characteristic.clear();
+        self.cached_devices.clear();
+        self.cached_services.clear();
+        self.cached_characteristics.clear();
+        self.cached_descriptors.clear();
+        self.allowed_services.clear();
         self.adapter = BluetoothAdapter::init_mock().ok();
         bluetooth_test::test(self, data_set_name, sender);
     }

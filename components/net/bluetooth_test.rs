@@ -55,7 +55,7 @@ const UNICODE_DEVICE_ADDRESS: &'static str = "00:00:00:00:00:03";
 // Service UUIDs
 
 const BLACKLIST_TEST_SERVICE_UUID: &'static str = "611c954a-263b-4f4a-aab6-01ddb953f985";
-const DEVICE_INFORMATION_UUID: &'static str = "0000180A-0000-1000-8000-00805f9b34fb";
+const DEVICE_INFORMATION_UUID: &'static str = "0000180a-0000-1000-8000-00805f9b34fb";
 const GENERIC_ACCESS_SERVICE_UUID: &'static str = "00001800-0000-1000-8000-00805f9b34fb";
 const GLUCOSE_SERVICE_UUID: &'static str = "00001808-0000-1000-8000-00805f9b34fb";
 const HEART_RATE_SERVICE_UUID: &'static str = "0000180d-0000-1000-8000-00805f9b34fb";
@@ -67,9 +67,9 @@ const TX_POWER_SERVICE_UUID: &'static str = "00001804-0000-1000-8000-00805f9b34f
 
 const BODY_SENSOR_LOCATION_CHARACTERISTIC_UUID: &'static str = "00002a38-0000-1000-8000-00805f9b34fb";
 const BLACKLIST_EXCLUDE_READS_CHARACTERISTIC_UUID: &'static str = "bad1c9a2-9a5b-4015-8b60-1579bbbf2135";
-const DEVICE_NAME_CHARACTERISTIC_UUID: &'static str = "00002A00-0000-1000-8000-00805f9b34fb";
+const DEVICE_NAME_CHARACTERISTIC_UUID: &'static str = "00002a00-0000-1000-8000-00805f9b34fb";
 const HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID: &'static str = "00002a37-0000-1000-8000-00805f9b34fb";
-const PHERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID: &'static str = "00002A02-0000-1000-8000-00805f9b34fb";
+const PHERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID: &'static str = "00002a02-0000-1000-8000-00805f9b34fb";
 const REQUEST_DISCONNECTION_CHARACTERISTIC_UUID: &'static str = "00000002-0000-1000-8000-00805f9b34fb";
 const SERIAL_NUMBER_STRING_UUID: &'static str = "00002a25-0000-1000-8000-00805f9b34fb";
 
@@ -431,7 +431,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
 
                     // Serial Number String Characteristic
                     let serial_number_string =
-                        BluetoothGATTCharacteristic::create_characteristic(blacklist_test_service.clone(),
+                        BluetoothGATTCharacteristic::create_characteristic(device_information_service.clone(),
                                                                            generate_id().to_owned());
                     set_attribute_or_return_error(serial_number_string.set_uuid(SERIAL_NUMBER_STRING_UUID.to_owned()),
                                                   &sender);
