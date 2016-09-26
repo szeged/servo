@@ -12,13 +12,13 @@ promise_test(t => {
     .then(services => {
         assert_equals(services.length, 4);
         assert_equals(services[0].uuid,
-                      BluetoothUUID.getService(blacklist_test_service_uuid));
+                      blacklist_test_service_uuid);
         assert_equals(services[1].uuid,
-                      BluetoothUUID.getService('device_information'));
+                      device_information.uuid);
         assert_equals(services[2].uuid,
-                      BluetoothUUID.getService('generic_access'));
+                      generic_access.uuid);
         assert_equals(services[3].uuid,
-                      BluetoothUUID.getService('heart_rate'));
+                      heart_rate.uuid);
     });
 }, 'Request for services. Does not return blacklisted service.');
 </script>

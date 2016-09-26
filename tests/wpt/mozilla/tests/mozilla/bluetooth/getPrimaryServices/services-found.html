@@ -14,11 +14,11 @@ promise_test(t => {
     .then(services => {
         assert_equals(services.length, 3);
         assert_equals(services[0].uuid,
-                      BluetoothUUID.getService(generic_access.name));
+                      generic_access.uuid);
         assert_equals(services[1].uuid,
-                      BluetoothUUID.getService(heart_rate.name));
+                      heart_rate.uuid);
         assert_equals(services[2].uuid,
-                      BluetoothUUID.getService(heart_rate.name));
+                      heart_rate.uuid);
         assert_true(services[0].isPrimary);
         assert_true(services[1].isPrimary);
         assert_true(services[2].isPrimary);

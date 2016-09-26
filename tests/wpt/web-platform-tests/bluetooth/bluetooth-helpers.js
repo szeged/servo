@@ -67,19 +67,18 @@ var battery_level = {
   name: 'battery_level',
   uuid: '00002a19-0000-1000-8000-00805f9b34fb'
 };
-var human_interface_device = {
-  alias: 'TODO',
-  name: 'human_interface_device',
-  uuid: 'TODO'
+var tx_power = {
+  alias: 0x1804,
+  name: 'tx_power',
+  uuid: '00001804-0000-1000-8000-00805f9b34fb'
 }
-
-// Function to test that a promise rejects with the expected error type and
-// message.
-/*function assert_promise_rejects_with_message(promise, expected, description) {
-  return promise.then(() => {
-    assert_unreached('Promise should have rejected: ' + description);
-  })
-  .catch(error => {
-      assert_equals(expected, error);
-  });
-}*/
+var human_interface_device = {
+  alias: 0x1812,
+  name: 'human_interface_device',
+  uuid: '00001812-0000-1000-8000-00805f9b34fb'
+}
+var device_information = {
+  alias: 0x180a,
+  name: 'device_information',
+  uuid: '0000180a-0000-1000-8000-00805f9b34fb'
+}
