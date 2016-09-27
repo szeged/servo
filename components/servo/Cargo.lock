@@ -199,7 +199,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "blurmock"
 version = "0.1.0"
-source = "git+https://github.com/szeged/blurmock.git#82c2b6bd3cbb91900dd4c5218f020a9265697336"
+source = "git+https://github.com/szeged/blurmock.git#401869298b393a57b2bfb0668ca37d0b74a0a274"
 dependencies = [
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
