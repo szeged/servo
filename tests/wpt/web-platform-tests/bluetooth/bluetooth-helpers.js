@@ -22,7 +22,9 @@ var adapter_type = {
   missing_heart_rate: 'MissingServiceHeartRateAdapter',
   glucose_heart_rate: 'GlucoseHeartRateAdapter',
   unicode_device: 'UnicodeDeviceAdapter',
-  blacklist: 'BlacklistTestAdapter'
+  blacklist: 'BlacklistTestAdapter',
+  missing_characteristic_heart_rate: 'MissingCharacteristicHeartRateAdapter',
+  missing_service_heart_rate: 'MissingServiceHeartRateAdapter'
 };
 
 // Sometimes we need to test that using either the name, alias, or UUID
@@ -81,4 +83,18 @@ var device_information = {
   alias: 0x180a,
   name: 'device_information',
   uuid: '0000180a-0000-1000-8000-00805f9b34fb'
+}
+var peripherial_privacy_flag = {
+  alias: 0x2a02,
+  name: 'gap.peripheral_privacy_flag',
+  uuid: '00002a02-0000-1000-8000-00805f9b34fb'
+}
+
+// Helper function for converting strings to an array of bytes.
+function asciiToDecimal(bytestr) {
+    var result = [];
+    for(var i = 0; i < bytestr.length; i++) {
+        result[i] = bytestr.charCodeAt(i) ;
+    }
+    return result;
 }

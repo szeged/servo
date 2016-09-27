@@ -18,6 +18,10 @@ thread_local!(pub static CACHED_IDS: RefCell<HashSet<String>> = RefCell::new(Has
 const ADAPTER_ERROR: &'static str = "No adapter found";
 const WRONG_DATA_SET_ERROR: &'static str = "Wrong data set name was provided";
 const FAILED_SET_ERROR: &'static str = "Failed to set an attribute for testing";
+const READ_FLAG: &'static str = "read";
+const WRITE_FLAG: &'static str = "write";
+// 'Heart Rate Device' device name in bytes
+const HEART_RATE_BYTES: &'static [u8] = &[72, 101, 97, 114, 116, 32, 82, 97, 116, 101, 32, 68, 101, 118, 105, 99, 101];
 
 // Adapter names
 
@@ -69,7 +73,7 @@ const BODY_SENSOR_LOCATION_CHARACTERISTIC_UUID: &'static str = "00002a38-0000-10
 const BLACKLIST_EXCLUDE_READS_CHARACTERISTIC_UUID: &'static str = "bad1c9a2-9a5b-4015-8b60-1579bbbf2135";
 const DEVICE_NAME_CHARACTERISTIC_UUID: &'static str = "00002a00-0000-1000-8000-00805f9b34fb";
 const HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID: &'static str = "00002a37-0000-1000-8000-00805f9b34fb";
-const PHERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID: &'static str = "00002a02-0000-1000-8000-00805f9b34fb";
+const PERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID: &'static str = "00002a02-0000-1000-8000-00805f9b34fb";
 const REQUEST_DISCONNECTION_CHARACTERISTIC_UUID: &'static str = "00000002-0000-1000-8000-00805f9b34fb";
 const SERIAL_NUMBER_STRING_UUID: &'static str = "00002a25-0000-1000-8000-00805f9b34fb";
 
@@ -126,7 +130,6 @@ pub fn create_generic_access_service(device: BluetoothDevice,
     let generic_access_service = BluetoothGATTService::create_service(device,
                                                              generate_id().to_owned());
     set_attribute_or_return_error(generic_access_service.set_uuid(GENERIC_ACCESS_SERVICE_UUID.to_owned()), sender);
-    set_attribute_or_return_error(generic_access_service.set_primary(true), sender);
     generic_access_service
 }
 
@@ -135,7 +138,6 @@ pub fn create_heart_rate_service(device: BluetoothDevice,
                                  -> BluetoothGATTService {
     let heart_rate_service = BluetoothGATTService::create_service(device, generate_id().to_owned());
     set_attribute_or_return_error(heart_rate_service.set_uuid(HEART_RATE_SERVICE_UUID.to_owned()), sender);
-    set_attribute_or_return_error(heart_rate_service.set_primary(true), sender);
     heart_rate_service
 }
 
@@ -149,15 +151,18 @@ pub fn create_device_name(service: BluetoothGATTService,
     device_name
 }
 
-pub fn create_pheripheral_privacy_flag(service: BluetoothGATTService,
+pub fn create_peripheral_privacy_flag(service: BluetoothGATTService,
                                                       sender: &IpcSender<BluetoothResult<()>>)
                                                       -> BluetoothGATTCharacteristic {
-    let pheripheral_privacy_flag = BluetoothGATTCharacteristic::create_characteristic(service,
+    let peripheral_privacy_flag = BluetoothGATTCharacteristic::create_characteristic(service,
                                                                                       generate_id().to_owned());
-    set_attribute_or_return_error(pheripheral_privacy_flag.set_uuid(
-        PHERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID.to_owned()),
+    set_attribute_or_return_error(peripheral_privacy_flag.set_uuid(
+        PERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID.to_owned()),
                                   sender);
-    pheripheral_privacy_flag
+    set_attribute_or_return_error(peripheral_privacy_flag
+                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                  &sender);
+    peripheral_privacy_flag
 }
 
 pub fn create_heart_rate_measurement(service: BluetoothGATTService,
@@ -267,10 +272,11 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
 
                     // Device Name Characteristic
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
-                    set_attribute_or_return_error(device_name.write_value(vec![9]), &sender);
+                    set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
+                    set_attribute_or_return_error(device_name.set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())), &sender);
 
                     // Pheripheral Privacy Flag Characteristic
-                    let pheripheral_privacy_flag = create_pheripheral_privacy_flag(generic_access_service.clone(),
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
                                                                                   &sender);
 
                     // Heart Rate Service
@@ -301,7 +307,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
 
                     // Pheripheral Privacy Flag
-                    let pheripheral_privacy_flag = create_pheripheral_privacy_flag(generic_access_service.clone(),
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
                                                                                    &sender);
 
                     // Heart Rate Service
@@ -331,7 +337,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
 
                     // Pheripheral Privacy Flag Characteristic
-                    let pheripheral_privacy_flag = create_pheripheral_privacy_flag(generic_access_service.clone(),
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
                                                                                    &sender);
 
                     // Heart Rate Service
@@ -366,10 +372,10 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
 
                     // Device Name Characteristic
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
-                    set_attribute_or_return_error(device_name.write_value(vec![9]), &sender);
+                    set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
 
                     // Pheripheral Privacy Flag Characteristic
-                    let pheripheral_privacy_flag = create_pheripheral_privacy_flag(generic_access_service.clone(),
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
                                                                                   &sender);
 
                     // Heart Rate Service 1
@@ -422,6 +428,10 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                                                   .set_uuid(BLACKLIST_EXCLUDE_READS_CHARACTERISTIC_UUID.to_owned()),
                                                   &sender);
 
+                    set_attribute_or_return_error(blacklist_exclude_reads_characteristic
+                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  &sender);
+
                     // Device Information Service
                     let device_information_service = BluetoothGATTService::create_service(connectable_device.clone(),
                                                                                           generate_id().to_owned());
@@ -441,10 +451,10 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
 
                     // Device Name Characteristic
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
-                    set_attribute_or_return_error(device_name.write_value(vec![9]), &sender);
+                    set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
 
                     // Pheripheral Privacy Flag Characteristic
-                    let pheripheral_privacy_flag = create_pheripheral_privacy_flag(generic_access_service.clone(),
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
                                                                                   &sender);
 
                     // Heart Rate Service
