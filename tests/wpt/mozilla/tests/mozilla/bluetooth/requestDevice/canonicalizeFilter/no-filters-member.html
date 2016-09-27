@@ -6,7 +6,13 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
-    return promise_rejects(
-      t, 'DOMException', window.navigator.bluetooth.requestDevice([{}, {optionalServices: ['wrong_service']}]));
+    try {
+        window.navigator.bluetooth.requestDevice([{}, {optionalServices: ['wrong_service']}])
+        .then(() => {
+            assert_unreached('Promise should have rejected.');
+        })
+    } catch(error) {
+        assert_equals('TypeError', error.name);
+    }
 }, 'RequestDeviceOptions requires a |filters| member.');
 </script>

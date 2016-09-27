@@ -6,7 +6,13 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
-    return promise_rejects(
-      t, new TypeError(), window.navigator.bluetooth.requestDevice());
+    try {
+        window.navigator.bluetooth.requestDevice()
+        .then(() => {
+            assert_unreached('Promise should have rejected.');
+        })
+    } catch(error) {
+        assert_equals('TypeError', error.name);
+    }
 }, 'requestDevice() requires an argument.');
 </script>
