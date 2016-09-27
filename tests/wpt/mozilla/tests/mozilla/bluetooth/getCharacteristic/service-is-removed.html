@@ -11,7 +11,7 @@ promise_test(t => {
     .then(device => device.gatt.connect())
     .then(gattServer => gattServer.getPrimaryService(generic_access.name))
     .then(service => {
-    	window.testRunner.setBluetoothMockDataSet(adapter_type.missing_heart_rate);
+    	window.testRunner.setBluetoothMockDataSet(adapter_type.missing_service_heart_rate);
     	return promise_rejects(t, 'InvalidStateError', service.getCharacteristic(device_name.uuid));
 	});
 }, 'Service is removed. Reject with InvalidStateError.');

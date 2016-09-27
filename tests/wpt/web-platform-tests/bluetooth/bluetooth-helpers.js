@@ -19,7 +19,6 @@ var adapter_type = {
   two_heart_rate: 'TwoHeartRateServicesAdapter',
   empty_name_heart_rate: 'EmptyNameHeartRateAdapter',
   no_name_heart_rate: 'NoNameHeartRateAdapter',
-  missing_heart_rate: 'MissingServiceHeartRateAdapter',
   glucose_heart_rate: 'GlucoseHeartRateAdapter',
   unicode_device: 'UnicodeDeviceAdapter',
   blacklist: 'BlacklistTestAdapter',

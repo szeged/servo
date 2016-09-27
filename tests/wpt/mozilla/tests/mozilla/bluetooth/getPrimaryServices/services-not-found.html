@@ -5,7 +5,7 @@
 <script>
 'use strict';
 promise_test(t => {
-    window.testRunner.setBluetoothMockDataSet(adapter_type.missing_heart_rate);
+    window.testRunner.setBluetoothMockDataSet(adapter_type.missing_service_heart_rate);
     return window.navigator.bluetooth.requestDevice(
         { filters: [{services: [heart_rate.name]}],
         optionalServices: [generic_access.name]})
