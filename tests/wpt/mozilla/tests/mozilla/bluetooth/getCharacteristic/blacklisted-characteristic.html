@@ -1,0 +1,15 @@
+<!doctype html>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script src="/bluetooth/bluetooth-helpers.js"></script>
+<script>
+'use strict';
+promise_test(t => {
+    window.testRunner.setBluetoothMockDataSet(adapter_type.blacklist);
+    return window.navigator.bluetooth.requestDevice({filters: [{services: ["device_information"]}]})
+    .then(device => device.gatt.connect())
+    .then(gattServer =>
+      gattServer.getPrimaryService("device_information"))
+    .then(service => promise_rejects(t, 'SecurityError', service.getCharacteristic('serial_number_string')));
+}, 'Serial Number String characteristic is blacklisted.');
+</script>

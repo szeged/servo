@@ -19,7 +19,6 @@ var adapter_type = {
   two_heart_rate: 'TwoHeartRateServicesAdapter',
   empty_name_heart_rate: 'EmptyNameHeartRateAdapter',
   no_name_heart_rate: 'NoNameHeartRateAdapter',
-  missing_heart_rate: 'MissingServiceHeartRateAdapter',
   glucose_heart_rate: 'GlucoseHeartRateAdapter',
   unicode_device: 'UnicodeDeviceAdapter',
   blacklist: 'BlacklistTestAdapter',
@@ -48,6 +47,11 @@ var heart_rate = {
   alias: 0x180d,
   name: 'heart_rate',
   uuid: '0000180d-0000-1000-8000-00805f9b34fb'
+};
+var heart_rate_measurement = {
+  alias: 0x2a37,
+  name: 'heart_rate_measurement',
+  uuid: '00002a37-0000-1000-8000-00805f9b34fb'
 };
 var body_sensor_location = {
   alias: 0x2a38,
