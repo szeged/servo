@@ -6864,40 +6864,82 @@
             "url": "/_mozilla/mozilla/bluetooth/idl-NavigatorBluetooth.html"
           }
         ],
-        "mozilla/bluetooth/readValue/blacklisted-characteristic.html": [
+        "mozilla/bluetooth/readValue/characteristic/blacklisted-characteristic.html": [
           {
-            "path": "mozilla/bluetooth/readValue/blacklisted-characteristic.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/blacklisted-characteristic.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/blacklisted-characteristic.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/blacklisted-characteristic.html"
           }
         ],
-        "mozilla/bluetooth/readValue/characteristic-is-removed.html": [
+        "mozilla/bluetooth/readValue/characteristic/characteristic-is-removed.html": [
           {
-            "path": "mozilla/bluetooth/readValue/characteristic-is-removed.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic-is-removed.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/characteristic-is-removed.html"
           }
         ],
-        "mozilla/bluetooth/readValue/device-goes-out-of-range.html": [
+        "mozilla/bluetooth/readValue/characteristic/device-goes-out-of-range.html": [
           {
-            "path": "mozilla/bluetooth/readValue/device-goes-out-of-range.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/device-goes-out-of-range.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/device-goes-out-of-range.html"
           }
         ],
-        "mozilla/bluetooth/readValue/read-succeeds.html": [
+        "mozilla/bluetooth/readValue/characteristic/read-succeeds.html": [
           {
-            "path": "mozilla/bluetooth/readValue/read-succeeds.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/read-succeeds.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/read-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/read-succeeds.html"
           }
         ],
-        "mozilla/bluetooth/readValue/read-updates-value.html": [
+        "mozilla/bluetooth/readValue/characteristic/read-updates-value.html": [
           {
-            "path": "mozilla/bluetooth/readValue/read-updates-value.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/read-updates-value.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/read-updates-value.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/read-updates-value.html"
           }
         ],
-        "mozilla/bluetooth/readValue/service-is-removed.html": [
+        "mozilla/bluetooth/readValue/characteristic/service-is-removed.html": [
           {
-            "path": "mozilla/bluetooth/readValue/service-is-removed.html",
-            "url": "/_mozilla/mozilla/bluetooth/readValue/service-is-removed.html"
+            "path": "mozilla/bluetooth/readValue/characteristic/service-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/service-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/blacklisted-descriptor.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/blacklisted-descriptor.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/blacklisted-descriptor.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/characteristic-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/characteristic-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/descriptor-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/descriptor-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/descriptor-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/device-goes-out-of-range.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/read-succeeds.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/read-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/read-succeeds.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/read-updates-value.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/read-updates-value.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/read-updates-value.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/service-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/service-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/service-is-removed.html"
           }
         ],
         "mozilla/bluetooth/requestDevice/adapter-not-present.html": [
@@ -7146,40 +7188,82 @@
             "url": "/_mozilla/mozilla/bluetooth/requestDevice/two-filters.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/blacklisted-characteristic.html": [
+        "mozilla/bluetooth/writeValue/characteristic/blacklisted-characteristic.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/blacklisted-characteristic.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/blacklisted-characteristic.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/blacklisted-characteristic.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/blacklisted-characteristic.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/characteristic-is-removed.html": [
+        "mozilla/bluetooth/writeValue/characteristic/characteristic-is-removed.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/characteristic-is-removed.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic-is-removed.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/characteristic-is-removed.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/device-goes-out-of-range.html": [
+        "mozilla/bluetooth/writeValue/characteristic/device-goes-out-of-range.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/device-goes-out-of-range.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/device-goes-out-of-range.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/device-goes-out-of-range.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/write-succeeds.html": [
+        "mozilla/bluetooth/writeValue/characteristic/service-is-removed.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/write-succeeds.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/write-succeeds.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/service-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/service-is-removed.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/write-updates-value.html": [
+        "mozilla/bluetooth/writeValue/characteristic/write-succeeds.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/write-updates-value.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/write-updates-value.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/write-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/write-succeeds.html"
           }
         ],
-        "mozilla/bluetooth/writeValue/service-is-removed.html": [
+        "mozilla/bluetooth/writeValue/characteristic/write-updates-value.html": [
           {
-            "path": "mozilla/bluetooth/writeValue/service-is-removed.html",
-            "url": "/_mozilla/mozilla/bluetooth/writeValue/service-is-removed.html"
+            "path": "mozilla/bluetooth/writeValue/characteristic/write-updates-value.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/write-updates-value.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/blacklisted-descriptor.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/blacklisted-descriptor.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/blacklisted-descriptor.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/characteristic-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/characteristic-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/descriptor-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/descriptor-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/descriptor-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/device-goes-out-of-range.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/service-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/service-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/service-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/write-succeeds.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/write-succeeds.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/write-succeeds.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/write-updates-value.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/write-updates-value.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/write-updates-value.html"
           }
         ],
         "mozilla/body_listener.html": [
