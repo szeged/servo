@@ -7,6 +7,8 @@ var request_disconnection_service_uuid = "01d7d889-7451-419f-aeb8-d65e7b9277af";
 // Characteristics:
 var blacklist_exclude_reads_characteristic_uuid = "bad1c9a2-9a5b-4015-8b60-1579bbbf2135";
 var request_disconnection_characteristic_uuid = "01d7d88a-7451-419f-aeb8-d65e7b9277af";
+// Descriptors:
+var blacklist_exclude_reads_descriptor_uuid = "aaaaaaaa-aaaa-1181-0510-810819516110";
 
 // Bluetooth Adapter types:
 var adapter_type = {
@@ -21,7 +23,8 @@ var adapter_type = {
     unicode_device: 'UnicodeDeviceAdapter',
     blacklist: 'BlacklistTestAdapter',
     missing_characteristic_heart_rate: 'MissingCharacteristicHeartRateAdapter',
-    missing_service_heart_rate: 'MissingServiceHeartRateAdapter'
+    missing_service_heart_rate: 'MissingServiceHeartRateAdapter',
+    missing_descriptor_heart_rate: 'MissingDescriptorHeartRateAdapter'
 };
 
 var mock_device_name = {
@@ -118,6 +121,18 @@ var serial_number_string = {
     alias: 0x2a25,
     name: 'serial_number_string',
     uuid: '00002a25-0000-1000-8000-00805f9b34fb'
+};
+
+var client_characteristic_configuration = {
+    alias: 0x2902,
+    name: 'gatt.client_characteristic_configuration',
+    uuid: '00002902-0000-1000-8000-00805f9b34fb'
+};
+
+var number_of_digitals = {
+    alias: 0x2909,
+    name: 'number_of_digitals',
+    uuid: '00002909-0000-1000-8000-00805f9b34fb'
 };
 
 // Helper function for converting strings to an array of bytes.
