@@ -6,6 +6,9 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty_name_heart_rate);
-    return promise_rejects(t, 'NotFoundError', window.navigator.bluetooth.requestDevice({ filters: [{namePrefix: 'a', services: ['heart_rate'] }]}));
+    return promise_rejects(
+        t, 'NotFoundError',
+        window.navigator.bluetooth.requestDevice({
+            filters: [{namePrefix: 'a', services: [heart_rate.name] }]}));
 }, 'An empty name device is not matched by a filter with a namePrefix.');
 </script>

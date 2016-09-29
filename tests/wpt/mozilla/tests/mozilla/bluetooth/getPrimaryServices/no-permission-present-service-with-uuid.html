@@ -7,11 +7,13 @@
 promise_test(t => {
     let expected = 'SecurityError';
     window.testRunner.setBluetoothMockDataSet(adapter_type.heart_rate);
-    return window.navigator.bluetooth.requestDevice({filters: [{services: [heart_rate.name]}]})
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}]})
     .then(device => device.gatt.connect())
     .then(gattServer => Promise.all([
-      promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.alias)),
-      promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.name)),
-      promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.uuid))]));
+        promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.alias)),
+        promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.name)),
+        promise_rejects(t, expected, gattServer.getPrimaryServices(generic_access.uuid))]))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Request for present service without permission. Reject with SecurityError.');
 </script>

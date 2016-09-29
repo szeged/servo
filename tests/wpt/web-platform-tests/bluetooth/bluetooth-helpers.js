@@ -26,6 +26,16 @@ var adapter_type = {
   missing_service_heart_rate: 'MissingServiceHeartRateAdapter'
 };
 
+var mock_device_name = {
+  heart_rate: 'Heart Rate Device',
+  glucose: 'Glucose Device'
+};
+
+var wrong = {
+  name: 'wrong_name',
+  service: 'wrong_service'
+};
+
 // Sometimes we need to test that using either the name, alias, or UUID
 // produces the same result. The following objects help us do that.
 var generic_access = {
@@ -33,66 +43,84 @@ var generic_access = {
   name: 'generic_access',
   uuid: '00001800-0000-1000-8000-00805f9b34fb'
 };
+
 var device_name = {
   alias: 0x2a00,
   name: 'gap.device_name',
   uuid: '00002a00-0000-1000-8000-00805f9b34fb'
 };
+
 var reconnection_address = {
   alias: 0x2a03,
   name: 'gap.reconnection_address',
   uuid: '00002a03-0000-1000-8000-00805f9b34fb'
 };
+
 var heart_rate = {
   alias: 0x180d,
   name: 'heart_rate',
   uuid: '0000180d-0000-1000-8000-00805f9b34fb'
 };
+
 var heart_rate_measurement = {
   alias: 0x2a37,
   name: 'heart_rate_measurement',
   uuid: '00002a37-0000-1000-8000-00805f9b34fb'
 };
+
 var body_sensor_location = {
   alias: 0x2a38,
   name: 'body_sensor_location',
   uuid: '00002a38-0000-1000-8000-00805f9b34fb'
 };
+
 var glucose = {
   alias: 0x1808,
   name: 'glucose',
   uuid: '00001808-0000-1000-8000-00805f9b34fb'
 };
+
 var battery_service = {
   alias: 0x180f,
   name: 'battery_service',
   uuid: '0000180f-0000-1000-8000-00805f9b34fb'
 };
+
 var battery_level = {
   alias: 0x2A19,
   name: 'battery_level',
   uuid: '00002a19-0000-1000-8000-00805f9b34fb'
 };
+
 var tx_power = {
   alias: 0x1804,
   name: 'tx_power',
   uuid: '00001804-0000-1000-8000-00805f9b34fb'
-}
+};
+
 var human_interface_device = {
   alias: 0x1812,
   name: 'human_interface_device',
   uuid: '00001812-0000-1000-8000-00805f9b34fb'
-}
+};
+
 var device_information = {
   alias: 0x180a,
   name: 'device_information',
   uuid: '0000180a-0000-1000-8000-00805f9b34fb'
-}
+};
+
 var peripherial_privacy_flag = {
   alias: 0x2a02,
   name: 'gap.peripheral_privacy_flag',
   uuid: '00002a02-0000-1000-8000-00805f9b34fb'
-}
+};
+
+var serial_number_string = {
+  alias: 0x2A25,
+  name: 'serial_number_string',
+  uuid: '00002a25-0000-1000-8000-00805f9b34fb'
+};
 
 // Helper function for converting strings to an array of bytes.
 function asciiToDecimal(bytestr) {

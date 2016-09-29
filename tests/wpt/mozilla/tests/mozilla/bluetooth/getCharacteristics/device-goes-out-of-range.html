@@ -6,12 +6,14 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.heart_rate);
-    return window.navigator.bluetooth.requestDevice({filters: [{services: [heart_rate.name]}]})
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}]})
     .then(device => device.gatt.connect())
     .then(gattServer => gattServer.getPrimaryService(heart_rate.name))
     .then(service => {
     	window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
     	return promise_rejects(t, 'NetworkError', service.getCharacteristics());
-	});
+	})
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Device goes out of range. Reject with NetworkError.');
 </script>

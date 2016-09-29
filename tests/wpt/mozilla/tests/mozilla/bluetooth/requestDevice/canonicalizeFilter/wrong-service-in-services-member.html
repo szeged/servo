@@ -5,25 +5,25 @@
 <script>
 
 let test_specs = [{
-  filters: [{services: ['heart_rate', 'wrong_service']}]
+    filters: [{services: [heart_rate.name, wrong.service]}]
 }, {
-  filters: [{ services: ['heart_rate', 'wrong_service'], name: 'Name'}]
+    filters: [{ services: [heart_rate.name, wrong.service], name: 'Name'}]
 }, {
-  filters: [{ services: ['heart_rate', 'wrong_service'], namePrefix: 'Pre'}]
+    filters: [{ services: [heart_rate.name, wrong.service], namePrefix: 'Pre'}]
 }, {
-  filters: [{ services: ['heart_rate', 'wrong_service'], name: 'Name', namePrefix: 'Pre'}]
+    filters: [{ services: [heart_rate.name, wrong.service], name: 'Name', namePrefix: 'Pre'}]
 }, {
-  optionalServices: ['heart_rate'],
-  filters: [{ services: ['wrong_service'], name: 'Name', namePrefix: 'Pre'}]
+    optionalServices: [heart_rate.name],
+    filters: [{ services: [wrong.service], name: 'Name', namePrefix: 'Pre'}]
 }, {
-  optionalServices: ['heart_rate'],
-  filters: [{ services: ['wrong_service'], name: 'Name'}]
+    optionalServices: [heart_rate.name],
+    filters: [{ services: [wrong.service], name: 'Name'}]
 }, {
-  optionalServices: ['heart_rate'],
-  filters: [{ services: ['wrong_service'], name: 'Name', namePrefix: 'Pre'}]
+    optionalServices: [heart_rate.name],
+    filters: [{ services: [wrong.service], name: 'Name', namePrefix: 'Pre'}]
 }, {
-  optionalServices: ['heart_rate'],
-  filters: [{ services: ['wrong_service'], namePrefix: 'Pre'}]
+    optionalServices: [heart_rate.name],
+    filters: [{ services: [wrong.service], namePrefix: 'Pre'}]
 }];
 
 promise_test(t => {
@@ -32,7 +32,8 @@ promise_test(t => {
     test_specs.forEach(args => {
         test_promises = test_promises
             .then(() => promise_rejects(
-                t, 'SyntaxError', window.navigator.bluetooth.requestDevice(args)));
+                t, 'SyntaxError', window.navigator.bluetooth.requestDevice(args)))
+            .catch(error => assert_unreached('Promise should have resolved. ' + error));
     });
     return test_promises;
 }, 'Invalid optional service must reject the promise.');

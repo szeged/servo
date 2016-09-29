@@ -6,9 +6,9 @@
 'use strict';
 promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty_name_heart_rate);
-    return window.navigator.bluetooth.requestDevice({ filters: [{services: ['heart_rate']}]})
-    .then(device => {
-        assert_equals(device.name, '');
-    })
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}]})
+    .then(device => assert_equals(device.name, ''))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'An empty name device can be obtained by advertised service UUID.');
 </script>

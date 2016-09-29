@@ -6,12 +6,11 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.heart_rate);
-    return window.navigator.bluetooth.requestDevice(
-        { filters: [{services: [heart_rate.name]}],
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}],
         optionalServices: [glucose.name]})
     .then(device => device.gatt.connect())
-    .then(gattServer => {
-        return promise_rejects(t, 'NotFoundError', gattServer.getPrimaryServices(glucose.name));
-    });
+    .then(gattServer => promise_rejects(t, 'NotFoundError', gattServer.getPrimaryServices(glucose.name)))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Request for absent service. Reject with NotFoundError.');
 </script>
