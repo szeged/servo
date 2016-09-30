@@ -6,8 +6,7 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.glucose_heart_rate);
-    return promise_rejects(
-        t, new TypeError(), window.navigator.bluetooth.requestDevice({filters: []}),
-        'An empty |filters| member should result in a TypeError');
+    return promise_rejects(t, new TypeError(), window.navigator.bluetooth.requestDevice({filters: []}),
+                           'An empty |filters| member should result in a TypeError');
 }, 'An empty |filters| member should result in a TypeError');
 </script>

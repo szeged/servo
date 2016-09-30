@@ -5,13 +5,16 @@
 <script>
 'use strict';
 promise_test(t => {
-  let expected = 'SecurityError';
+    let expected = 'SecurityError';
     window.testRunner.setBluetoothMockDataSet(adapter_type.glucose_heart_rate);
-    return window.navigator.bluetooth.requestDevice({filters: [{services: [heart_rate.name]}]})
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => Promise.all([
-      promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.alias)),
-      promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.name)),
-      promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.uuid))]));
+        promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.alias)),
+        promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.name)),
+        promise_rejects(t, expected, gattServer.getPrimaryServices(glucose.uuid))]))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Request for absent service without permission. Reject with SecurityError.');
 </script>

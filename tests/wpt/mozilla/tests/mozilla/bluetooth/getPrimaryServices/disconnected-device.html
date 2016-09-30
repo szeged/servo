@@ -6,10 +6,10 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.heart_rate);
-    return window.navigator.bluetooth.requestDevice(
-        { filters: [{services: [heart_rate.name]}]})
-    .then(device =>
-        promise_rejects(t, 'NetworkError', device.gatt.getPrimaryServices())
-    );
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [heart_rate.name]}]
+    })
+    .then(device => promise_rejects(t, 'NetworkError', device.gatt.getPrimaryServices()))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'getPrimaryServices called before connecting. Reject with NetworkError.');
 </script>

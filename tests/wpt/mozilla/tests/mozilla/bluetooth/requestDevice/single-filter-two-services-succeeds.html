@@ -6,11 +6,10 @@
 'use strict';
 promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.glucose_heart_rate);
-    return window.navigator.bluetooth.requestDevice(
-        { filters: [{services: ['glucose', 'tx_power']}]})
-    .then(device => assert_equals(device.name, 'Glucose Device'))
-    .catch(error => {
-        assert_unreached('Promise should have resolved. ' + error);
-    });
+    return window.navigator.bluetooth.requestDevice({
+        filters: [{services: [glucose.name, tx_power.name]}]
+    })
+    .then(device => assert_equals(device.name, mock_device_name.glucose))
+    .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Filter with 2 services returns a matching device.');
 </script>

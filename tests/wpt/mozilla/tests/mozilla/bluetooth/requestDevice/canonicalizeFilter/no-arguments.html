@@ -4,13 +4,11 @@
 <script src="/bluetooth/bluetooth-helpers.js"></script>
 <script>
 'use strict';
-promise_test(t => {
+promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty);
     try {
-        window.navigator.bluetooth.requestDevice()
-        .then(() => {
-            assert_unreached('Promise should have rejected.');
-        })
+        window.navigator.bluetooth.requestDevice();
+        assert_unreached('requestDevice() should have thrown an error');
     } catch(error) {
         assert_equals('TypeError', error.name);
     }

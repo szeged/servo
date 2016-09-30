@@ -10,21 +10,21 @@ let test_specs = [{
 }, {
     filters: [{ namePrefix: '', name: 'Name'}]
 }, {
-    filters: [{ namePrefix: '', services: ['heart_rate']}]
+    filters: [{ namePrefix: '', services: [heart_rate.name]}]
 }, {
-    filters: [{ namePrefix: '', name: 'Name', services: ['heart_rate']}]
+    filters: [{ namePrefix: '', name: 'Name', services: [heart_rate.name]}]
 }, {
     filters: [{ namePrefix: ''}],
-    optionalServices: ['heart_rate']
+    optionalServices: [heart_rate.name]
 }, {
     filters: [{ namePrefix: '', name: 'Name'}],
-    optionalServices: ['heart_rate']
+    optionalServices: [heart_rate.name]
 }, {
-    filters: [{ namePrefix: '', services: ['heart_rate']}],
-    optionalServices: ['heart_rate']
+    filters: [{ namePrefix: '', services: [heart_rate.name]}],
+    optionalServices: [heart_rate.name]
 }, {
-    filters: [{ namePrefix: '', name: 'Name', services: ['heart_rate']}],
-    optionalServices: ['heart_rate']
+    filters: [{ namePrefix: '', name: 'Name', services: [heart_rate.name]}],
+    optionalServices: [heart_rate.name]
 }];
 
 promise_test(t => {
@@ -32,8 +32,8 @@ promise_test(t => {
     let test_promises = Promise.resolve();
     test_specs.forEach(args => {
         test_promises = test_promises
-            .then(() => promise_rejects(
-              t, new TypeError(), window.navigator.bluetooth.requestDevice(args)));
+            .then(() => promise_rejects(t, new TypeError(), window.navigator.bluetooth.requestDevice(args)))
+            .catch(error => assert_unreached('Promise should have resolved. ' + error));
     });
     return test_promises;
 }, 'requestDevice with empty namePrefix. Should reject with TypeError.');

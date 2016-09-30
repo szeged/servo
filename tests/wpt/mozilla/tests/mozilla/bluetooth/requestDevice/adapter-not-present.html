@@ -6,7 +6,8 @@
 'use strict';
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.not_present);
-    return promise_rejects(t, 'NotFoundError', window.navigator.bluetooth.requestDevice({filters: [{services: [generic_access.name]}]}),
+    return promise_rejects(
+        t, 'NotFoundError', window.navigator.bluetooth.requestDevice({filters: [{services: [generic_access.name]}]}),
         'Bluetooth adapter is not present.');
 }, 'Reject with NotFoundError if the adapter is not present.');
 </script>
