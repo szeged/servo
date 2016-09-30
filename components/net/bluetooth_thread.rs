@@ -242,7 +242,7 @@ impl BluetoothManager {
         self.cached_descriptors.clear();
         self.allowed_services.clear();
         self.adapter = BluetoothAdapter::init_mock().ok();
-        bluetooth_test::test(self, data_set_name, sender);
+        bluetooth_test::test(self, data_set_name, &sender);
     }
 
     // Adapter

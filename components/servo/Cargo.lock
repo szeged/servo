@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "device"
 version = "0.0.1"
-source = "git+https://github.com/szeged/devices?branch=test-api#8d5546bd3cb3d65045664b29f109b72a126bdbac"
+source = "git+https://github.com/szeged/devices?branch=test-api#a23e47a93ce6fa5ccb2d6c06df2fc011fdbcb041"
 dependencies = [
  "blurdroid 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "blurmock 0.1.0 (git+https://github.com/szeged/blurmock.git)",
