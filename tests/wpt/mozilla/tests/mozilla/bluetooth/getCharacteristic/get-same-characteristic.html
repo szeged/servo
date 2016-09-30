@@ -18,7 +18,7 @@ promise_test(() => {
             service.getCharacteristic(device_name.name)])
         .then(characteristics => {
             for (let i = 1; i < characteristics.length; i++) {
-                assert_not_equals(characteristics[0], characteristics[i],
+                assert_equals(characteristics[0], characteristics[i],
                     'Should return the same characteristic as the first call.');
             }
         });
