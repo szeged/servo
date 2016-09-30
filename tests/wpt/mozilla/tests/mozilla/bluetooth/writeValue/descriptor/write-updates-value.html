@@ -17,9 +17,7 @@ promise_test(() => {
     .then(descriptor => {
         assert_equals(descriptor.value, null);
         return descriptor.writeValue(asciiToDecimal('foo'))
-        .then(() => {
-            assert_equals(descriptor.value, 'foo');
-        })
+        .then(() => assert_equals(descriptor.value, 'foo'));
     })
     .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'A regular write request to a writable descriptor should update value.');
