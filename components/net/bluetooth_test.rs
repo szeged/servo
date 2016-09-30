@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 use bluetooth_thread::BluetoothManager;
-use device::bluetooth::{BluetoothAdapter, BluetoothDevice, BluetoothGATTCharacteristic, BluetoothGATTService};
+use device::bluetooth::{BluetoothAdapter, BluetoothDevice};
+use device::bluetooth::{BluetoothGATTCharacteristic, BluetoothGATTDescriptor, BluetoothGATTService};
 use ipc_channel::ipc::IpcSender;
 use net_traits::bluetooth_thread::{BluetoothError, BluetoothResult};
 use rand::{self, Rng};
@@ -40,6 +41,7 @@ const EMPTY_NAME_HEART_RATE_ADAPTER: &'static str = "EmptyNameHeartRateAdapter";
 const NO_NAME_HEART_RATE_ADAPTER: &'static str = "NoNameHeartRateAdapter";
 const TWO_HEART_RATE_SERVICES_ADAPTER: &'static str = "TwoHeartRateServicesAdapter";
 const BLACKLIST_TEST_ADAPTER: &'static str = "BlacklistTestAdapter";
+const MISSING_DESCRIPTOR_HEART_RATE_ADAPTER: &'static str = "MissingDescriptorHeartRateAdapter";
 
 // Device names
 
@@ -76,6 +78,14 @@ const HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID: &'static str = "00002a37-0000-
 const PERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID: &'static str = "00002a02-0000-1000-8000-00805f9b34fb";
 const REQUEST_DISCONNECTION_CHARACTERISTIC_UUID: &'static str = "00000002-0000-1000-8000-00805f9b34fb";
 const SERIAL_NUMBER_STRING_UUID: &'static str = "00002a25-0000-1000-8000-00805f9b34fb";
+
+// Descriptor UUIDs
+
+const NUMBER_OF_DIGITALS_UUID: &'static str = "00002909-0000-1000-8000-00805f9b34fb";
+const CHARACTERISTIC_USER_DESCRIPTION_UUID: &'static str = "00002901-0000-1000-8000-00805f9b34fb";
+const CLIENT_CHARACTERISTIC_CONFIGURATION_UUID: &'static str = "00002902-0000-1000-8000-00805f9b34fb";
+const BLACKLIST_EXCLUDE_READS_DESCRIPTOR_UUID: &'static str = "aaaaaaaa-aaaa-1181-0510-810819516110";
+const BLACKLIST_DESCRIPTOR_UUID: &'static str = "07711111-6104-0970-7011-1107105110aaa";
 
 pub fn generate_id() -> String {
     let mut id;
@@ -259,6 +269,42 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                     // Heart Rate Service
                     let heart_rate_service = create_heart_rate_service(heart_rate_device.clone(), &sender);
                 },
+                MISSING_DESCRIPTOR_HEART_RATE_ADAPTER => {
+                    set_adapter(adapter, MISSING_DESCRIPTOR_HEART_RATE_ADAPTER.to_owned(), &sender);
+
+                    // Heart Rate Device
+                    let heart_rate_device = create_heart_rate_device(adapter, &sender);
+                    set_attribute_or_return_error(heart_rate_device.set_name(HEART_RATE_DEVICE_NAME.to_owned()),
+                                                  &sender);
+
+                    // Generic Access Service
+                    let generic_access_service = create_generic_access_service(heart_rate_device.clone(), &sender);
+
+                    // Device Name Characteristic
+                    let device_name = create_device_name(generic_access_service.clone(), &sender);
+                    set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
+                    set_attribute_or_return_error(device_name
+                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  &sender);
+
+                    // Pheripheral Privacy Flag Characteristic
+                    let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
+                                                                                  &sender);
+
+                    // Heart Rate Service
+                    let heart_rate_service = create_heart_rate_service(heart_rate_device.clone(), &sender);
+
+                    // Heart Rate Measurement Characteristic
+                    let heart_rate_measurement = create_heart_rate_measurement(heart_rate_service.clone(), &sender);
+
+                    // Body Sensor Location Characteristic 1
+                    let body_sensor_location_1 = create_body_sensor_location(heart_rate_service.clone(), &sender);
+                    set_attribute_or_return_error(body_sensor_location_1.write_value(vec![1]), &sender);
+
+                    // Body Sensor Location Characteristic 2
+                    let body_sensor_location_2 = create_body_sensor_location(heart_rate_service.clone(), &sender);
+                    set_attribute_or_return_error(body_sensor_location_2.write_value(vec![2]), &sender);
+                },
                 HEART_RATE_ADAPTER => {
                     set_adapter(adapter, HEART_RATE_ADAPTER.to_owned(), &sender);
 
@@ -273,7 +319,35 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                     // Device Name Characteristic
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
                     set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
-                    set_attribute_or_return_error(device_name.set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())), &sender);
+                    set_attribute_or_return_error(device_name
+                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  &sender);
+
+                    // Number of Digitals descriptor
+                    let number_of_digitals = BluetoothGATTDescriptor::create_descriptor(device_name.clone(),
+                                                                                        generate_id());
+                    set_attribute_or_return_error(number_of_digitals.set_uuid(NUMBER_OF_DIGITALS_UUID.to_owned()),
+                                                                              &sender);
+                    set_attribute_or_return_error(number_of_digitals.set_value(vec![49, 49]), &sender);
+
+                    // Characteristic User Description descriptor
+                    let characteristic_user_description =
+                        BluetoothGATTDescriptor::create_descriptor(device_name.clone(),
+                                                                   generate_id());
+                    set_attribute_or_return_error(characteristic_user_description
+                                                  .set_uuid(CHARACTERISTIC_USER_DESCRIPTION_UUID.to_owned()),
+                                                  &sender);
+                    set_attribute_or_return_error(characteristic_user_description.set_value(vec![22, 33, 44, 55]),
+                                                  &sender);
+
+                    // Client Characteristic Configuration descriptor
+                    let client_characteristic_configuration =
+                        BluetoothGATTDescriptor::create_descriptor(device_name.clone(),
+                                                                   generate_id());
+                    set_attribute_or_return_error(client_characteristic_configuration
+                                                  .set_uuid(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID.to_owned()),
+                                                  &sender);
+                    set_attribute_or_return_error(client_characteristic_configuration.set_value(vec![0, 0]), &sender);
 
                     // Pheripheral Privacy Flag Characteristic
                     let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
@@ -432,6 +506,26 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                                                   .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
                                                   &sender);
 
+                    // Blacklist Exclude Reads descriptor
+                    let blacklist_exclude_reads_descriptor =
+                        BluetoothGATTDescriptor::create_descriptor(blacklist_exclude_reads_characteristic.clone(),
+                                                                   generate_id());
+                    set_attribute_or_return_error(blacklist_exclude_reads_descriptor
+                                                  .set_uuid(CHARACTERISTIC_USER_DESCRIPTION_UUID.to_owned()),
+                                                  &sender);
+                    set_attribute_or_return_error(blacklist_exclude_reads_descriptor.set_value(vec![054, 054, 054]),
+                                                  &sender);
+
+                    // Blacklist descriptor
+                    let blacklist_descriptior =
+                        BluetoothGATTDescriptor::create_descriptor(blacklist_exclude_reads_characteristic.clone(),
+                                                                   generate_id());
+                    set_attribute_or_return_error(blacklist_descriptior
+                                                  .set_uuid(CHARACTERISTIC_USER_DESCRIPTION_UUID.to_owned()),
+                                                  &sender);
+                    set_attribute_or_return_error(blacklist_descriptior.set_value(vec![054, 054, 054]),
+                                                  &sender);
+
                     // Device Information Service
                     let device_information_service = BluetoothGATTService::create_service(connectable_device.clone(),
                                                                                           generate_id().to_owned());
@@ -452,6 +546,16 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: IpcSe
                     // Device Name Characteristic
                     let device_name = create_device_name(generic_access_service.clone(), &sender);
                     set_attribute_or_return_error(device_name.write_value(HEART_RATE_BYTES.to_vec()), &sender);
+
+                    // Characteristic User Description descriptor
+                    let characteristic_user_description =
+                        BluetoothGATTDescriptor::create_descriptor(device_name.clone(),
+                                                                   generate_id());
+                    set_attribute_or_return_error(characteristic_user_description
+                                                  .set_uuid(CHARACTERISTIC_USER_DESCRIPTION_UUID.to_owned()),
+                                                  &sender);
+                    set_attribute_or_return_error(characteristic_user_description.set_value(vec![22, 33, 44, 55]),
+                                                  &sender);
 
                     // Pheripheral Privacy Flag Characteristic
                     let peripheral_privacy_flag = create_peripheral_privacy_flag(generic_access_service.clone(),
