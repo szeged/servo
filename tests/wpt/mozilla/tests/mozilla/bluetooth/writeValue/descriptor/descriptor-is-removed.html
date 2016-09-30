@@ -16,7 +16,7 @@ promise_test(t => {
     .then(characteristic => characteristic.getDescriptor(number_of_digitals.name))
     .then(descriptor => {
         window.testRunner.setBluetoothMockDataSet(adapter_type.missing_descriptor_heart_rate);
-        return promise_rejects(t, 'InvalidStateError', descriptor.writeValue(new Uint8Array(1 /* length */)));
+        return promise_rejects(t, 'InvalidStateError', descriptor.writeValue(new Uint8Array(1)));
     })
     .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Descriptor gets removed. Reject with InvalidStateError.');
