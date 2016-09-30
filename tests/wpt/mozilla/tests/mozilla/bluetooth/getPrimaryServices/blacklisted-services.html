@@ -15,14 +15,10 @@ promise_test(() => {
     .then(gattServer => gattServer.getPrimaryServices())
     .then(services => {
         assert_equals(services.length, 4);
-        assert_equals(services[0].uuid,
-                      blacklist_test_service_uuid);
-        assert_equals(services[1].uuid,
-                      device_information.uuid);
-        assert_equals(services[2].uuid,
-                      generic_access.uuid);
-        assert_equals(services[3].uuid,
-                      heart_rate.uuid);
+        assert_equals(services[0].uuid, blacklist_test_service_uuid);
+        assert_equals(services[1].uuid, device_information.uuid);
+        assert_equals(services[2].uuid, generic_access.uuid);
+        assert_equals(services[3].uuid, heart_rate.uuid);
     })
     .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'Request for services. Does not return blacklisted service.');
