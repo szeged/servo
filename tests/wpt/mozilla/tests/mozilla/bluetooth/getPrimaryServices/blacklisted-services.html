@@ -10,7 +10,9 @@ promise_test(() => {
         filters: [{services: [device_information.name]}],
         optionalServices: [
             blacklist_test_service_uuid, generic_access.name,
-            heart_rate.name, human_interface_device.name]})
+            heart_rate.name, human_interface_device.name
+        ]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => gattServer.getPrimaryServices())
     .then(services => {

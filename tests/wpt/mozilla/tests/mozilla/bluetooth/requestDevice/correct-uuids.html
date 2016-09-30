@@ -8,7 +8,8 @@ promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.glucose_heart_rate);
     return window.navigator.bluetooth.requestDevice({
         filters: [{services: [glucose.name]}],
-        optionalServices: [tx_power.name]})
+        optionalServices: [tx_power.name]
+    })
     .then(device => {
         assert_equals(device.uuids.length, 2);
         assert_in_array(glucose.uuid, device.uuids);

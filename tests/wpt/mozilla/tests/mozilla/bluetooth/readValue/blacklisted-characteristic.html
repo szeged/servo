@@ -7,7 +7,8 @@
 promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.blacklist);
     return window.navigator.bluetooth.requestDevice({
-        filters: [{services: [blacklist_test_service_uuid]}]})
+        filters: [{services: [blacklist_test_service_uuid]}]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => gattServer.getPrimaryService(blacklist_test_service_uuid))
     .then(service => service.getCharacteristic(blacklist_exclude_reads_characteristic_uuid))

@@ -8,7 +8,8 @@ promise_test(t => {
     let expected = 'SecurityError';
     window.testRunner.setBluetoothMockDataSet(adapter_type.heart_rate);
     return window.navigator.bluetooth.requestDevice({
-        filters: [{services: [heart_rate.name]}]})
+        filters: [{services: [heart_rate.name]}]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => Promise.all([
         promise_rejects(t, expected, gattServer.getPrimaryService(glucose.alias)),

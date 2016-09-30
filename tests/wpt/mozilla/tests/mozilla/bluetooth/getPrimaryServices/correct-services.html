@@ -7,7 +7,8 @@
 promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.two_heart_rate);
     return window.navigator.bluetooth.requestDevice({
-        filters: [{services: [heart_rate.name]}]})
+        filters: [{services: [heart_rate.name]}]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => gattServer.getPrimaryServices(heart_rate.name))
     .then(services => Promise.all([

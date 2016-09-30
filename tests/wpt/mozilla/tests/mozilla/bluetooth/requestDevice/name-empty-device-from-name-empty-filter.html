@@ -8,7 +8,8 @@ promise_test(() => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.empty_name_heart_rate);
     return window.navigator.bluetooth.requestDevice({
         filters: [{name: ''}],
-        optionalServices: [generic_access.name]})
+        optionalServices: [generic_access.name]
+    })
     .then(device => assert_equals(device.name, ''))
     .catch(error => assert_unreached('Promise should have resolved. ' + error));
 }, 'An empty name device can be obtained by empty name filter.');

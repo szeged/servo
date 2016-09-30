@@ -8,7 +8,8 @@ promise_test(t => {
     window.testRunner.setBluetoothMockDataSet(adapter_type.two_heart_rate);
     return window.navigator.bluetooth.requestDevice({
         filters: [{services: [heart_rate.name]}],
-        optionalServices: [generic_access.name]})
+        optionalServices: [generic_access.name]
+    })
     .then(device => device.gatt.connect())
     .then(gattServer => {
         gattServer.disconnect();
