@@ -80,7 +80,7 @@ pub fn generate_id() -> String {
     let mut id;
     let mut generated = false;
     let mut rng = rand::thread_rng();
-    loop {
+    while !generated {
         id = rng.gen::<u32>().to_string();
         CACHED_IDS.with(|cache|
             if !cache.borrow().contains(&id) {
@@ -88,9 +88,6 @@ pub fn generate_id() -> String {
                 generated = true;
             }
         );
-        if generated {
-            break;
-        }
     }
     id
 }
@@ -165,7 +162,7 @@ pub fn create_characteristic_with_value(service: &BluetoothGATTService,
     characteristic
 }
 
-// Create Characteristic
+// Create Descriptor
 pub fn create_descriptor(characteristic: &BluetoothGATTCharacteristic,
                                          uuid: String,
                                          sender: &IpcSender<BluetoothResult<()>>)
@@ -175,7 +172,7 @@ pub fn create_descriptor(characteristic: &BluetoothGATTCharacteristic,
     descriptor
 }
 
-// Create Characteristic
+// Create Descriptor with value
 pub fn create_descriptor_with_value(characteristic: &BluetoothGATTCharacteristic,
                                     uuid: String,
                                     value: Vec<u8>,
