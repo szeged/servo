@@ -119,7 +119,7 @@ pub fn create_device(adapter: &BluetoothAdapter,
     device
 }
 
-// Create Rate Device with UUIDs
+// Create Device with UUIDs
 pub fn create_device_with_uuids(adapter: &BluetoothAdapter,
                                 name: String,
                                 address: String,
