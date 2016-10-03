@@ -77,7 +77,7 @@ const CLIENT_CHARACTERISTIC_CONFIGURATION_UUID: &'static str = "00002902-0000-10
 const NUMBER_OF_DIGITALS_UUID: &'static str = "00002909-0000-1000-8000-00805f9b34fb";
 
 pub fn generate_id() -> String {
-    let mut id;
+    let mut id = String::new();
     let mut generated = false;
     let mut rng = rand::thread_rng();
     while !generated {
@@ -226,7 +226,7 @@ pub fn create_generic_access_service(device: &BluetoothDevice,
                                          HEART_RATE_BYTES.to_vec(),
                                          sender);
     set_attribute_or_return_error(device_name_characteristic
-                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                  .set_flags(vec![READ_FLAG.to_string(), WRITE_FLAG.to_string()]),
                                   sender);
 
     // Number of Digitals descriptor
@@ -256,7 +256,7 @@ pub fn create_generic_access_service(device: &BluetoothDevice,
                               PERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID.to_owned(),
                               sender);
     set_attribute_or_return_error(peripheral_privacy_flag_characteristic
-                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                  .set_flags(vec![READ_FLAG.to_string(), WRITE_FLAG.to_string()]),
                                   sender);
     generic_access_service
 }
@@ -378,7 +378,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: &IpcS
                                                          HEART_RATE_BYTES.to_vec(),
                                                          sender);
                     set_attribute_or_return_error(device_name_characteristic
-                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  .set_flags(vec![READ_FLAG.to_string(), WRITE_FLAG.to_string()]),
                                                   sender);
 
                     // Peripheral Privacy Flag Characteristic
@@ -387,7 +387,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: &IpcS
                                               PERIPHERAL_PRIVACY_FLAG_CHARACTERISTIC_UUID.to_owned(),
                                               sender);
                     set_attribute_or_return_error(peripheral_privacy_flag_characteristic
-                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  .set_flags(vec![READ_FLAG.to_string(), WRITE_FLAG.to_string()]),
                                                   sender);
 
                     // Heart Rate Service
@@ -491,7 +491,7 @@ pub fn test(manager: &mut BluetoothManager, data_set_name: String, sender: &IpcS
                                               BLACKLIST_EXCLUDE_READS_CHARACTERISTIC_UUID.to_owned(),
                                               sender);
                     set_attribute_or_return_error(blacklist_exclude_reads_characteristic
-                                                  .set_flags(vec!(READ_FLAG.to_string(), WRITE_FLAG.to_string())),
+                                                  .set_flags(vec![READ_FLAG.to_string(), WRITE_FLAG.to_string()]),
                                                   sender);
 
                     // Blacklist Exclude Reads Descriptor
