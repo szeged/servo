@@ -6666,6 +6666,126 @@
             "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/service-is-removed.html"
           }
         ],
+        "mozilla/bluetooth/getDescriptor/blacklisted-descriptor.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/blacklisted-descriptor.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/blacklisted-descriptor.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/descriptor-found.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/descriptor-found.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/descriptor-found.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/descriptor-not-found.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/descriptor-not-found.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/descriptor-not-found.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/device-goes-out-of-range.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/get-same-descriptor.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/get-same-descriptor.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/get-same-descriptor.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/invalid-descriptor-name.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/invalid-descriptor-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/invalid-descriptor-name.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/characteristic-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/characteristic-is-removed.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/blacklisted-descriptors-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/blacklisted-descriptors-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/blacklisted-descriptors-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/blacklisted-descriptors.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/blacklisted-descriptors.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/blacklisted-descriptors.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/descriptors-found-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/descriptors-found-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/descriptors-found-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/descriptors-found.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/descriptors-found.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/descriptors-found.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/descriptors-not-found-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/descriptors-not-found-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/descriptors-not-found-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/descriptors-not-found.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/descriptors-not-found.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/descriptors-not-found.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/correct-descriptors.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/correct-descriptors.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/correct-descriptors.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/device-goes-out-of-range-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/device-goes-out-of-range-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/device-goes-out-of-range-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/device-goes-out-of-range.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/device-goes-out-of-range.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/get-same-descriptors.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/get-same-descriptors.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/get-same-descriptors.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/invalid-descriptor-name.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/invalid-descriptor-name.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/invalid-descriptor-name.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/characteristic-is-removed-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/characteristic-is-removed-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/characteristic-is-removed-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/characteristic-is-removed.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/characteristic-is-removed.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/characteristic-is-removed.html"
+          }
+        ],
         "mozilla/bluetooth/getPrimaryService/device-goes-out-of-range.html": [
           {
             "path": "mozilla/bluetooth/getPrimaryService/device-goes-out-of-range.html",
