@@ -110,7 +110,8 @@ fn create_device(adapter: &BluetoothAdapter,
                  address: String,
                  sender: &IpcSender<BluetoothResult<()>>)
                  -> BluetoothDevice {
-    let device = BluetoothDevice::create_device(adapter.clone(), generate_id());
+    // The unwrap here will never cause a panic, because adapter is a fake one.
+    let device = BluetoothDevice::create_mock_device(adapter.clone(), generate_id()).unwrap();
     set_attribute_or_return_error(device.set_name(Some(name)), sender);
     set_attribute_or_return_error(device.set_address(address), sender);
     set_attribute_or_return_error(device.set_connectable(true), sender);
@@ -134,7 +135,8 @@ fn create_service(device: &BluetoothDevice,
                   uuid: String,
                   sender: &IpcSender<BluetoothResult<()>>)
                   -> BluetoothGATTService {
-    let service = BluetoothGATTService::create_service(device.clone(), generate_id().to_owned());
+    // The unwrap here will never cause a panic, because device is a fake one.
+    let service = BluetoothGATTService::create_mock_service(device.clone(), generate_id().to_owned()).unwrap();
     set_attribute_or_return_error(service.set_uuid(uuid), sender);
     service
 }
@@ -144,7 +146,9 @@ fn create_characteristic(service: &BluetoothGATTService,
                          uuid: String,
                          sender: &IpcSender<BluetoothResult<()>>)
                          -> BluetoothGATTCharacteristic {
-    let characteristic = BluetoothGATTCharacteristic::create_characteristic(service.clone(), generate_id().to_owned());
+    // The unwrap here will never cause a panic, because service is a fake one.
+    let characteristic =
+        BluetoothGATTCharacteristic::create_mock_characteristic(service.clone(), generate_id().to_owned()).unwrap();
     set_attribute_or_return_error(characteristic.set_uuid(uuid), sender);
     characteristic
 }
@@ -165,7 +169,9 @@ fn create_descriptor(characteristic: &BluetoothGATTCharacteristic,
                                      uuid: String,
                                      sender: &IpcSender<BluetoothResult<()>>)
                                      -> BluetoothGATTDescriptor {
-    let descriptor = BluetoothGATTDescriptor::create_descriptor(characteristic.clone(), generate_id().to_owned());
+    // The unwrap here will never cause a panic, because characteristic is a fake one.
+    let descriptor =
+        BluetoothGATTDescriptor::create_mock_descriptor(characteristic.clone(), generate_id().to_owned()).unwrap();
     set_attribute_or_return_error(descriptor.set_uuid(uuid), sender);
     descriptor
 }
