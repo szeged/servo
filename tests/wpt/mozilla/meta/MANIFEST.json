@@ -6632,6 +6632,18 @@
             "url": "/_mozilla/mozilla/bluetooth/getCharacteristic/device-goes-out-of-range.html"
           }
         ],
+        "mozilla/bluetooth/getCharacteristic/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristic/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristic/disconnect-called-before.html"
+          }
+        ],
+        "mozilla/bluetooth/getCharacteristic/disconnect-called-during.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristic/disconnect-called-during.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristic/disconnect-called-during.html"
+          }
+        ],
         "mozilla/bluetooth/getCharacteristic/get-same-characteristic.html": [
           {
             "path": "mozilla/bluetooth/getCharacteristic/get-same-characteristic.html",
@@ -6704,6 +6716,30 @@
             "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/device-goes-out-of-range.html"
           }
         ],
+        "mozilla/bluetooth/getCharacteristics/disconnect-called-before-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristics/disconnect-called-before-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/disconnect-called-before-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getCharacteristics/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristics/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/disconnect-called-before.html"
+          }
+        ],
+        "mozilla/bluetooth/getCharacteristics/disconnect-called-during-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristics/disconnect-called-during-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/disconnect-called-during-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getCharacteristics/disconnect-called-during.html": [
+          {
+            "path": "mozilla/bluetooth/getCharacteristics/disconnect-called-during.html",
+            "url": "/_mozilla/mozilla/bluetooth/getCharacteristics/disconnect-called-during.html"
+          }
+        ],
         "mozilla/bluetooth/getCharacteristics/get-same-characteristics.html": [
           {
             "path": "mozilla/bluetooth/getCharacteristics/get-same-characteristics.html",
@@ -6756,6 +6792,18 @@
           {
             "path": "mozilla/bluetooth/getDescriptor/device-goes-out-of-range.html",
             "url": "/_mozilla/mozilla/bluetooth/getDescriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/disconnect-called-before.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptor/disconnect-called-during.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptor/disconnect-called-during.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptor/disconnect-called-during.html"
           }
         ],
         "mozilla/bluetooth/getDescriptor/get-same-descriptor.html": [
@@ -6834,6 +6882,30 @@
           {
             "path": "mozilla/bluetooth/getDescriptors/device-goes-out-of-range.html",
             "url": "/_mozilla/mozilla/bluetooth/getDescriptors/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/disconnect-called-before-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/disconnect-called-before-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/disconnect-called-before-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/disconnect-called-before.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/disconnect-called-during-with-uuid.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/disconnect-called-during-with-uuid.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/disconnect-called-during-with-uuid.html"
+          }
+        ],
+        "mozilla/bluetooth/getDescriptors/disconnect-called-during.html": [
+          {
+            "path": "mozilla/bluetooth/getDescriptors/disconnect-called-during.html",
+            "url": "/_mozilla/mozilla/bluetooth/getDescriptors/disconnect-called-during.html"
           }
         ],
         "mozilla/bluetooth/getDescriptors/get-same-descriptors.html": [
@@ -7058,6 +7130,12 @@
             "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/device-goes-out-of-range.html"
           }
         ],
+        "mozilla/bluetooth/readValue/characteristic/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/characteristic/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/characteristic/disconnect-called-before.html"
+          }
+        ],
         "mozilla/bluetooth/readValue/characteristic/read-succeeds.html": [
           {
             "path": "mozilla/bluetooth/readValue/characteristic/read-succeeds.html",
@@ -7098,6 +7176,12 @@
           {
             "path": "mozilla/bluetooth/readValue/descriptor/device-goes-out-of-range.html",
             "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/readValue/descriptor/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/readValue/descriptor/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/disconnect-called-before.html"
           }
         ],
         "mozilla/bluetooth/readValue/descriptor/read-succeeds.html": [
@@ -7382,6 +7466,12 @@
             "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/device-goes-out-of-range.html"
           }
         ],
+        "mozilla/bluetooth/writeValue/characteristic/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/characteristic/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/characteristic/disconnect-called-before.html"
+          }
+        ],
         "mozilla/bluetooth/writeValue/characteristic/service-is-removed.html": [
           {
             "path": "mozilla/bluetooth/writeValue/characteristic/service-is-removed.html",
@@ -7422,6 +7512,12 @@
           {
             "path": "mozilla/bluetooth/writeValue/descriptor/device-goes-out-of-range.html",
             "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/device-goes-out-of-range.html"
+          }
+        ],
+        "mozilla/bluetooth/writeValue/descriptor/disconnect-called-before.html": [
+          {
+            "path": "mozilla/bluetooth/writeValue/descriptor/disconnect-called-before.html",
+            "url": "/_mozilla/mozilla/bluetooth/writeValue/descriptor/disconnect-called-before.html"
           }
         ],
         "mozilla/bluetooth/writeValue/descriptor/service-is-removed.html": [
