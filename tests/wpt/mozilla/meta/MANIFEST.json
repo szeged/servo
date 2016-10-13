@@ -7202,6 +7202,18 @@
             "url": "/_mozilla/mozilla/bluetooth/readValue/descriptor/service-is-removed.html"
           }
         ],
+        "mozilla/bluetooth/requestDevice/accept-all-devices-with-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/accept-all-devices-with-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/accept-all-devices-with-filter.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/accept-all-devices.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/accept-all-devices.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/accept-all-devices.html"
+          }
+        ],
         "mozilla/bluetooth/requestDevice/adapter-not-present.html": [
           {
             "path": "mozilla/bluetooth/requestDevice/adapter-not-present.html",
@@ -7416,6 +7428,12 @@
           {
             "path": "mozilla/bluetooth/requestDevice/no-devices.html",
             "url": "/_mozilla/mozilla/bluetooth/requestDevice/no-devices.html"
+          }
+        ],
+        "mozilla/bluetooth/requestDevice/not-accept-all-devices-without-filter.html": [
+          {
+            "path": "mozilla/bluetooth/requestDevice/not-accept-all-devices-without-filter.html",
+            "url": "/_mozilla/mozilla/bluetooth/requestDevice/not-accept-all-devices-without-filter.html"
           }
         ],
         "mozilla/bluetooth/requestDevice/same-device.html": [
