@@ -15,12 +15,6 @@ promise_test(() => {
     .then(characteristics => Promise.all([
         characteristics[0].readValue(),
         characteristics[1].readValue()]))
-    .then(value_arrays => {
-            assert_equals(value_arrays.length, 2);
-            assert_equals(value_arrays[0].length, 1);
-            assert_equals(value_arrays[0], '1');
-            assert_equals(value_arrays[1].length, 1);
-            assert_equals(value_arrays[1], '2');
-    });
+    .then(value_arrays => assert_array_equals(value_arrays, ['1', '2']));
 }, 'Find characteristics with UUID in service.');
 </script>

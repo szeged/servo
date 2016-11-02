@@ -10,5 +10,5 @@ promise_test(t => {
         t, new TypeError(),
         window.navigator.bluetooth.requestDevice({acceptAllDevices: false}),
         'Filters member is empty');
-}, 'Reject with TypeError if filters present and acceptAllDevices is false.');
+}, 'Reject with TypeError if `filters` not present and `acceptAllDevices` is false.');
 </script>

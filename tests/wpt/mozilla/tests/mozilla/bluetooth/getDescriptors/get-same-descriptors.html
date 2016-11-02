@@ -16,13 +16,6 @@ promise_test(() => {
     .then(characteristic => Promise.all([
         characteristic.getDescriptors(number_of_digitals.name),
         characteristic.getDescriptors(number_of_digitals.name)]))
-    .then(descriptors => {
-        let descs1 = descriptors[0];
-        let descs2 = descriptors[1];
-        assert_equals(descs1.length, descs2.length);
-        for (let i = 0; i < descs1.length; i++) {
-            assert_equals(descs1[i], descs2[i]);
-        }
-    });
+    .then(descriptors => assert_array_equals(descriptors[0], descriptors[1]));
 }, 'Calls to get the same descriptor should return the same object.');
 </script>

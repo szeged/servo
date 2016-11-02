@@ -14,13 +14,6 @@ promise_test(() => {
     .then(service => Promise.all([
         service.getCharacteristics(body_sensor_location.name),
         service.getCharacteristics(body_sensor_location.name)]))
-    .then(characteristics => {
-        let chars1 = characteristics[0];
-        let chars2 = characteristics[1];
-        assert_equals(chars1.length, chars2.length);
-        for (let i = 0; i < chars1.length; i++) {
-            assert_equals(chars1[i], chars2[i]);
-        }
-    });
+    .then(characteristics => assert_array_equals(characteristics[0], characteristics[1]));
 }, 'Calls to get the same characteristics should return the same objects.');
 </script>
