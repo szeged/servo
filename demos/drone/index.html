@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="drone.js"></script>
+  <script src="wbt.js"></script>
+  <link rel="stylesheet" type="text/css" href="drone.css">
+  <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet' type='text/css'>
+  <title>Airborne Cargo Travis</title>
+</head>
+<body>
+  <h1>Airborne Cargo Travis</h1>
+  <h2>remote control</h2>
+  <table class="center controls texts">
+    <tr id="fistrow">
+      <td></td>
+      <td><div onclick="connect()">Connect</div></td>
+      <td><div onclick="takeOff()">Take off</div></td>
+      <td><div onclick="flip()">Flip</div></td>
+      <td><div onclick="land()">Land</div></td>
+      <td></td>
+    </tr>
+    <table class="center controls symbols">
+    <tr>
+      <td></td>
+      <td><div onclick="ascend()">&#9650;</div></td>
+      <td></td>
+      <td></td>
+      <td><div onclick="goForward()">&#8679;</div></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><div onclick="turnLeft()">&#8630;</div></td>
+      <td><div onclick="hover()">&#9899;</div></td>
+      <td><div id="separation" onclick="turnRight()">&#8631;</div></td>
+      <td><div onclick="goToLeft()">&#8678;</div></td>
+      <td><div onclick="hover()">&#9899;</div></td>
+      <td><div onclick="goToRight()">&#8680;</div></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><div onclick="descend()">&#9660;</div></td>
+      <td></td>
+      <td></td>
+      <td><div onclick="goBackward()">&#8681;</div></td>
+      <td></td>
+    </tr>
+  </table>
+</body>
+</html>
