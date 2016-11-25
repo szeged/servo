@@ -1,0 +1,65 @@
+body {
+	text-align: center;
+	background-color: #000000;
+	font-family: sans-serif;
+	color: #FFD700;
+}
+
+textarea {
+	display: none;
+}
+
+.center, .center div {
+	margin: 0 auto;
+}
+
+.controls td div {
+	background-color: gray;
+	background: linear-gradient(#db0, #aa4444);
+	color: #FFD700;
+	font-weight: bold;
+	height: 100px;
+	width: 100px;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 100px;
+	border-radius: 15px;
+	margin: 3px;
+	cursor: pointer;
+	font-family: "Georgia", serif;
+}
+
+#fistrow td div {
+	margin: 20px;
+	margin-bottom: 40px;
+	width: 140px !important;
+}
+
+.symbols {
+	font-size: 40px;
+}
+
+.texts {
+	font-size: 21px;
+}
+
+#separation{
+	min-width: 200px;
+}
+
+#moves{
+	margin-top: 100px;
+}
+
+.controls {
+	border-collapse: collapse;
+}
+
+.controls td div:hover {
+	background: linear-gradient(#aa4444, #db0);
+	color: #FFD700;
+}
+
+.controls td div:active {
+	color: #C33;
+}

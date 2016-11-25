@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="car.js"></script>
+  <script src="wbt.js"></script>
+  <link rel="stylesheet" type="text/css" href="car.css">
+  <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet' type='text/css'>
+  <title>Monster Truck</title>
+</head>
+<body>
+  <h1>Monster Truck</h1>
+  <h2>remote control</h2>
+  <table class="center controls texts">
+      <tr id="fistrow">
+        <td></td>
+        <td><div onclick="connect()">Connect</div></td>
+        <td><div onclick="toggleOnOff()">On/Off</div></td>
+        <td></td>
+      </tr>
+    <table id="moves" class="center controls symbols">
+    <tr>
+      <td><div id="goForward">&#8679;</div></td>
+      <td id="separation"></td>
+      <td rowspan="2"><div id="goToLeft">&#8678;</div></td>
+      <td rowspan="2"><div id="goToRight">&#8680;</div></td>
+    <tr>
+      <td><div id="goBackward">&#8681;</div></td>
+    </tr>
+  </table>
+</body>
+</html>
