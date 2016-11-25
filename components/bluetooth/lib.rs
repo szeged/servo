@@ -944,18 +944,24 @@ impl BluetoothManager {
         return drop(sender.send(Ok(BluetoothResponse::GetCharacteristics(characteristics_vec))));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptor
     fn get_descriptor(&mut self,
                       characteristic_id: String,
                       uuid: String,
                       sender: IpcSender<BluetoothResponseResult>) {
+        // Step 5.
         if !self.cached_characteristics.contains_key(&characteristic_id) {
             return drop(sender.send(Err(BluetoothError::InvalidState)));
         }
         let mut adapter = get_adapter_or_return_error!(self, sender);
         let descriptors = self.get_gatt_descriptors_by_uuid(&mut adapter, &characteristic_id, &uuid);
+
+        // Step 7: If its argument is empty, throws a NotFoundError.
         if descriptors.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+
+        // Step 6.
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
                 return drop(sender.send(
@@ -971,10 +977,12 @@ impl BluetoothManager {
         return drop(sender.send(Err(BluetoothError::NotFound)));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-getdescriptors
     fn get_descriptors(&mut self,
                        characteristic_id: String,
                        uuid: Option<String>,
                        sender: IpcSender<BluetoothResponseResult>) {
+        // Step 5.
         if !self.cached_characteristics.contains_key(&characteristic_id) {
             return drop(sender.send(Err(BluetoothError::InvalidState)));
         }
@@ -983,9 +991,13 @@ impl BluetoothManager {
             Some(id) => self.get_gatt_descriptors_by_uuid(&mut adapter, &characteristic_id, &id),
             None => self.get_and_cache_gatt_descriptors(&mut adapter, &characteristic_id),
         };
+
+        // Step 7: If its argument is empty, throws a NotFoundError.
         if descriptors.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
+
+        // Step 6.
         let mut descriptors_vec = vec!();
         for descriptor in descriptors {
             if let Ok(uuid) = descriptor.get_uuid() {
@@ -998,60 +1010,94 @@ impl BluetoothManager {
             }
         }
         descriptors_vec.retain(|d| !uuid_is_blocklisted(&d.uuid, Blocklist::All));
+
+        // Step 7: If its argument is empty, throws a NotFoundError.
         if descriptors_vec.is_empty() {
             return drop(sender.send(Err(BluetoothError::NotFound)));
         }
         return drop(sender.send(Ok(BluetoothResponse::GetDescriptors(descriptors_vec))));
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-readvalue
     fn read_value(&mut self, id: String, sender: IpcSender<BluetoothResponseResult>) {
+        // (Characteristic) Step 5.2: Missing because it is optional.
         let mut adapter = get_adapter_or_return_error!(self, sender);
+
+        // (Characteristic) Step 5.3.
         let mut value = self.get_gatt_characteristic(&mut adapter, &id)
                             .map(|c| c.read_value().unwrap_or(vec![]));
+
+        // (Characteristic) TODO: Step 5.4: Handle all the errors returned from the read_value call.
+
         if value.is_none() {
             value = self.get_gatt_descriptor(&mut adapter, &id)
                         .map(|d| d.read_value().unwrap_or(vec![]));
         }
         match value {
+            // (Characteristic) Step 5.5.4.
             Some(v) => return drop(sender.send(Ok(BluetoothResponse::ReadValue(v)))),
+
+            // (Characteristic) Step 4.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
     }
 
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue
     fn write_value(&mut self, id: String, value: Vec<u8>, sender: IpcSender<BluetoothResponseResult>) {
+        // (Characteristic) Step 7.2: Missing because it is optional.
         let mut adapter = get_adapter_or_return_error!(self, sender);
+
+        // (Characteristic) Step 7.3.
         let mut result = self.get_gatt_characteristic(&mut adapter, &id)
                              .map(|c| c.write_value(value.clone()));
+
+        // (Characteristic) TODO: Step 7.4: Handle all the errors returned from the write_value call.
+
         if result.is_none() {
             result = self.get_gatt_descriptor(&mut adapter, &id)
                          .map(|d| d.write_value(value.clone()));
         }
+
         match result {
             Some(v) => match v {
+                // (Characteristic) Step 7.5.3.
+                // Note: There is no need to send back the value, because the algorithm returns with undefined.
                 Ok(_) => return drop(sender.send(Ok(BluetoothResponse::WriteValue(value)))),
+
+                // (Characteristic) Step 7.1.
                 Err(_) => return drop(sender.send(Err(BluetoothError::NotSupported))),
             },
+
+            // (Characteristic) Step 6.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-startnotifications
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-stopnotifications
     fn enable_notification(&mut self, id: String, enable: bool, sender: IpcSender<BluetoothResponseResult>) {
+        // (StartNotification) TODO: Step 7: Missing because it is optional.
         let mut adapter = get_adapter_or_return_error!(self, sender);
         match self.get_gatt_characteristic(&mut adapter, &id) {
             Some(c) => {
                 let result = match enable {
+                    // (StartNotification) Step 8.
+                    // TODO: Handle all the errors returned from the start_notify call.
                     true => c.start_notify(),
+
+                    // (StopNotification) Step 4.
                     false => c.stop_notify(),
                 };
                 match result {
-                    // Step 11.
+                    // (StartNotification) Step 11.
+                    // (StopNotification)  Step 5.
                     Ok(_) => return drop(sender.send(Ok(BluetoothResponse::EnableNotification(())))),
-                    // Step 4.
+
+                    // (StartNotification) Step 4.
                     Err(_) => return drop(sender.send(Err(BluetoothError::NotSupported))),
                 }
             },
-            // Step 3.
+            // (StartNotification) Step 3.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
     }
