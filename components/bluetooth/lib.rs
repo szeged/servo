@@ -1019,8 +1019,10 @@ impl BluetoothManager {
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-readvalue
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattdescriptor-readvalue
     fn read_value(&mut self, id: String, sender: IpcSender<BluetoothResponseResult>) {
         // (Characteristic) Step 5.2: Missing because it is optional.
+        // (Descriptor)     Step 5.1: Missing because it is optional.
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
         // (Characteristic) Step 5.3.
@@ -1029,22 +1031,30 @@ impl BluetoothManager {
 
         // (Characteristic) TODO: Step 5.4: Handle all the errors returned from the read_value call.
 
+        // (Descriptor) Step 5.2.
         if value.is_none() {
             value = self.get_gatt_descriptor(&mut adapter, &id)
                         .map(|d| d.read_value().unwrap_or(vec![]));
         }
+
+        // (Descriptor) TODO: Step 5.3: Handle all the errors returned from the read_value call.
+
         match value {
             // (Characteristic) Step 5.5.4.
+            // (Descriptor)     Step 5.4.3.
             Some(v) => return drop(sender.send(Ok(BluetoothResponse::ReadValue(v)))),
 
             // (Characteristic) Step 4.
+            // (Descriptor)     Step 4.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
     }
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattcharacteristic-writevalue
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattdescriptor-writevalue
     fn write_value(&mut self, id: String, value: Vec<u8>, sender: IpcSender<BluetoothResponseResult>) {
         // (Characteristic) Step 7.2: Missing because it is optional.
+        // (Descriptor)     Step 7.1: Missing because it is optional.
         let mut adapter = get_adapter_or_return_error!(self, sender);
 
         // (Characteristic) Step 7.3.
@@ -1053,15 +1063,19 @@ impl BluetoothManager {
 
         // (Characteristic) TODO: Step 7.4: Handle all the errors returned from the write_value call.
 
+        // (Descriptor) Step 7.2.
         if result.is_none() {
             result = self.get_gatt_descriptor(&mut adapter, &id)
                          .map(|d| d.write_value(value.clone()));
         }
 
+        // (Descriptor) TODO: Step 7.3: Handle all the errors returned from the write_value call.
+
         match result {
             Some(v) => match v {
                 // (Characteristic) Step 7.5.3.
-                // Note: There is no need to send back the value, because the algorithm returns with undefined.
+                // (Descriptor) Step 7.4.3.
+                // Note: There is no need to send back the value, because both algorithm returns with undefined.
                 Ok(_) => return drop(sender.send(Ok(BluetoothResponse::WriteValue(value)))),
 
                 // (Characteristic) Step 7.1.
@@ -1069,6 +1083,7 @@ impl BluetoothManager {
             },
 
             // (Characteristic) Step 6.
+            // (Descriptor)     Step 6.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
     }
