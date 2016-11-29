@@ -1075,7 +1075,6 @@ impl BluetoothManager {
             Some(v) => match v {
                 // (Characteristic) Step 7.5.3.
                 // (Descriptor) Step 7.4.3.
-                // Note: There is no need to send back the value, because both algorithm returns with undefined.
                 Ok(_) => return drop(sender.send(Ok(BluetoothResponse::WriteValue(value)))),
 
                 // (Characteristic) Step 7.1.

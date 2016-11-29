@@ -158,7 +158,7 @@ impl AsyncBluetoothListener for BluetoothRemoteGATTDescriptor {
                 // TODO: Step 5.4.1: Implement activeAlgorithms internal slot for BluetoothRemoteGATTServer.
 
                 // Step 5.4.2.
-                // TODO(#5014): Replace ByteString with ArrayBuffer when ArrayBuffer is implemented.
+                // TODO(#5014): Replace ByteString with ArrayBuffer when it is implemented.
                 let value = ByteString::new(result);
                 *self.value.borrow_mut() = Some(value.clone());
 
@@ -170,8 +170,7 @@ impl AsyncBluetoothListener for BluetoothRemoteGATTDescriptor {
                 // TODO: Step 7.4.1: Implement activeAlgorithms internal slot for BluetoothRemoteGATTServer.
 
                 // Step 7.4.2.
-                // TODO(#5014): Replace ByteString with a DataView wrapping a new ArrayBuffer
-                // when ArrayBuffer is implemented.
+                // TODO(#5014): Replace ByteString with an ArrayBuffer wrapped in a DataView.
                 let value = ByteString::new(result);
                 *self.value.borrow_mut() = Some(value.clone());
 
