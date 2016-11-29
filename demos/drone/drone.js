@@ -2,7 +2,17 @@ var counter = 0;
 var pingInProgress = false;
 var pingVar = 0;
 
-var move = 0;
+var ctrl = {
+    forward: 0,
+    backward: 0,
+    left: 0,
+    right: 0,
+    ascend: 0,
+    descend: 0,
+    turnLeft: 0,
+    turnRight: 0,
+}
+
 var speed = {
     roll: 0,
     pitch: 0,
@@ -30,48 +40,74 @@ function flip() {
 }
 
 function hover() {
-    speed.roll = 0;
-    speed.pitch = 0;
-    speed.yaw = 0;
-    speed.altitude = 0;
+    ctrl.forward = 0;
+    ctrl.backward = 0;
+    ctrl.left = 0;
+    ctrl.right = 0;
+    ctrl.ascend = 0;
+    ctrl.descend = 0;
+    ctrl.turnLeft = 0;
+    ctrl.turnRight = 0;
 }
 
-function setSpeed(prop, value) {
-    move = 1;
-    speed[prop] = value;
+function setColor(target, value) {
+    $(target).css("color", value?"#c33":"#FFD700");
 }
 
-
-function ascend() {
-    setSpeed('altitude', 50);
+function ascend(value) {
+    if (!ctrl['descend']) {
+        ctrl['ascend'] = value;
+        setColor("#ascend", value);
+    }
 }
 
-function descend() {
-    setSpeed('altitude', 200);
+function descend(value) {
+    if (!ctrl['ascend']) {
+        ctrl['descend'] = value;
+        setColor("#descend", value);
+    }
 }
 
-function turnRight() {
-    setSpeed('yaw', 50);
+function turnRight(value) {
+    if (!ctrl['turnLeft']) {
+        ctrl['turnRight'] = value;
+        setColor("#turnRight", value);
+    }
 }
 
-function turnLeft() {
-    setSpeed('yaw', 200);
+function turnLeft(value) {
+    if (!ctrl['turnRight']) {
+        ctrl['turnLeft'] = value;
+        setColor("#turnLeft", value);
+    }
 }
 
-function goForward() {
-    setSpeed('pitch', 50);
+function goForward(value) {
+    if (!ctrl['backward']) {
+        ctrl['forward'] = value;
+        setColor("#goForward", value);
+    }
 }
 
-function goBackward() {
-    setSpeed('pitch', 200);
+function goBackward(value) {
+    if (!ctrl['forward']) {
+        ctrl['backward'] = value;
+        setColor("#goBackward", value);
+    }
 }
 
-function goToRight() {
-    setSpeed('roll', 50);
+function goToRight(value) {
+    if (!ctrl['left']) {
+        ctrl['right'] = value;
+        setColor("#goToRight", value);
+    }
 }
 
-function goToLeft() {
-    setSpeed('roll', 200);
+function goToLeft(value) {
+    if (!ctrl['right']) {
+        ctrl['left'] = value;
+        setColor("#goToLeft", value);
+    }
 }
 
 function ping() {
@@ -87,56 +123,115 @@ function stopPing() {
     pingInProgress = false;
 }
 
+function setSpeed(prop, v1, v2) {
+    speed[prop] = ctrl[v1] ? 50 : (ctrl[v2] ? 200 : 0);
+}
+
 function updateSpeed() {
-    console.log("updateSpeed");
-    writeCharacteristic([2, counter++, 2, 0, 2, 0, move-- ? 1:0, speed.roll, speed.pitch, speed.yaw, speed.altitude, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    if (!move) {
-        hover();
+    setSpeed('roll', 'right', 'left');
+    setSpeed('pitch', 'forward', 'backward');
+    setSpeed('yaw', 'turnRight', 'turnLeft');
+    setSpeed('altitude', 'ascend', 'descend');
+    writeCharacteristic([2, counter++, 2, 0, 2, 0, (speed.pitch || speed.roll) ? 1 : 0, speed.roll, speed.pitch, speed.yaw, speed.altitude, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+}
+
+function handleKey(key, value) {
+    console.log(key, value);
+    switch(key)
+    {
+        case 87: //W
+            ascend(value);
+            break;
+        case 65: //A
+            turnLeft(value);
+            break;
+        case 83: //S
+            descend(value);
+            break;
+        case 68: //D
+            turnRight(value);
+            break;
+        case 38: //UPArrow
+            goForward(value);
+            break;
+        case 40: //DOWNArrow
+            goBackward(value);
+            break;
+        case 39: //RIGHTArrow
+            goToRight(value);
+            break;
+        case 37: //LEFTArrow
+            goToLeft(value);
+            break;
+        case 32: //SPACE
+            hover();
+            break;
+        case 13: //ENTER
+            land();
+            break;
+        case 17: //CTRL
+            break;
+        case 16: //SHIFT
+            break;
+        default:
+            console.log(e.keyCode);
+            break;
     }
 }
 
-$(document).ready(function(){
-    window.onkeyup = function(e)
-    {
-        switch(e.keyCode)
-        {
-            case 87: //W
-                ascend();
-                break;
-            case 65: //A
-                turnLeft();
-                break;
-            case 83: //S
-                descend();
-                break;
-            case 68: //D
-                turnRight();
-                break;
-            case 38: //UPArrow
-                goForward();
-                break;
-            case 40: //DOWNArrow
-                goBackward();
-                break;
-            case 39: //RIGHTArrow
-                goToRight();
-                break;
-            case 37: //LEFTArrow
-                goToLeft();
-                break;
-            case 32: //SPACE
-                hover();
-                break;
-            case 13: //ENTER
-                land();
-                break;
-            case 17: //CTRL
-                break;
-            case 16: //SHIFT
-                break;
-            default:
-                console.log(e.keyCode);
-                break;
-        }
+$(document).ready(function() {
+    window.onkeyup = function(e) {
+        handleKey(e.keyCode, 0);
     }
+    window.onkeydown = function(e) {
+        handleKey(e.keyCode, 1);
+    }
+    $("#ascend").mousedown(function() {
+        ascend(1);
+    });
+    $("#ascend").mouseup(function() {
+        ascend(0);
+    });
+    $("#descend").mousedown(function() {
+        descend(1);
+    });
+    $("#descend").mouseup(function() {
+        descend(0);
+    });
+    $("#turnRight").mousedown(function() {
+        turnRight(1);
+    });
+    $("#turnRight").mouseup(function() {
+        turnRight(0);
+    });
+    $("#turnLeft").mousedown(function() {
+        turnLeft(1);
+    });
+    $("#turnLeft").mouseup(function() {
+        turnLeft(0);
+    });
+    $("#goForward").mousedown(function() {
+        goForward(1);
+    });
+    $("#goForward").mouseup(function() {
+        goForward(0);
+    });
+    $("#goBackward").mousedown(function() {
+        goBackward(1);
+    });
+    $("#goBackward").mouseup(function() {
+        goBackward(0);
+    });
+    $("#goToLeft").mousedown(function() {
+        goToLeft(1);
+    });
+    $("#goToLeft").mouseup(function() {
+        goToLeft(0);
+    });
+    $("#goToRight").mousedown(function() {
+        goToRight(1);
+    });
+    $("#goToRight").mouseup(function() {
+        goToRight(0);
+    });
 })
