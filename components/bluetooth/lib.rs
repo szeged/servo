@@ -613,7 +613,7 @@ impl BluetoothManager {
                 return drop(sender.send(Ok(BluetoothResponse::RequestDevice(message))));
             }
         }
-        // TODO: Step 10-11: Implement the permission API.
+        // TODO: Step 10 - 11: Implement the permission API.
         return drop(sender.send(Err(BluetoothError::NotFound)));
         // Step 12: Missing, because it is optional.
     }
