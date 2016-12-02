@@ -278,6 +278,9 @@ impl BluetoothManager {
                 BluetoothRequest::EnableNotification(id, enable, sender) => {
                     self.enable_notification(id, enable, sender)
                 },
+                BluetoothRequest::WatchAdvertisements(id, sender) => {
+                    self.watch_advertisements(id, sender)
+                },
                 BluetoothRequest::Test(data_set_name, sender) => {
                     self.test(data_set_name, sender)
                 }
@@ -606,9 +609,6 @@ impl BluetoothManager {
                 let message = BluetoothDeviceMsg {
                     id: device_id,
                     name: device.get_name().ok(),
-                    appearance: device.get_appearance().ok(),
-                    tx_power: device.get_tx_power().ok().map(|p| p as i8),
-                    rssi: device.get_rssi().ok().map(|p| p as i8),
                 };
                 return drop(sender.send(Ok(BluetoothResponse::RequestDevice(message))));
             }
@@ -1092,5 +1092,12 @@ impl BluetoothManager {
             // (StartNotification) Step 3.
             None => return drop(sender.send(Err(BluetoothError::InvalidState))),
         }
+    }
+
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-watchadvertisements
+    fn watch_advertisements(&mut self, _device_id: String, sender: IpcSender<BluetoothResponseResult>) {
+        // TODO: Implement this when supported in lower level
+        // Step 2.
+        return drop(sender.send(Err(BluetoothError::NotSupported)));
     }
 }
