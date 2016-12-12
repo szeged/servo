@@ -81,16 +81,15 @@ impl BluetoothAdvertisingEvent {
         let rssi = init.rssi.clone();
         let bubbles = EventBubbles::from(init.parent.bubbles);
         let cancelable = EventCancelable::from(init.parent.cancelable);
-        let event = BluetoothAdvertisingEvent::new(global,
-                                                   Atom::from(type_),
-                                                   bubbles,
-                                                   cancelable,
-                                                   device,
-                                                   name,
-                                                   appearance,
-                                                   txPower,
-                                                   rssi);
-        Ok(event)
+        Ok(BluetoothAdvertisingEvent::new(global,
+                                          Atom::from(type_),
+                                          bubbles,
+                                          cancelable,
+                                          device,
+                                          name,
+                                          appearance,
+                                          txPower,
+                                          rssi))
     }
 }
 

@@ -1096,8 +1096,8 @@ impl BluetoothManager {
 
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-watchadvertisements
     fn watch_advertisements(&mut self, _device_id: String, sender: IpcSender<BluetoothResponseResult>) {
-        // TODO: Implement this when supported in lower level
         // Step 2.
+        // TODO: Implement this when supported in lower level
         return drop(sender.send(Err(BluetoothError::NotSupported)));
     }
 }
