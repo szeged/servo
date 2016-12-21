@@ -19,44 +19,13 @@
   <div class="col-md-2"></div>
   <div class="container col-md-8">
 
-    <h2 id="intro">Introduction</h2>
-    <p>Currently we are using HTML pages to manually test the WebBluetooth features, because there is no test API implementation yet.</p>
-    
-    <p><a class="btn btn-default" href="https://docs.google.com/spreadsheets/d/1Nx4bxhBA9S58k6eP7v1AJ0Hxe40vG35_WIXrmG-Enag/pubhtml" target="_blank" role="button">View table &raquo;</a></p>
-    <h2 id="overview-table">Overview</h2>
-    <p>A table with all the testable DOM functions is defined in the specification. <br>
-    Each function name is linked to it’s corresponding test table.</p>
-    <p>Notation:</p>
-    <ul>
-      <li>Green: implemented in Servo</li>
-      <li>Red: not implemented yet</li>
-    </ul>
+    <h2 id="test-api">Test API</h2>
+    <p>We are using <a href="https://github.com/w3c/testharness.js/">test harness</a> tests to validate the WebBluetooth features.</p>
+    <p>Our implementation is based on <a href="https://webbluetoothcg.github.io/web-bluetooth/tests">chrome's test api spec</a>.</p>
+    <p>The servo implementation can be found <a href="https://github.com/servo/servo/blob/master/components/bluetooth/test.rs">here</a>.</p>
+    <p>For the low level simulation we used the <a href="https://crates.io/crates/blurmock">blurmock</a> crate.</p>
 
-    <h2 id="function-table">Functions</h2>
-    <p>Function names are linked to the Web Bluetooth specification.</p>
-    <p>Columns:</p>
-
-    <ol>
-      <li>Step number from the specification.</li>
-      <li>Name of the used HTML test for the step.</li>
-      <li>Values, which we used as arguments for the DOM functions.</li>
-      <li>Expected results (described in spec).</li>
-      <li>What our implementation returns.</li>
-    </ol>
-
-    <p>Notation</p>
-    <ul>
-      <li>Green:  The expected behavior and the result matches for that step.</li>
-      <li>Red: Testable, but not imlemented yet.</li>
-      <li>Blue: Testable, but not working correctly.</li>
-      <li>Yellow: Not testable step.</li>
-    </ul>
-    <h2 id="tests">Tests</h2>
-    <p>For each test case a button is created. By pressing these buttons, a test will run with the corresponding input values. <br>
-
-    <p><a class="btn btn-default" href="tests" role="button">View tests &raquo;</a></p>
-
-    <hr>
+    <p><a class="btn btn-default" href="https://github.com/servo/servo/tree/master/tests/wpt/mozilla/tests/mozilla/bluetooth" target="_blank" role="button">View tests &raquo;</a></p>
 
     <footer>
       <div class="row">
