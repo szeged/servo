@@ -35,6 +35,10 @@ th {
     text-align: center;
 }
 
+.feature {
+    text-align: left;
+}
+
 .license-button-container {
     text-align: right;
 }
