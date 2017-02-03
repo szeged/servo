@@ -32,8 +32,8 @@ interface Bluetooth : EventTarget {
 //  [SecureContext]
 //  readonly attribute BluetoothDevice? referringDevice;
   attribute EventHandler onavailabilitychanged;
-//  [SecureContext]
-//  Promise<boolean> getAvailability();
+  [SecureContext]
+  Promise<boolean> getAvailability();
 //  [SecureContext]
 //  attribute EventHandler onavailabilitychanged;
 //  [SecureContext]

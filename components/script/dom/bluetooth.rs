@@ -454,6 +454,18 @@ impl BluetoothMethods for Bluetooth {
         return p;
     }
 
+    #[allow(unrooted_must_root)]
+    // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-getavailability
+    fn GetAvailability(&self) -> Rc<Promise> {
+        let p = Promise::new(&self.global());
+        // Step 1. We did not override the method
+        // Step 2 - 3. in handle_response
+        let sender = response_async(&p, self);
+        self.get_bluetooth_thread().send(
+            BluetoothRequest::GetAvailability(sender)).unwrap();
+        return p;
+    }
+
     // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-onavailabilitychanged
     event_handler!(availabilitychanged, GetOnavailabilitychanged, SetOnavailabilitychanged);
 }
@@ -477,6 +489,11 @@ impl AsyncBluetoothListener for Bluetooth {
                 // Step 5.
                 promise.resolve_native(promise_cx, &bt_device);
             },
+            // https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-getavailability
+            // Step 2 - 3.
+            BluetoothResponse::GetAvailability(is_available) => {
+                promise.resolve_native(promise_cx, &is_available);
+            }
             _ => promise.reject_error(promise_cx, Error::Type("Something went wrong...".to_owned())),
         }
     }
