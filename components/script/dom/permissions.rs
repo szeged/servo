@@ -102,14 +102,17 @@ impl Permissions {
                         return p;
                     },
                 };
+
                 // (Query, Request) Step 5.
                 let result = BluetoothPermissionResult::new(&self.global(), &status);
 
                 match &op {
                     // (Request) Step 6 - 8.
                     &Operation::Request => Bluetooth::permission_request(cx, &p, &bluetooth_desc, &result),
+
                     // (Query) Step 6 - 7.
                     &Operation::Query => Bluetooth::permission_query(cx, &p, &bluetooth_desc, &result),
+
                     // (Revoke) Step 3 - 4.
                     &Operation::Revoke => Bluetooth::permission_revoke(&bluetooth_desc, &result),
                 }
@@ -119,13 +122,16 @@ impl Permissions {
                     &Operation::Request => {
                         // (Request) Step 6.
                         Permissions::permission_request(cx, &p, &root_desc, &status);
+
                         // (Request) Step 7. The default algorithm always resolve
+
                         // (Request) Step 8.
                         p.resolve_native(cx, &status);
                     },
                     &Operation::Query => {
                         // (Query) Step 6.
                         Permissions::permission_query(cx, &p, &root_desc, &status);
+
                         // (Query) Step 7.
                         p.resolve_native(cx, &status);
                     },
@@ -137,6 +143,7 @@ impl Permissions {
         match op {
             // (Revoke) Step 5.
             Operation::Revoke => self.manipulate(Operation::Query, cx, permissionDesc, Some(p)),
+
             // (Query, Request) Step 4.
             _ => p,
         }
