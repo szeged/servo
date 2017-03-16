@@ -61,8 +61,14 @@ function toggleOnOff() {
         pingInProgress = true;
     } else {
         clearInterval(pingVar);
+        pingVar = 0;
         pingInProgress = false;
     }
+
+    if(pingVar)
+      document.getElementById("onoff").style.background = "linear-gradient(#44aa44, #db0)";
+    else
+      document.getElementById("onoff").style.background = null;
 }
 
 function updateSpeed() {
