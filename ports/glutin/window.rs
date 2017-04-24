@@ -474,6 +474,8 @@ impl Window {
             Event::MouseInput(element_state, mouse_button, pos) => {
                 if mouse_button == MouseButton::Left ||
                    mouse_button == MouseButton::Right {
+                       let mouse_pos = self.mouse_pos.get();
+                       self.handle_mouse(mouse_button, element_state, mouse_pos.x, mouse_pos.y);
                     match pos {
                         Some((x, y)) => {
                             self.mouse_pos.set(Point2D::new(x, y));
@@ -949,6 +951,17 @@ fn create_window_proxy(window: &Window) -> Option<glutin::WindowProxy> {
 }
 
 impl WindowMethods for Window {
+    fn get_window(&self) -> &glutin::Window {
+        match self.kind {
+            WindowKind::Window(ref window) => {
+                return window;
+            }
+            WindowKind::Headless(ref context) => {
+                unreachable!()
+            }
+        }
+    }
+
     fn gl(&self) -> Rc<gl::Gl> {
         self.gl.clone()
     }
