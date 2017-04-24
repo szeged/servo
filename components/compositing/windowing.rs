@@ -17,6 +17,7 @@ use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 use style_traits::cursor::Cursor;
 use webrender_traits::ScrollLocation;
+use glutin;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -175,4 +176,6 @@ pub trait WindowMethods {
     /// will want to avoid blocking on UI events, and just
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState) {}
+
+    fn get_window(&self) -> &glutin::Window;
 }
