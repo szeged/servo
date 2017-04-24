@@ -13,3 +13,7 @@ opt-level = 3
 # Uncomment to profile on Linux:
 # debug = true
 # lto = false
+
+[replace]
+"https://github.com/servo/webrender#0.36.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-8516d6"}
+"https://github.com/servo/webrender#webrender_traits:0.36.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-8516d6"}
