@@ -20,6 +20,7 @@ use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 use style_traits::cursor::Cursor;
 use webrender_traits::ScrollLocation;
+use glutin;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -170,4 +171,6 @@ pub trait WindowMethods {
 
     /// Return the GL function pointer trait.
     fn gl(&self) -> Rc<gl::Gl>;
+
+    fn get_window(&self) -> &glutin::Window;
 }

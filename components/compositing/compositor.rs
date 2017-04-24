@@ -1358,8 +1358,8 @@ impl<Window: WindowMethods> IOCompositor<Window> {
         if modifiers.contains(CONTROL) && state == KeyState::Pressed {
             match key {
                 Key::F12 => {
-                    let profiler_enabled = self.webrender.get_profiler_enabled();
-                    self.webrender.set_profiler_enabled(!profiler_enabled);
+                    // let profiler_enabled = self.webrender.get_profiler_enabled();
+                    // self.webrender.set_profiler_enabled(!profiler_enabled);
                     return;
                 }
                 _ => {}
@@ -1694,7 +1694,7 @@ impl<Window: WindowMethods> IOCompositor<Window> {
     }
 
     pub fn set_webrender_profiler_enabled(&mut self, enabled: bool) {
-        self.webrender.set_profiler_enabled(enabled);
+        //self.webrender.set_profiler_enabled(enabled);
         self.webrender_api.generate_frame(None);
     }
 
