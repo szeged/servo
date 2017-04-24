@@ -137,7 +137,8 @@ fn main() {
         process::exit(0);
     }
 
-    let window = app::create_window(None);
+    //let window = app::create_window(None);
+    let window = app::create_window();
 
     // Our wrapper around `Browser` that also implements some
     // callbacks required by the glutin window implementation.
