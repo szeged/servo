@@ -260,6 +260,38 @@
        </div>
       </div>
 
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+          <h2>How to use Web Bluetooth</h2>
+          <h3>Requirement</h3>
+          <p>
+            First of all you have to install the bluetooth support on your OS. Check out our <a href="setup/">guide</a> how to setup the basic environment.
+          </p>
+          <h3>Building</h3>
+          <p>
+            There is no special build flag or option which is required to build Servo with Web Bluetooth support. All information how to compile <b>Servo</b> can be found at <a href="https://github.com/servo/servo#building">Servo's GitHub</a> page.
+          </p>
+          <h3>Running</h3>
+          <p>
+            The support of Web Bluetooth is behind a <i>pref</i> option. So, in order to use a bluetooth device you should add only one extra parameter to the command line: <code class="text-nowrap">--pref=dom.bluetooth.enabled</code>. For example:
+          </p>
+          <p>
+            <code>./mach run --release --pref=dom.bluetooth.enabled</code>
+          </p>
+          <h3>Testing</h3>
+          <p>
+            If you are about to test the Web Bluetooth implementation in Servo, you can use the Web Platform Tests. For example:
+          </p>
+          <p>
+            <code>./mach test-wpt tests/wpt/mozilla/tests/mozilla/bluetooth/ --pref=dom.bluetooth.enabled --pref=dom.bluetooth.testing.enabled --pref=dom.permissions.enabled</code>
+          </p>
+          <small>
+            Note: you have to enable the bluetooth test device and permissions features as well. Since the WPT testing works on an artificial hardware.
+          </small>
+        </div>
+      </div>
+
       <hr>
       <div class="row">
         <div class="col-md-4">
