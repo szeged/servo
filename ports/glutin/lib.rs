@@ -35,17 +35,17 @@ use window::Window;
 
 pub mod window;
 
-// pub type WindowID = glutin::WindowID;
+pub type WindowID = glutin::WindowID;
 
 pub trait NestedEventLoopListener {
     fn handle_event_from_nested_event_loop(&mut self, event: WindowEvent) -> bool;
 }
 
-pub fn create_window(/*parent: Option<WindowID>*/) -> Rc<Window> {
+pub fn create_window(parent: Option<WindowID>) -> Rc<Window> {
     // Read command-line options.
     let opts = opts::get();
     let foreground = opts.output_file.is_none() && !opts.headless;
 
     // Open a window.
-    Window::new(foreground, opts.initial_window_size/*, parent*/)
+    Window::new(foreground, opts.initial_window_size, parent)
 }
