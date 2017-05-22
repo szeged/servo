@@ -218,8 +218,8 @@ fn window_creation_scale_factor() -> ScaleFactor<f32, DeviceIndependentPixel, De
 
 impl Window {
     pub fn new(is_foreground: bool,
-               window_size: TypedSize2D<u32, DeviceIndependentPixel>/*,
-               parent: Option<glutin::WindowID>*/) -> Rc<Window> {
+               window_size: TypedSize2D<u32, DeviceIndependentPixel>,
+               parent: Option<glutin::WindowID>) -> Rc<Window> {
         let win_size: TypedSize2D<u32, DevicePixel> =
             (window_size.to_f32() * window_creation_scale_factor())
                 .to_uint().cast().expect("Window size should fit in u32");
@@ -242,13 +242,13 @@ impl Window {
                                             .with_dimensions(width, height)
                                             .with_gl(Window::gl_version())
                                             .with_visibility(visible)
-                                            //.with_parent(parent)
+                                            .with_parent(parent)
                                             .with_multitouch();
 
-            /*if let Ok(mut icon_path) = resource_files::resources_dir_path() {
+            if let Ok(mut icon_path) = resource_files::resources_dir_path() {
                 icon_path.push("servo.png");
                 builder = builder.with_icon(icon_path);
-            }*/
+            }
 
             if opts::get().enable_vsync {
                 builder = builder.with_vsync();
@@ -327,7 +327,7 @@ impl Window {
         Rc::new(window)
     }
 
-    /*pub fn platform_window(&self) -> glutin::WindowID {
+    pub fn platform_window(&self) -> glutin::WindowID {
         match self.kind {
             WindowKind::Window(ref window) => {
                 unsafe { glutin::WindowID::new(window.platform_window()) }
@@ -336,7 +336,7 @@ impl Window {
                 unreachable!();
             }
         }
-    }*/
+    }
 
     fn nested_window_resize(width: u32, height: u32) {
         unsafe {
@@ -475,12 +475,12 @@ impl Window {
             Event::Resized(width, height) => {
                 self.event_queue.borrow_mut().push(WindowEvent::Resize(TypedSize2D::new(width, height)));
             }
-            Event::MouseInput(element_state, mouse_button/*, pos*/) => {
+            Event::MouseInput(element_state, mouse_button, pos) => {
                 if mouse_button == MouseButton::Left ||
                    mouse_button == MouseButton::Right {
                        let mouse_pos = self.mouse_pos.get();
                        self.handle_mouse(mouse_button, element_state, mouse_pos.x, mouse_pos.y);
-                    /*match pos {
+                    match pos {
                         Some((x, y)) => {
                             self.mouse_pos.set(Point2D::new(x, y));
                             self.event_queue.borrow_mut().push(
@@ -491,7 +491,7 @@ impl Window {
                             let mouse_pos = self.mouse_pos.get();
                             self.handle_mouse(mouse_button, element_state, mouse_pos.x, mouse_pos.y);
                         }
-                    }*/
+                    }
                 }
             }
             Event::MouseMoved(x, y) => {
@@ -499,17 +499,17 @@ impl Window {
                 self.event_queue.borrow_mut().push(
                     WindowEvent::MouseWindowMoveEventClass(TypedPoint2D::new(x as f32, y as f32)));
             }
-            Event::MouseWheel(delta, phase/*, pos*/) => {
+            Event::MouseWheel(delta, phase, pos) => {
                 let (dx, dy) = match delta {
                     MouseScrollDelta::LineDelta(dx, dy) => (dx, dy * LINE_HEIGHT),
                     MouseScrollDelta::PixelDelta(dx, dy) => (dx, dy),
                 };
                 let scroll_location = ScrollLocation::Delta(TypedPoint2D::new(dx, dy));
-                /*if let Some((x, y)) = pos {
+                if let Some((x, y)) = pos {
                     self.mouse_pos.set(Point2D::new(x, y));
                     self.event_queue.borrow_mut().push(
                         WindowEvent::MouseWindowMoveEventClass(TypedPoint2D::new(x as f32, y as f32)));
-                };*/
+                };
                 let phase = glutin_phase_to_touch_event_type(phase);
                 self.scroll_window(scroll_location, phase);
             },
