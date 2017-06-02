@@ -19,5 +19,5 @@ opt-level = 3
 # crate, add that here. Use the form:
 #
 #     "<crate>:<version>" = { path = "/path/to/local/checkout" }
-"https://github.com/servo/webrender#0.39.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-4ab9b9b"}
-"https://github.com/servo/webrender#webrender_traits:0.39.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-4ab9b9b"}
+"https://github.com/servo/webrender#0.39.0" = { path = '../webrender3/webrender'}
+"https://github.com/servo/webrender#webrender_traits:0.39.0" = { path = '../webrender3/webrender_traits'}
