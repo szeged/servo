@@ -958,6 +958,17 @@ fn create_window_proxy(window: &Window) -> Option<glutin::WindowProxy> {
 }
 
 impl WindowMethods for Window {
+    fn get_window(&self) -> &glutin::Window {
+        match self.kind {
+            WindowKind::Window(ref window) => {
+                return window;
+            }
+            WindowKind::Headless(ref context) => {
+                unreachable!()
+            }
+        }
+    }
+
     fn gl(&self) -> Rc<gl::Gl> {
         self.gl.clone()
     }

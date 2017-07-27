@@ -819,8 +819,8 @@ impl<Window: WindowMethods> IOCompositor<Window> {
             }
 
             WindowEvent::ToggleWebRenderProfiler => {
-                let profiler_enabled = self.webrender.get_profiler_enabled();
-                self.webrender.set_profiler_enabled(!profiler_enabled);
+                //let profiler_enabled = self.webrender.get_profiler_enabled();
+                //self.webrender.set_profiler_enabled(!profiler_enabled);
                 self.webrender_api.generate_frame(None);
             }
         }
