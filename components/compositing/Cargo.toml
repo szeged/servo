@@ -28,3 +28,4 @@ time = "0.1.17"
 webrender = {git = "https://github.com/servo/webrender"}
 webrender_traits = {git = "https://github.com/servo/webrender", features = ["ipc"]}
 servo-glutin = "0.11"
+winit = "0.7.5"

@@ -15,7 +15,7 @@ extern crate compositing;
 
 extern crate euclid;
 extern crate gleam;
-extern crate glutin_app;
+extern crate windowing_app;
 extern crate script_traits;
 extern crate servo_config;
 extern crate servo_geometry;

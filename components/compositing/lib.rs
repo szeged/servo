@@ -24,6 +24,7 @@ extern crate time;
 extern crate webrender;
 extern crate webrender_traits;
 extern crate glutin;
+extern crate winit;
 
 pub use compositor_thread::CompositorProxy;
 pub use compositor::IOCompositor;

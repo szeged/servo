@@ -23,6 +23,8 @@ extern crate servo_geometry;
 extern crate servo_url;
 extern crate style_traits;
 extern crate webrender_traits;
+extern crate webrender;
+extern crate winit;
 
 #[cfg(target_os = "windows")] extern crate winapi;
 #[cfg(target_os = "windows")] extern crate user32;
@@ -31,21 +33,33 @@ extern crate webrender_traits;
 use compositing::windowing::WindowEvent;
 use servo_config::opts;
 use std::rc::Rc;
+#[cfg(not(feature = "dx11"))]
+pub use gl_window as window;
+#[cfg(feature = "dx11")]
+pub use winit_window as window;
 use window::Window;
 
-pub mod window;
-
+#[cfg(not(feature = "dx11"))]
+pub mod gl_window;
+#[cfg(not(feature = "dx11"))]
 pub type WindowID = glutin::WindowID;
+
+#[cfg(feature = "dx11")]
+pub mod winit_window;
+#[cfg(feature = "dx11")]
+pub type WindowID = winit::WindowId;
 
 pub trait NestedEventLoopListener {
     fn handle_event_from_nested_event_loop(&mut self, event: WindowEvent) -> bool;
 }
 
-pub fn create_window(parent: Option<WindowID>) -> Rc<Window> {
+pub fn create_window(parent: Option<WindowID>) -> (Rc<Window>, winit::EventsLoop) {
     // Read command-line options.
     let opts = opts::get();
     let foreground = opts.output_file.is_none() && !opts.headless;
+    let events_loop = winit::EventsLoop::new();
 
     // Open a window.
-    Window::new(foreground, opts.initial_window_size, parent)
+    let window = Window::new(foreground, opts.initial_window_size, parent, &events_loop);
+    (window, events_loop)
 }

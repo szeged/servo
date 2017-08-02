@@ -16,7 +16,7 @@ use window;
 use wrappers::CefWrap;
 
 use compositing::windowing::{WindowNavigateMsg, WindowEvent};
-use glutin_app;
+use windowing_app;
 use libc::c_int;
 use std::cell::{Cell, RefCell};
 use std::ptr;
@@ -29,7 +29,7 @@ thread_local!(pub static BROWSERS: RefCell<Vec<CefBrowser>> = RefCell::new(vec!(
 
 pub enum ServoBrowser {
     Invalid,
-    OnScreen(Browser<glutin_app::window::Window>),
+    OnScreen(Browser<windowing_app::window::Window>),
     OffScreen(Browser<window::Window>),
 }
 
@@ -104,7 +104,7 @@ pub struct ServoCefBrowser {
     /// A reference to the browser client.
     pub client: CefClient,
     /// the glutin window when using windowed rendering
-    pub window: Option<Rc<glutin_app::window::Window>>,
+    pub window: Option<Rc<windowing_app::window::Window>>,
     /// Whether the on-created callback has fired yet.
     pub callback_executed: Cell<bool>,
     /// whether the browser can navigate back
@@ -130,8 +130,8 @@ impl ServoCefBrowser {
         let mut window_handle: cef_window_handle_t = get_null_window_handle();
 
         let (glutin_window, servo_browser) = if window_info.windowless_rendering_enabled == 0 {
-            let parent_window = glutin_app::WindowID::new(window_info.parent_window as *mut _);
-            let glutin_window = glutin_app::create_window(Some(parent_window));
+            let parent_window = windowing_app::WindowID::new(window_info.parent_window as *mut _);
+            let glutin_window = windowing_app::create_window(Some(parent_window));
             let home_url = ServoUrl::parse(PREFS.get("shell.homepage").as_string()
                     .unwrap_or("about:blank")).unwrap();
             let servo_browser = Browser::new(glutin_window.clone(), home_url);

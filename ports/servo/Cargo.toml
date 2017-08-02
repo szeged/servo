@@ -37,7 +37,7 @@ debugmozjs = ["libservo/debugmozjs"]
 [dependencies]
 backtrace = "0.3"
 browserhtml = {git = "https://github.com/browserhtml/browserhtml", branch = "crate"}
-glutin_app = {path = "../../ports/glutin"}
+windowing_app = {path = "../../ports/windowing_app"}
 log = "0.3"
 libservo = {path = "../../components/servo"}
 

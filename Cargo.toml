@@ -19,5 +19,8 @@ opt-level = 3
 # crate, add that here. Use the form:
 #
 #     "<crate>:<version>" = { path = "/path/to/local/checkout" }
-"https://github.com/servo/webrender#0.44.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-29ce31a"}
-"https://github.com/servo/webrender#webrender_traits:0.44.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-29ce31a"}
+#"https://github.com/servo/webrender#0.44.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-29ce31a"}
+#"https://github.com/servo/webrender#webrender_traits:0.44.0" = { git = 'https://github.com/szeged/webrender.git', branch = "gfx-wr-29ce31a"}
+"https://github.com/servo/webrender#0.44.0" = { path = "../webrender/webrender"}
+"https://github.com/servo/webrender#webrender_traits:0.44.0" = { path = "../webrender/webrender_traits"}
+"https://github.com/rust-lang/crates.io-index#winit:0.7.5" = { path ="../winit"}

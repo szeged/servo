@@ -1,12 +1,16 @@
 [package]
-name = "glutin_app"
+name = "windowing_app"
 version = "0.0.1"
 authors = ["The Servo Project Developers"]
 license = "MPL-2.0"
 
 [lib]
-name = "glutin_app"
+name = "windowing_app"
 path = "lib.rs"
+
+[features]
+default = ["dx11"]
+dx11 = ["winit"]
 
 [dependencies]
 bitflags = "0.7"
@@ -22,7 +26,9 @@ servo_geometry = {path = "../../components/geometry"}
 servo_config = {path = "../../components/config"}
 servo_url = {path = "../../components/url"}
 style_traits = {path = "../../components/style_traits"}
+webrender = {git = "https://github.com/servo/webrender"}
 webrender_traits = {git = "https://github.com/servo/webrender", features = ["ipc"]}
+winit = {version = "0.7.5", optional= true}
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 osmesa-sys = "0.1.2"

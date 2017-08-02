@@ -18,6 +18,8 @@ use std::rc::Rc;
 use style_traits::cursor::Cursor;
 use webrender_traits::ScrollLocation;
 use glutin;
+use winit;
+use webrender::WrapperWindow;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -149,7 +151,7 @@ pub trait WindowMethods {
     fn hidpi_factor(&self) -> ScaleFactor<f32, DeviceIndependentPixel, DevicePixel>;
 
     /// Returns a thread-safe object to wake up the window's event loop.
-    fn create_event_loop_waker(&self) -> Box<EventLoopWaker>;
+    fn create_event_loop_waker(&self, events_loop: &winit::EventsLoop) -> Box<EventLoopWaker>;
 
     /// Requests that the window system prepare a composite. Typically this will involve making
     /// some type of platform-specific graphics context current. Returns true if the composite may
@@ -169,7 +171,7 @@ pub trait WindowMethods {
     fn set_favicon(&self, url: ServoUrl);
 
     /// Return the GL function pointer trait.
-    fn gl(&self) -> Rc<gl::Gl>;
+    //fn gl(&self) -> Rc<gl::Gl>;
 
     /// Set whether the application is currently animating.
     /// Typically, when animations are active, the window
@@ -177,5 +179,8 @@ pub trait WindowMethods {
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState) {}
 
-    fn get_window(&self) -> &glutin::Window;
+    fn set_wrapper_window(&self, window: Option<WrapperWindow>);
+
+    //fn get_window(&self) -> Rc<glutin::Window>;
+    fn get_window(&self) -> Rc<winit::Window>;
 }
