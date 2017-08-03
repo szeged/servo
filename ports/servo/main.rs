@@ -143,7 +143,7 @@ fn main() {
         process::exit(0);
     }
 
-    let (window, mut events_loop) = app::create_window(None);
+    let window = app::create_window(None);
 
     // If the url is not provided, we fallback to the homepage in PREFS,
     // or a blank page in case the homepage is not set either.
@@ -158,7 +158,7 @@ fn main() {
     // Our wrapper around `Browser` that also implements some
     // callbacks required by the glutin window implementation.
     let mut browser = BrowserWrapper {
-        browser: Browser::new(window.clone(), target_url, &events_loop)
+        browser: Browser::new(window.clone(), target_url)
     };
 
     browser.browser.setup_logging();
@@ -170,7 +170,7 @@ fn main() {
     // Feed events from the window to the browser until the browser
     // says to stop.
     loop {
-        let should_continue = browser.browser.handle_events(window.wait_events(&mut events_loop));
+        let should_continue = browser.browser.handle_events(window.wait_events());
         if !should_continue {
             break;
         }

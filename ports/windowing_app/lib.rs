@@ -53,13 +53,12 @@ pub trait NestedEventLoopListener {
     fn handle_event_from_nested_event_loop(&mut self, event: WindowEvent) -> bool;
 }
 
-pub fn create_window(parent: Option<WindowID>) -> (Rc<Window>, winit::EventsLoop) {
+pub fn create_window(parent: Option<WindowID>) -> Rc<Window> {
     // Read command-line options.
     let opts = opts::get();
     let foreground = opts.output_file.is_none() && !opts.headless;
-    let events_loop = winit::EventsLoop::new();
 
     // Open a window.
-    let window = Window::new(foreground, opts.initial_window_size, parent, &events_loop);
-    (window, events_loop)
+    let window = Window::new(foreground, opts.initial_window_size, parent);
+    window
 }

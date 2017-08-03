@@ -78,7 +78,7 @@ impl HeadlessContext {
 }
 
 enum WindowKind {
-    Window(Rc<winit::Window>),
+    Window(Rc<winit::Window>, Rc<RefCell<EventsLoop>>),
     Headless(HeadlessContext),
 }
 
@@ -108,8 +108,7 @@ fn window_creation_scale_factor() -> ScaleFactor<f32, DeviceIndependentPixel, De
 impl Window {
     pub fn new(is_foreground: bool,
                window_size: TypedSize2D<u32, DeviceIndependentPixel>,
-               parent: Option<winit::WindowId>,
-               events_loop: &EventsLoop) -> Rc<Window> {
+               _parent: Option<winit::WindowId>) -> Rc<Window> {
         println!("New winit window");
         let win_size: TypedSize2D<u32, DevicePixel> =
             (window_size.to_f32() * window_creation_scale_factor())
@@ -122,6 +121,7 @@ impl Window {
         // unstyled content is white and chrome often has a transparent background). See issue
         // #9996.
         let visible = is_foreground && !opts::get().no_native_titlebar;
+        let events_loop = EventsLoop::new();
 
         let window_kind = if opts::get().headless {
             WindowKind::Headless(HeadlessContext::new(width, height))
@@ -152,12 +152,12 @@ impl Window {
 
             builder = builder_with_platform_options(builder);
 
-            let mut winit_window = builder.build(events_loop).expect("Failed to create window.");
+            let mut winit_window = builder.build(&events_loop).expect("Failed to create window.");
 
             //TODO
             //winit_window.set_window_resize_callback(Some(Window::nested_window_resize as fn(u32, u32)));
 
-            WindowKind::Window(Rc::new(winit_window))
+            WindowKind::Window(Rc::new(winit_window), Rc::new(RefCell::new(events_loop)))
         };
 
         let window = Window {
@@ -182,7 +182,7 @@ impl Window {
 
     pub fn platform_window(&self) -> winit::WindowId {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 window.id()
             }
             WindowKind::Headless(..) => {
@@ -398,9 +398,9 @@ impl Window {
     }
 
     #[cfg(any(target_os = "macos", target_os = "windows"))]
-    fn handle_next_event(&self, events_loop: &mut EventsLoop) -> bool {
+    fn handle_next_event(&self) -> bool {
         match self.kind {
-            WindowKind::Window(..) => {
+            WindowKind::Window(.., ref events_loop) => {
                 /*let event = match window.wait_events().next() {
                     None => {
                         warn!("Window event stream closed.");
@@ -419,7 +419,7 @@ impl Window {
                 }
                 close*/
                 let mut close = false;
-                events_loop.run_forever(|event| {
+                events_loop.borrow_mut().run_forever(|event| {
                     match event {
                         winit::Event::WindowEvent { window_id: _, event }=> {
                             close = self.handle_window_event(event);
@@ -429,7 +429,7 @@ impl Window {
                     ControlFlow::Break
                 });
                 if !close {
-                    events_loop.poll_events(|event| {
+                    events_loop.borrow_mut().poll_events(|event| {
                         if let winit::Event::WindowEvent { window_id: _, event } = event {
                             if self.handle_window_event(event) {
                                 close = true;
@@ -447,7 +447,7 @@ impl Window {
         }
     }
 
-    pub fn wait_events(&self, events_loop: &mut EventsLoop) -> Vec<WindowEvent> {
+    pub fn wait_events(&self) -> Vec<WindowEvent> {
         use std::mem;
 
         let mut events = mem::replace(&mut *self.event_queue.borrow_mut(), Vec::new());
@@ -462,11 +462,11 @@ impl Window {
         // such as mouse click.
         if poll {
             match self.kind {
-                WindowKind::Window(..) => {
+                WindowKind::Window(.., ref events_loop) => {
                     /*while let Some(event) = self.events_loop.poll_events().next() {
                         close_event = self.handle_window_event(event) || close_event;
                     }*/
-                    events_loop.poll_events(|event| {
+                    events_loop.borrow_mut().poll_events(|event| {
                         match event {
                             winit::Event::WindowEvent { window_id: _, event } => {
                                 close_event = self.handle_window_event(event) || close_event;
@@ -479,7 +479,7 @@ impl Window {
                 WindowKind::Headless(..) => {}
             }
         } else {
-            close_event = self.handle_next_event(events_loop);
+            close_event = self.handle_next_event();
         }
 
         if close_event {
@@ -748,10 +748,10 @@ impl Window {
     }
 }
 
-fn create_window_proxy(window: &Window, events_loop: &EventsLoop) -> Option<winit::EventsLoopProxy> {
+fn create_window_proxy(window: &Window) -> Option<winit::EventsLoopProxy> {
     match window.kind {
-        WindowKind::Window(..) => {
-            Some(events_loop.create_proxy())
+        WindowKind::Window(.., ref events_loop) => {
+            Some(events_loop.borrow().create_proxy())
         }
         WindowKind::Headless(..) => {
             None
@@ -766,7 +766,7 @@ impl WindowMethods for Window {
 
     fn get_window(&self) -> Rc<winit::Window> {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 window.clone()
             }
             WindowKind::Headless(..) => {
@@ -777,7 +777,7 @@ impl WindowMethods for Window {
 
     fn framebuffer_size(&self) -> TypedSize2D<u32, DevicePixel> {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 let scale_factor = window.hidpi_factor() as u32;
                 // TODO(ajeffrey): can this fail?
                 let (width, height) = window.get_inner_size().expect("Failed to get window inner size.");
@@ -797,7 +797,7 @@ impl WindowMethods for Window {
 
     fn size(&self) -> TypedSize2D<f32, DeviceIndependentPixel> {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 // TODO(ajeffrey): can this fail?
                 let (width, height) = window.get_inner_size().expect("Failed to get window inner size.");
                 TypedSize2D::new(width as f32, height as f32)
@@ -810,7 +810,7 @@ impl WindowMethods for Window {
 
     fn client_window(&self) -> (Size2D<u32>, Point2D<i32>) {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 // TODO(ajeffrey): can this fail?
                 let (width, height) = window.get_outer_size().expect("Failed to get window outer size.");
                 let size = Size2D::new(width, height);
@@ -833,7 +833,7 @@ impl WindowMethods for Window {
 
     fn set_inner_size(&self, size: Size2D<u32>) {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 window.set_inner_size(size.width as u32, size.height as u32)
             }
             WindowKind::Headless(..) => {}
@@ -842,7 +842,7 @@ impl WindowMethods for Window {
 
     fn set_position(&self, point: Point2D<i32>) {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 window.set_position(point.x, point.y)
             }
             WindowKind::Headless(..) => {}
@@ -871,7 +871,7 @@ impl WindowMethods for Window {
         }
     }
 
-    fn create_event_loop_waker(&self, events_loop: &winit::EventsLoop) -> Box<EventLoopWaker> {
+    fn create_event_loop_waker(&self) -> Box<EventLoopWaker> {
         struct WinitEventLoopWaker {
             window_proxy: Option<winit::EventsLoopProxy>,
         }
@@ -888,7 +888,7 @@ impl WindowMethods for Window {
                 }
             }
         }
-        let window_proxy = create_window_proxy(self, events_loop);
+        let window_proxy = create_window_proxy(self);
         box WinitEventLoopWaker {
             window_proxy: window_proxy,
         }
@@ -897,7 +897,7 @@ impl WindowMethods for Window {
     #[cfg(not(target_os = "windows"))]
     fn hidpi_factor(&self) -> ScaleFactor<f32, DeviceIndependentPixel, DevicePixel> {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 ScaleFactor::new(window.hidpi_factor())
             }
             WindowKind::Headless(..) => {
@@ -915,7 +915,7 @@ impl WindowMethods for Window {
 
     fn set_page_title(&self, title: Option<String>) {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 let fallback_title: String = if let Some(ref current_url) = *self.current_url.borrow() {
                     current_url.to_string()
                 } else {
@@ -942,7 +942,7 @@ impl WindowMethods for Window {
     fn load_end(&self) {
         if opts::get().no_native_titlebar {
             match self.kind {
-                WindowKind::Window(ref window) => {
+                WindowKind::Window(ref window, ..) => {
                     window.show();
                 }
                 WindowKind::Headless(..) => {}
@@ -963,7 +963,7 @@ impl WindowMethods for Window {
     /// Has no effect on Android.
     fn set_cursor(&self, c: Cursor) {
         match self.kind {
-            WindowKind::Window(ref window) => {
+            WindowKind::Window(ref window, ..) => {
                 use winit::MouseCursor;
 
                 let winit_cursor = match c {

@@ -151,7 +151,7 @@ pub trait WindowMethods {
     fn hidpi_factor(&self) -> ScaleFactor<f32, DeviceIndependentPixel, DevicePixel>;
 
     /// Returns a thread-safe object to wake up the window's event loop.
-    fn create_event_loop_waker(&self, events_loop: &winit::EventsLoop) -> Box<EventLoopWaker>;
+    fn create_event_loop_waker(&self) -> Box<EventLoopWaker>;
 
     /// Requests that the window system prepare a composite. Typically this will involve making
     /// some type of platform-specific graphics context current. Returns true if the composite may

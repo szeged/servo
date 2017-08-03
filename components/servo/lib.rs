@@ -123,7 +123,7 @@ pub struct Browser<Window: WindowMethods + 'static> {
 }
 
 impl<Window> Browser<Window> where Window: WindowMethods + 'static {
-    pub fn new(window: Rc<Window>, target_url: ServoUrl, event_loop: &winit::EventsLoop) -> Browser<Window> {
+    pub fn new(window: Rc<Window>, target_url: ServoUrl) -> Browser<Window> {
         // Global configuration options, parsed from the command line.
         let opts = opts::get();
 
@@ -135,7 +135,7 @@ impl<Window> Browser<Window> where Window: WindowMethods + 'static {
         // messages to client may need to pump a platform-specific event loop
         // to deliver the message.
         let (compositor_proxy, compositor_receiver) =
-            create_compositor_channel(window.create_event_loop_waker(event_loop));
+            create_compositor_channel(window.create_event_loop_waker());
         let supports_clipboard = window.supports_clipboard();
         let time_profiler_chan = profile_time::Profiler::create(&opts.time_profiling,
                                                                 opts.time_profiler_trace_path.clone());
