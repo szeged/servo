@@ -19,6 +19,7 @@ use std::rc::Rc;
 use style_traits::DevicePixel;
 use style_traits::cursor::Cursor;
 use webrender_api::{DeviceUintSize, DeviceUintRect, ScrollLocation};
+use glutin;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -182,6 +183,8 @@ pub trait WindowMethods {
 
     /// Return the GL function pointer trait.
     fn gl(&self) -> Rc<gl::Gl>;
+
+    fn get_window(&self) -> Rc<glutin::Window>;
 
     /// Set whether the application is currently animating.
     /// Typically, when animations are active, the window
