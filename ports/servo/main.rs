@@ -21,7 +21,7 @@
 extern crate android_injected_glue;
 extern crate backtrace;
 // The window backed by glutin
-extern crate glutin_app as app;
+extern crate winit_app as app;
 #[macro_use]
 extern crate log;
 // The Servo engine

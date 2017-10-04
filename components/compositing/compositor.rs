@@ -8,7 +8,7 @@ use compositor_thread::{CompositorProxy, CompositorReceiver};
 use compositor_thread::{InitialCompositorState, Msg};
 use euclid::{TypedPoint2D, TypedVector2D, ScaleFactor};
 use gfx_traits::Epoch;
-use gleam::gl;
+//use gleam::gl;
 use image::{DynamicImage, ImageFormat, RgbImage};
 use ipc_channel::ipc::{self, IpcSharedMemory};
 use libc::c_void;
@@ -184,8 +184,8 @@ pub struct IOCompositor<Window: WindowMethods> {
     /// The webrender interface, if enabled.
     webrender_api: webrender_api::RenderApi,
 
-    /// GL functions interface (may be GL or GLES)
-    gl: Rc<gl::Gl>,
+    // GL functions interface (may be GL or GLES)
+    //gl: Rc<gl::Gl>,
 
     /// Map of the pending paint metrics per layout thread.
     /// The layout thread for each specific pipeline expects the compositor to
@@ -260,9 +260,12 @@ enum CompositeTarget {
 }
 
 struct RenderTargetInfo {
-    framebuffer_ids: Vec<gl::GLuint>,
+    /*framebuffer_ids: Vec<gl::GLuint>,
     renderbuffer_ids: Vec<gl::GLuint>,
-    texture_ids: Vec<gl::GLuint>,
+    texture_ids: Vec<gl::GLuint>,*/
+    framebuffer_ids: Vec<u32>,
+    renderbuffer_ids: Vec<u32>,
+    texture_ids: Vec<u32>,
 }
 
 impl RenderTargetInfo {
@@ -275,7 +278,7 @@ impl RenderTargetInfo {
     }
 }
 
-fn initialize_png(gl: &gl::Gl, width: usize, height: usize) -> RenderTargetInfo {
+/*fn initialize_png(gl: &gl::Gl, width: usize, height: usize) -> RenderTargetInfo {
     let framebuffer_ids = gl.gen_framebuffers(1);
     gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer_ids[0]);
 
@@ -309,7 +312,7 @@ fn initialize_png(gl: &gl::Gl, width: usize, height: usize) -> RenderTargetInfo 
         renderbuffer_ids: renderbuffer_ids,
         texture_ids: texture_ids,
     }
-}
+}*/
 
 #[derive(Clone)]
 pub struct RenderNotifier {
@@ -350,7 +353,7 @@ impl<Window: WindowMethods> IOCompositor<Window> {
         };
 
         IOCompositor {
-            gl: window.gl(),
+            //gl: window.gl(),
             window: window,
             port: state.receiver,
             root_pipeline: None,
@@ -1293,10 +1296,10 @@ impl<Window: WindowMethods> IOCompositor<Window> {
             }
         }
 
-        let render_target_info = match target {
+        let render_target_info = RenderTargetInfo::empty();/*match target {
             CompositeTarget::Window => RenderTargetInfo::empty(),
             _ => initialize_png(&*self.gl, width, height)
-        };
+        };*/
 
         profile(ProfilerCategory::Compositing, None, self.time_profiler_chan.clone(), || {
             debug!("compositor: compositing");
@@ -1391,16 +1394,17 @@ impl<Window: WindowMethods> IOCompositor<Window> {
                 width: usize,
                 height: usize)
                 -> RgbImage {
-        let mut pixels = self.gl.read_pixels(0, 0,
+        /*let mut pixels = self.gl.read_pixels(0, 0,
                                              width as gl::GLsizei,
                                              height as gl::GLsizei,
-                                             gl::RGB, gl::UNSIGNED_BYTE);
+                                             gl::RGB, gl::UNSIGNED_BYTE);*/
+        let mut pixels = vec![1; width * height * 3];
 
-        self.gl.bind_framebuffer(gl::FRAMEBUFFER, 0);
+        /*self.gl.bind_framebuffer(gl::FRAMEBUFFER, 0);
 
         self.gl.delete_buffers(&render_target_info.texture_ids);
         self.gl.delete_renderbuffers(&render_target_info.renderbuffer_ids);
-        self.gl.delete_framebuffers(&render_target_info.framebuffer_ids);
+        self.gl.delete_framebuffers(&render_target_info.framebuffer_ids);*/
 
         // flip image vertically (texture is upside down)
         let orig_pixels = pixels.clone();

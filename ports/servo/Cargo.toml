@@ -42,7 +42,7 @@ unstable = ["libservo/unstable", "profile_tests/unstable"]
 [dependencies]
 backtrace = "0.3"
 browserhtml = {git = "https://github.com/browserhtml/browserhtml", branch = "crate"}
-glutin_app = {path = "../../ports/glutin"}
+winit_app = {path = "../../ports/glutin"}
 log = "0.3"
 libservo = {path = "../../components/servo"}
 

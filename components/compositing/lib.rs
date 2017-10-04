@@ -6,7 +6,7 @@
 
 extern crate euclid;
 extern crate gfx_traits;
-extern crate gleam;
+//extern crate gleam;
 extern crate image;
 extern crate ipc_channel;
 extern crate libc;
@@ -24,7 +24,8 @@ extern crate style_traits;
 extern crate time;
 extern crate webrender;
 extern crate webrender_api;
-extern crate glutin;
+//extern crate glutin;
+extern crate winit;
 
 pub use compositor_thread::CompositorProxy;
 pub use compositor::IOCompositor;

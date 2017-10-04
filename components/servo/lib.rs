@@ -53,6 +53,7 @@ pub extern crate style_traits;
 pub extern crate webrender_api;
 pub extern crate webvr;
 pub extern crate webvr_traits;
+pub extern crate winit;
 
 #[cfg(feature = "webdriver")]
 extern crate webdriver_server;
@@ -154,8 +155,8 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
             devtools::start_server(port)
         });
 
-        let mut resource_path = resources_dir_path().unwrap();
-        resource_path.push("shaders");
+        /*let mut resource_path = resources_dir_path().unwrap();
+        resource_path.push("shaders");*/
 
         let (mut webrender, webrender_api_sender) = {
             // TODO(gw): Duplicates device_pixels_per_screen_px from compositor. Tidy up!
@@ -168,7 +169,7 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                 }
             };
 
-            let renderer_kind = if opts::get().should_use_osmesa() {
+            /*let renderer_kind = if opts::get().should_use_osmesa() {
                 RendererKind::OSMesa
             } else {
                 RendererKind::Native
@@ -183,12 +184,12 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
             };
 
             let mut debug_flags = webrender::DebugFlags::empty();
-            debug_flags.set(webrender::DebugFlags::PROFILER_DBG, opts.webrender_stats);
-            let render_notifier = Box::new(RenderNotifier::new(compositor_proxy.clone()));
+            debug_flags.set(webrender::DebugFlags::PROFILER_DBG, opts.webrender_stats);*/
 
+            let render_notifier = Box::new(RenderNotifier::new(compositor_proxy.clone()));
             webrender::Renderer::new(render_notifier, webrender::RendererOptions {
                 device_pixel_ratio: device_pixel_ratio,
-                resource_override_path: Some(resource_path),
+                /*resource_override_path: Some(resource_path),
                 enable_aa: opts.enable_text_antialiasing,
                 debug_flags: debug_flags,
                 enable_batcher: opts.webrender_batch,
@@ -197,7 +198,7 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                 precache_shaders: opts.precache_shaders,
                 enable_scrollbars: opts.output_file.is_none(),
                 renderer_kind: renderer_kind,
-                enable_subpixel_aa: opts.enable_subpixel_text_antialiasing,
+                enable_subpixel_aa: opts.enable_subpixel_text_antialiasing,*/
                 ..Default::default()
             }, device, factory, main_color, main_depth).expect("Unable to initialize webrender!")
         };
@@ -554,7 +555,6 @@ fn create_constellation(user_agent: Cow<'static, str>,
     };*/
 
     let gl_factory = GLContextFactory::new_headless_context(&compositor_proxy);
-
     // Initialize WebGL Thread entry point.
     let (webgl_threads, image_handler, output_handler) = WebGLThreads::new(gl_factory,
                                                                            window_gl,
