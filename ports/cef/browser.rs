@@ -17,7 +17,7 @@ use window;
 use wrappers::CefWrap;
 
 use compositing::windowing::WindowEvent;
-use glutin_app;
+use winit_app;
 use libc::c_int;
 use std::cell::{Cell, RefCell};
 use std::ptr;
@@ -30,7 +30,7 @@ thread_local!(pub static BROWSERS: RefCell<Vec<CefBrowser>> = RefCell::new(vec!(
 
 pub enum ServoBrowser {
     Invalid,
-    OnScreen(Servo<glutin_app::window::Window>, BrowserId),
+    OnScreen(Servo<winit_app::window::Window>, BrowserId),
     OffScreen(Servo<window::Window>, BrowserId),
 }
 
@@ -105,7 +105,7 @@ pub struct ServoCefBrowser {
     /// A reference to the browser client.
     pub client: CefClient,
     /// the glutin window when using windowed rendering
-    pub window: Option<Rc<glutin_app::window::Window>>,
+    pub window: Option<Rc<winit_app::window::Window>>,
     /// Whether the on-created callback has fired yet.
     pub callback_executed: Cell<bool>,
     /// whether the browser can navigate back
@@ -130,16 +130,16 @@ impl ServoCefBrowser {
         let host = ServoCefBrowserHost::new(client.clone()).as_cef_interface();
         let mut window_handle: cef_window_handle_t = get_null_window_handle();
 
-        let (glutin_window, servo_browser) = if window_info.windowless_rendering_enabled == 0 {
-            let parent_window = glutin_app::WindowID::new(window_info.parent_window as *mut _);
-            let glutin_window = glutin_app::create_window(Some(parent_window));
-            let mut servo_browser = Servo::new(glutin_window.clone());
+        let (dxgi_window, servo_browser) = if window_info.windowless_rendering_enabled == 0 {
+            let parent_window = winit_app::WindowID::new(window_info.parent_window as *mut _);
+            let dxgi_window = winit_app::create_window(Some(parent_window));
+            let mut servo_browser = Servo::new(dxgi_window.clone());
             let (sender, receiver) = ipc::channel().unwrap();
             servo_browser.handle_events(vec![WindowEvent::NewBrowser(target_url, sender)]);
             let browser_id = receiver.recv().unwrap();
             servo_browser.handle_events(vec![WindowEvent::SelectBrowser(browser_id)]);
-            window_handle = glutin_window.platform_window().window as cef_window_handle_t;
-            (Some(glutin_window), ServoBrowser::OnScreen(servo_browser, browser_id))
+            window_handle = dxgi_window.platform_window().window as cef_window_handle_t;
+            (Some(dxgi_window), ServoBrowser::OnScreen(servo_browser, browser_id))
         } else {
             (None, ServoBrowser::Invalid)
         };
@@ -152,7 +152,7 @@ impl ServoCefBrowser {
             frame: frame,
             host: host,
             client: client,
-            window: glutin_window,
+            window: dxgi_window,
             callback_executed: Cell::new(false),
             servo_browser: RefCell::new(servo_browser),
             message_queue: RefCell::new(vec!()),
