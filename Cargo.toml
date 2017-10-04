@@ -24,3 +24,4 @@ opt-level = 3
 [replace]
 "https://github.com/servo/webrender#0.50.0" = { path = '../webrender/webrender' }
 "https://github.com/servo/webrender#webrender_api:0.50.0" = { path = '../webrender/webrender_api' }
+"https://github.com/rust-lang/crates.io-index#winit:0.7.6" = { path ="../winit"}

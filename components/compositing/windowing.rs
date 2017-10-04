@@ -7,7 +7,7 @@
 use compositor_thread::EventLoopWaker;
 use euclid::{Point2D, Size2D};
 use euclid::{ScaleFactor, TypedPoint2D, TypedSize2D};
-use gleam::gl;
+//use gleam::gl;
 use ipc_channel::ipc::IpcSender;
 use msg::constellation_msg::{Key, KeyModifiers, KeyState, TopLevelBrowsingContextId, TraversalDirection};
 use net_traits::net_error_list::NetError;
@@ -19,7 +19,9 @@ use std::rc::Rc;
 use style_traits::DevicePixel;
 use style_traits::cursor::Cursor;
 use webrender_api::{DeviceUintSize, DeviceUintRect, ScrollLocation};
-use glutin;
+//use glutin;
+use winit;
+use webrender::ResultWindow;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -181,14 +183,16 @@ pub trait WindowMethods {
     /// Add a favicon
     fn set_favicon(&self, ctx: TopLevelBrowsingContextId, url: ServoUrl);
 
-    /// Return the GL function pointer trait.
-    fn gl(&self) -> Rc<gl::Gl>;
+    // Return the GL function pointer trait.
+    //fn gl(&self) -> Rc<gl::Gl>;
 
-    fn get_window(&self) -> Rc<glutin::Window>;
+    fn get_window(&self) -> Rc<winit::Window>;
 
     /// Set whether the application is currently animating.
     /// Typically, when animations are active, the window
     /// will want to avoid blocking on UI events, and just
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState) {}
+
+    fn set_dxgi_window(&self, window: Option<ResultWindow>);
 }

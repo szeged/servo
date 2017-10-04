@@ -53,6 +53,7 @@ pub extern crate style_traits;
 pub extern crate webrender_api;
 pub extern crate webvr;
 pub extern crate webvr_traits;
+pub extern crate winit;
 
 #[cfg(feature = "webdriver")]
 extern crate webdriver_server;
@@ -154,10 +155,10 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
             devtools::start_server(port)
         });
 
-        let mut resource_path = resources_dir_path().unwrap();
-        resource_path.push("shaders");
+        /*let mut resource_path = resources_dir_path().unwrap();
+        resource_path.push("shaders");*/
 
-        let (mut webrender, webrender_api_sender, _) = {
+        let (mut webrender, webrender_api_sender, dxgi_window) = {
             // TODO(gw): Duplicates device_pixels_per_screen_px from compositor. Tidy up!
             let scale_factor = window.hidpi_factor().get();
             let device_pixel_ratio = match opts.device_pixels_per_px {
@@ -168,7 +169,7 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                 }
             };
 
-            let renderer_kind = if opts::get().should_use_osmesa() {
+            /*let renderer_kind = if opts::get().should_use_osmesa() {
                 RendererKind::OSMesa
             } else {
                 RendererKind::Native
@@ -183,11 +184,11 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
             };
 
             let mut debug_flags = webrender::DebugFlags::empty();
-            debug_flags.set(webrender::PROFILER_DBG, opts.webrender_stats);
+            debug_flags.set(webrender::PROFILER_DBG, opts.webrender_stats);*/
 
             webrender::Renderer::new(window.get_window(), webrender::RendererOptions {
                 device_pixel_ratio: device_pixel_ratio,
-                resource_override_path: Some(resource_path),
+                /*resource_override_path: Some(resource_path),
                 enable_aa: opts.enable_text_antialiasing,
                 debug_flags: debug_flags,
                 enable_batcher: opts.webrender_batch,
@@ -196,13 +197,14 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                 precache_shaders: opts.precache_shaders,
                 enable_scrollbars: opts.output_file.is_none(),
                 renderer_kind: renderer_kind,
-                enable_subpixel_aa: opts.enable_subpixel_text_antialiasing,
+                enable_subpixel_aa: opts.enable_subpixel_text_antialiasing,*/
                 ..Default::default()
             }).expect("Unable to initialize webrender!")
         };
 
         let webrender_api = webrender_api_sender.create_api();
         let webrender_document = webrender_api.add_document(window.framebuffer_size());
+        window.set_dxgi_window(Some(dxgi_window));
 
         // Important that this call is done in a single-threaded fashion, we
         // can't defer it after `create_constellation` has started.
@@ -544,11 +546,12 @@ fn create_constellation(user_agent: Cow<'static, str>,
     };
 
     // GLContext factory used to create WebGL Contexts
-    let gl_factory = if opts::get().should_use_osmesa() {
+    /*let gl_factory = if opts::get().should_use_osmesa() {
         GLContextFactory::current_osmesa_handle().unwrap()
     } else {
         GLContextFactory::current_native_handle(&compositor_proxy).unwrap()
-    };
+    };*/
+    let gl_factory = GLContextFactory::current_osmesa_handle().unwrap();
 
     // Initialize WebGL Thread entry point.
     let (webgl_threads, image_handler) = WebGLThreads::new(gl_factory,

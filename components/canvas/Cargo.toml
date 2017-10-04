@@ -21,5 +21,5 @@ ipc-channel = "0.8"
 log = "0.3.5"
 num-traits = "0.1.32"
 offscreen_gl_context = { version = "0.11", features = ["serde", "osmesa"] }
-webrender = {git = "https://github.com/servo/webrender"}
+webrender = {git = "https://github.com/servo/webrender", features = ["dx11"]}
 webrender_api = {git = "https://github.com/servo/webrender", features = ["ipc"]}
