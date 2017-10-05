@@ -551,7 +551,8 @@ fn create_constellation(user_agent: Cow<'static, str>,
     } else {
         GLContextFactory::current_native_handle(&compositor_proxy).unwrap()
     };*/
-    let gl_factory = GLContextFactory::current_osmesa_handle().unwrap();
+
+    let gl_factory = GLContextFactory::new_headless_context(&compositor_proxy);
 
     // Initialize WebGL Thread entry point.
     let (webgl_threads, image_handler) = WebGLThreads::new(gl_factory,
