@@ -547,11 +547,13 @@ fn create_constellation(user_agent: Cow<'static, str>,
     };
 
     // GLContext factory used to create WebGL Contexts
-    let gl_factory = if opts::get().should_use_osmesa() {
+    /*let gl_factory = if opts::get().should_use_osmesa() {
         GLContextFactory::current_osmesa_handle().unwrap()
     } else {
         GLContextFactory::current_native_handle(&compositor_proxy).unwrap()
-    };
+    };*/
+
+    let gl_factory = GLContextFactory::new_headless_context(&compositor_proxy);
 
     // Initialize WebGL Thread entry point.
     let (webgl_threads, image_handler, output_handler) = WebGLThreads::new(gl_factory,

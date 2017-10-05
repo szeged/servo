@@ -108,6 +108,10 @@ impl GLContextFactory {
             WebGLVersion::WebGL1 => GLVersion::Major(2),
             WebGLVersion::WebGL2 => GLVersion::Major(3),
         }
+
+    pub fn new_headless_context(proxy: &CompositorProxy) -> GLContextFactory {
+        let headless_ctx = NativeGLContext::create_shared(None);
+        GLContextFactory::Native(headless_ctx.unwrap().handle(), Some(MainThreadDispatcher::new(proxy.clone())))
     }
 }
 
