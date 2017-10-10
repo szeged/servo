@@ -43,6 +43,7 @@ use std::collections::VecDeque;
 use std::os::raw::c_void;
 use std::ptr;
 use std::rc::Rc;
+use std::sync::Arc;
 use style_traits::DevicePixel;
 use style_traits::cursor::Cursor;
 #[cfg(target_os = "windows")]
@@ -209,7 +210,6 @@ pub struct Window {
     pressed_key_map: RefCell<Vec<(ScanCode, char)>>,*/
 
     animation_state: Cell<AnimationState>,
-    polled_winit_events: RefCell<VecDeque<winit::Event>>,
 
     //gl: Rc<gl::Gl>,
 }
@@ -341,7 +341,6 @@ impl Window {
             last_pressed_key: Cell::new(None),
             //gl: gl.clone(),
             animation_state: Cell::new(AnimationState::Idle),
-            polled_winit_events: RefCell::new(VecDeque::new()),
         };
 
         //NOTE: until dxgi_window is uninitialized we draw nothing
@@ -623,12 +622,8 @@ impl Window {
                 if !close {
                     events_loop.borrow_mut().poll_events(|event| {
                         if let winit::Event::WindowEvent { window_id: _, event } = event {
-                            if self.handle_window_event(event) {
-                                close = true;
-                                return ControlFlow::Break;
-                            }
+                            close = self.handle_window_event(event) || close;
                         }
-                        ControlFlow::Continue
                     });
                 }
                 close
@@ -659,9 +654,8 @@ impl Window {
                         match event {
                             winit::Event::WindowEvent { window_id: _, event } => {
                                 close_event = self.handle_window_event(event) || close_event;
-                                return  ControlFlow::Continue;
                             },
-                            _ => ControlFlow::Continue,
+                            _ => (),
                         }
                     });
                 }
@@ -939,10 +933,10 @@ impl Window {
     }
 }
 
-fn create_window_proxy(window: &Window) -> Option<winit::EventsLoopProxy> {
+fn create_window_proxy(window: &Window) -> Option<Arc<winit::EventsLoopProxy>> {
     match window.kind {
         WindowKind::Window(_, ref events_loop) => {
-            Some(events_loop.borrow().create_proxy())
+            Some(Arc::new(events_loop.borrow().create_proxy()))
         }
         WindowKind::Headless(..) => {
             None
@@ -1066,7 +1060,7 @@ impl WindowMethods for Window {
 
     fn create_event_loop_waker(&self) -> Box<EventLoopWaker> {
         struct WinitEventLoopWaker {
-            window_proxy: Option<winit::EventsLoopProxy>,
+            window_proxy: Option<Arc<winit::EventsLoopProxy>>,
         }
         impl EventLoopWaker for WinitEventLoopWaker {
             fn wake(&self) {
