@@ -22,6 +22,6 @@ opt-level = 3
 #webrender = { path = '../webrender/webrender'}
 #webrender_api = { path = '../webrender/webrender_api'}
 [replace]
-"https://github.com/servo/webrender#0.50.0" = { path = '../webrender/webrender' }
-"https://github.com/servo/webrender#webrender_api:0.50.0" = { path = '../webrender/webrender_api' }
-"https://github.com/rust-lang/crates.io-index#winit:0.7.6" = { path ="../winit"}
+"https://github.com/servo/webrender#0.50.0" = { git = 'https://github.com/szeged/webrender', branch='refactor_44_to_50' }
+"https://github.com/servo/webrender#webrender_api:0.50.0" = { git = 'https://github.com/szeged/webrender', branch='refactor_44_to_50' }
+"https://github.com/rust-lang/crates.io-index#winit:0.7.6" = { git = 'https://github.com/zakorgy/winit', branch='dx11'}
