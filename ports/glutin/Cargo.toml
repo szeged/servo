@@ -24,6 +24,7 @@ servo_config = {path = "../../components/config"}
 servo_url = {path = "../../components/url"}
 style_traits = {path = "../../components/style_traits"}
 webrender_api = {git = "https://github.com/servo/webrender", features = ["ipc"]}
+webrender = {git = "https://github.com/servo/webrender"}
 
 [target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
 osmesa-sys = "0.1.2"

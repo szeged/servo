@@ -22,6 +22,7 @@ extern crate servo_geometry;
 extern crate servo_url;
 extern crate style_traits;
 extern crate webrender_api;
+extern crate webrender;
 
 #[cfg(target_os = "windows")] extern crate winapi;
 #[cfg(target_os = "windows")] extern crate user32;
@@ -31,6 +32,7 @@ use compositing::windowing::WindowEvent;
 use servo_config::opts;
 use std::rc::Rc;
 use window::Window;
+use webrender::{BackendDevice, Factory, RTV, DSV};
 
 pub mod window;
 
@@ -40,7 +42,7 @@ pub trait NestedEventLoopListener {
     fn handle_event_from_nested_event_loop(&mut self, event: WindowEvent) -> bool;
 }
 
-pub fn create_window(parent: Option<WindowID>) -> Rc<Window> {
+pub fn create_window(parent: Option<WindowID>) -> (Rc<Window>, BackendDevice, Factory, RTV, DSV) {
     // Read command-line options.
     let opts = opts::get();
     let foreground = opts.output_file.is_none() && !opts.headless;

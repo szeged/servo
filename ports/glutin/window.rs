@@ -45,6 +45,7 @@ use style_traits::DevicePixel;
 use style_traits::cursor::Cursor;
 #[cfg(target_os = "windows")]
 use user32;
+use webrender::{BackendDevice, Factory, RTV, DSV, create_rgba8_window};
 use webrender_api::{DeviceUintRect, DeviceUintSize, ScrollLocation};
 #[cfg(target_os = "windows")]
 use winapi;
@@ -229,7 +230,7 @@ impl Window {
 
     pub fn new(is_foreground: bool,
                window_size: TypedSize2D<u32, DeviceIndependentPixel>,
-               parent: Option<glutin::WindowID>) -> Rc<Window> {
+               parent: Option<glutin::WindowID>) -> (Rc<Window>, BackendDevice, Factory, RTV, DSV) {
         let win_size: TypedSize2D<u32, DevicePixel> =
             (window_size.to_f32() * window_creation_scale_factor())
                 .to_usize().cast().expect("Window size should fit in u32");
@@ -242,9 +243,9 @@ impl Window {
         // #9996.
         let visible = is_foreground && !opts::get().no_native_titlebar;
 
-        let window_kind = if opts::get().headless {
+        /*let window_kind = if opts::get().headless {
             WindowKind::Headless(HeadlessContext::new(width, height))
-        } else {
+        } else {*/
             let mut builder =
                 glutin::WindowBuilder::new().with_title("Servo".to_string())
                                             .with_decorations(!opts::get().no_native_titlebar)
@@ -275,9 +276,9 @@ impl Window {
             unsafe { glutin_window.make_current().expect("Failed to make context current!") }
 
             glutin_window.set_window_resize_callback(Some(Window::nested_window_resize as fn(u32, u32)));
-
-            WindowKind::Window(Rc::new(glutin_window))
-        };
+            let (window, device, factory, main_color, main_depth) = create_rgba8_window(glutin_window);
+            let window_kind = WindowKind::Window(Rc::new(window));
+        //};
 
         let gl = match window_kind {
             WindowKind::Window(ref window) => {
@@ -337,7 +338,7 @@ impl Window {
 
         window.present();
 
-        Rc::new(window)
+        (Rc::new(window), device, factory, main_color, main_depth)
     }
 
     pub fn platform_window(&self) -> glutin::WindowID {
