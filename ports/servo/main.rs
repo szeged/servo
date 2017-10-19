@@ -144,7 +144,7 @@ fn main() {
         process::exit(0);
     }
 
-    let (window, device, factory, main_color, main_depth) = app::create_window(None);
+    let (window, device_init_params) = app::create_window(None);
 
     // If the url is not provided, we fallback to the homepage in PREFS,
     // or a blank page in case the homepage is not set either.
@@ -159,7 +159,7 @@ fn main() {
     // Our wrapper around `ServoWrapper` that also implements some
     // callbacks required by the glutin window implementation.
     let mut servo_wrapper = ServoWrapper {
-        servo: Servo::new(window.clone(), device, factory, main_color, main_depth)
+        servo: Servo::new(window.clone(), device_init_params)
     };
 
     let (sender, receiver) = ipc::channel().unwrap();

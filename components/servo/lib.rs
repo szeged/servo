@@ -102,7 +102,7 @@ use std::cmp::max;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::mpsc::{Sender, channel};
-use webrender::{BackendDevice, Factory, RendererKind, RTV, DSV};
+use webrender::{DeviceInitParams, RendererKind};
 use webvr::{WebVRThread, WebVRCompositorHandler};
 
 pub use gleam::gl;
@@ -128,7 +128,7 @@ pub struct Servo<Window: WindowMethods + 'static> {
 }
 
 impl<Window> Servo<Window> where Window: WindowMethods + 'static {
-    pub fn new(window: Rc<Window>, device: BackendDevice, factory:  Factory, main_color: RTV, main_depth: DSV) -> Servo<Window> {
+    pub fn new(window: Rc<Window>, params: DeviceInitParams) -> Servo<Window> {
         // Global configuration options, parsed from the command line.
         let opts = opts::get();
 
@@ -198,7 +198,7 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                 renderer_kind: renderer_kind,
                 enable_subpixel_aa: opts.enable_subpixel_text_antialiasing,
                 ..Default::default()
-            }, device, factory, main_color, main_depth).expect("Unable to initialize webrender!")
+            }, params).expect("Unable to initialize webrender!")
         };
 
         let webrender_api = webrender_api_sender.create_api();

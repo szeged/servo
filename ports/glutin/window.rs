@@ -43,7 +43,7 @@ use style_traits::DevicePixel;
 use style_traits::cursor::Cursor;
 #[cfg(target_os = "windows")]
 use user32;
-use webrender::{BackendDevice, Factory, RTV, DSV, create_rgba8_window};
+use webrender;
 use webrender_api::{DeviceUintRect, DeviceUintSize, ScrollLocation};
 #[cfg(target_os = "windows")]
 use winapi;
@@ -228,7 +228,7 @@ impl Window {
 
     pub fn new(is_foreground: bool,
                window_size: TypedSize2D<u32, DeviceIndependentPixel>,
-               parent: Option<glutin::WindowID>) -> (Rc<Window>, BackendDevice, Factory, RTV, DSV) {
+               parent: Option<glutin::WindowID>) -> (Rc<Window>, webrender::DeviceInitParams) {
         let win_size: TypedSize2D<u32, DevicePixel> =
             (window_size.to_f32() * window_creation_scale_factor())
                 .to_usize().cast().expect("Window size should fit in u32");
@@ -274,7 +274,7 @@ impl Window {
             unsafe { glutin_window.make_current().expect("Failed to make context current!") }
 
             glutin_window.set_window_resize_callback(Some(Window::nested_window_resize as fn(u32, u32)));
-            let (window, device, factory, main_color, main_depth) = create_rgba8_window(glutin_window);
+            let (window, params) = webrender::create_rgba8_window(glutin_window);
             let window_kind = WindowKind::Window(Rc::new(window));
         //};
 
@@ -336,7 +336,7 @@ impl Window {
 
         window.present();
 
-        (Rc::new(window), device, factory, main_color, main_depth)
+        (Rc::new(window), params)
     }
 
     pub fn platform_window(&self) -> glutin::WindowID {
