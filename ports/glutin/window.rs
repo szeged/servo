@@ -505,7 +505,7 @@ impl Window {
                        self.handle_mouse(button, state, mouse_pos.x, mouse_pos.y);
                 }
             }
-            Event::MouseMoved{device_id: _, position} => {
+            Event::CursorMoved {device_id: _, position} => {
                 self.mouse_pos.set(Point2D::new(position.0 as i32, position.1 as i32));
                 self.event_queue.borrow_mut().push(
                     WindowEvent::MouseWindowMoveEventClass(TypedPoint2D::new(position.0 as f32, position.1 as f32)));

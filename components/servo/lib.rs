@@ -225,7 +225,8 @@ impl<Window> Servo<Window> where Window: WindowMethods + 'static {
                                                                     &mut webrender,
                                                                     webrender_document,
                                                                     webrender_api_sender,
-                                                                    window.gl());
+                                                                    //window.gl(),
+                                                                    );
 
         // Send the constellation's swmanager sender to service worker manager thread
         script::init_service_workers(sw_senders);
@@ -511,7 +512,8 @@ fn create_compositor_channel(event_loop_waker: Box<compositor_thread::EventLoopW
      })
 }
 
-fn create_constellation(user_agent: Cow<'static, str>,
+fn create_constellation(
+                        user_agent: Cow<'static, str>,
                         config_dir: Option<PathBuf>,
                         embedder_proxy: EmbedderProxy,
                         compositor_proxy: CompositorProxy,
@@ -523,7 +525,8 @@ fn create_constellation(user_agent: Cow<'static, str>,
                         webrender: &mut webrender::Renderer,
                         webrender_document: webrender_api::DocumentId,
                         webrender_api_sender: webrender_api::RenderApiSender,
-                        window_gl: Rc<gl::Gl>)
+                        //window_gl: Rc<gl::Gl>,
+                        )
                         -> (Sender<ConstellationMsg>, SWManagerSenders) {
     let bluetooth_thread: IpcSender<BluetoothRequest> = BluetoothThreadFactory::new();
 
@@ -554,10 +557,11 @@ fn create_constellation(user_agent: Cow<'static, str>,
         GLContextFactory::current_native_handle(&compositor_proxy).unwrap()
     };*/
 
-    let gl_factory = GLContextFactory::new_headless_context(&compositor_proxy);
+    let (gl_factory, gl) = GLContextFactory::new_headless_context_and_gl(&compositor_proxy);
     // Initialize WebGL Thread entry point.
     let (webgl_threads, image_handler, output_handler) = WebGLThreads::new(gl_factory,
-                                                                           window_gl,
+                                                                           //window_gl,
+                                                                           gl,
                                                                            webrender_api_sender.clone(),
                                                                            webvr_compositor.map(|c| c as Box<_>));
     // Set webrender external image handler for WebGL textures
