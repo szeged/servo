@@ -186,7 +186,7 @@ impl<VR: WebVRRenderHandler + 'static, OB: WebGLThreadObserver> WebGLThread<VR, 
         // First try to create a shared context for the best performance.
         // Fallback to readback mode if the shared context creation fails.
         let result = self.gl_factory.new_shared_context(version, size, attributes)
-                                    .map(|r| (r, WebGLContextShareMode::SharedTexture))
+                                    .map(|r| (r, WebGLContextShareMode::Readback))
                                     .or_else(|_| {
                                         let ctx = self.gl_factory.new_context(version, size, attributes);
                                         ctx.map(|r| (r, WebGLContextShareMode::Readback))
