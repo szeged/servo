@@ -6,10 +6,10 @@
 
 extern crate embedder_traits;
 extern crate euclid;
+extern crate gfx_hal;
 extern crate gfx_traits;
 #[cfg(feature = "gleam")]
 extern crate gleam;
-#[cfg(feature = "gleam")]
 extern crate image;
 extern crate ipc_channel;
 extern crate libc;
@@ -26,6 +26,8 @@ extern crate style_traits;
 extern crate time;
 extern crate webrender;
 extern crate webrender_api;
+#[cfg(feature = "winit")]
+extern crate winit;
 
 pub use compositor_thread::CompositorProxy;
 pub use compositor::IOCompositor;

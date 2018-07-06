@@ -7,8 +7,8 @@
 use euclid::{Length, TypedPoint2D, TypedVector2D, TypedScale, TypedSize2D};
 #[cfg(target_os = "windows")]
 use gdi32;
-use gleam::gl;
-use glutin::{Api, ContextBuilder, GlContext, GlRequest, GlWindow};
+//use gleam::gl;
+//use glutin::{Api, ContextBuilder, GlContext, GlRequest, GlWindow};
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 use osmesa_sys;
 use servo::compositing::windowing::{AnimationState, MouseWindowEvent, WindowEvent};
@@ -38,7 +38,6 @@ use user32;
 use winapi;
 use winit;
 use winit::{ElementState, Event, MouseButton, MouseScrollDelta, TouchPhase, VirtualKeyCode};
-use winit::dpi::{LogicalPosition, LogicalSize, PhysicalSize};
 #[cfg(target_os = "macos")]
 use winit::os::macos::{ActivationPolicy, WindowBuilderExt};
 
@@ -64,7 +63,7 @@ fn builder_with_platform_options(builder: winit::WindowBuilder) -> winit::Window
     builder
 }
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+/*#[cfg(any(target_os = "linux", target_os = "macos"))]
 struct HeadlessContext {
     width: u32,
     height: u32,
@@ -72,14 +71,14 @@ struct HeadlessContext {
     _buffer: Vec<u32>,
 }
 
-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]*/
 struct HeadlessContext {
     width: u32,
     height: u32,
 }
 
 impl HeadlessContext {
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    /*#[cfg(any(target_os = "linux", target_os = "macos"))]
     fn new(width: u32, height: u32) -> HeadlessContext {
         let mut attribs = Vec::new();
 
@@ -116,7 +115,7 @@ impl HeadlessContext {
         }
     }
 
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]*/
     fn new(width: u32, height: u32) -> HeadlessContext {
         HeadlessContext {
             width: width,
@@ -124,7 +123,7 @@ impl HeadlessContext {
         }
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    /*#[cfg(any(target_os = "linux", target_os = "macos"))]
     fn get_proc_address(s: &str) -> *const c_void {
         let c_str = CString::new(s).expect("Unable to create CString");
         unsafe {
@@ -132,14 +131,14 @@ impl HeadlessContext {
         }
     }
 
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]*/
     fn get_proc_address(_: &str) -> *const c_void {
         ptr::null() as *const _
     }
 }
 
 enum WindowKind {
-    Window(GlWindow, RefCell<winit::EventsLoop>),
+    Window(winit::Window, RefCell<winit::EventsLoop>),
     Headless(HeadlessContext),
 }
 
@@ -156,7 +155,7 @@ pub struct Window {
     last_pressed_key: Cell<Option<Key>>,
     animation_state: Cell<AnimationState>,
     fullscreen: Cell<bool>,
-    gl: Rc<gl::Gl>,
+    //gl: Rc<gl::Gl>,
     suspended: Cell<bool>,
 }
 
@@ -190,7 +189,7 @@ impl Window {
 
         let screen_size;
         let inner_size;
-        let window_kind = if opts::get().headless {
+        let window_kind = if false { // opts::get().headless {
             screen_size = TypedSize2D::new(width, height);
             inner_size = TypedSize2D::new(width, height);
             WindowKind::Headless(HeadlessContext::new(width, height))
@@ -200,7 +199,7 @@ impl Window {
                 .with_title("Servo".to_string())
                 .with_decorations(!opts::get().no_native_titlebar)
                 .with_transparency(opts::get().no_native_titlebar)
-                .with_dimensions(LogicalSize::new(width as f64, height as f64))
+                .with_min_dimensions(width, height)
                 .with_visibility(visible)
                 .with_multitouch();
 
@@ -211,7 +210,7 @@ impl Window {
                 window_builder = window_builder.with_window_icon(icon);
             }
 
-            window_builder = builder_with_platform_options(window_builder);
+            /*window_builder = builder_with_platform_options(window_builder);
 
             let mut context_builder = ContextBuilder::new()
                 .with_gl(Window::gl_version())
@@ -226,24 +225,22 @@ impl Window {
 
             unsafe {
                 glutin_window.context().make_current().expect("Couldn't make window current");
-            }
+            }*/
+            let winit_window = window_builder.build(&events_loop).expect("Failed to create window.");
 
-            let PhysicalSize {
-                width: screen_width,
-                height: screen_height,
-            } = events_loop.get_primary_monitor().get_dimensions();
-            screen_size = TypedSize2D::new(screen_width as u32, screen_height as u32);
+            let (screen_width, screen_height) = events_loop.get_primary_monitor().get_dimensions();
+            screen_size = TypedSize2D::new(screen_width, screen_height);
             // TODO(ajeffrey): can this fail?
-            let LogicalSize { width, height } =
-                glutin_window.get_inner_size().expect("Failed to get window inner size.");
-            inner_size = TypedSize2D::new(width as u32, height as u32);
+            let (width, height) =
+                winit_window.get_inner_size().expect("Failed to get window inner size.");
+            inner_size = TypedSize2D::new(width, height);
 
-            glutin_window.show();
+            winit_window.show();
 
-            WindowKind::Window(glutin_window, RefCell::new(events_loop))
+            WindowKind::Window(winit_window, RefCell::new(events_loop))
         };
 
-        let gl = match window_kind {
+        /*let gl = match window_kind {
             WindowKind::Window(ref window, ..) => {
                 match gl::GlType::default() {
                     gl::GlType::Gl => {
@@ -275,7 +272,7 @@ impl Window {
 
         gl.clear_color(0.6, 0.6, 0.6, 1.0);
         gl.clear(gl::COLOR_BUFFER_BIT);
-        gl.finish();
+        gl.finish();*/
 
         let window = Window {
             kind: window_kind,
@@ -287,7 +284,7 @@ impl Window {
             key_modifiers: Cell::new(WinitKeyModifiers::empty()),
 
             last_pressed_key: Cell::new(None),
-            gl: gl.clone(),
+            //gl: gl.clone(),
             animation_state: Cell::new(AnimationState::Idle),
             fullscreen: Cell::new(false),
             inner_size: Cell::new(inner_size),
@@ -295,7 +292,7 @@ impl Window {
             suspended: Cell::new(false),
         };
 
-        window.present();
+        //window.present();
 
         Rc::new(window)
     }
@@ -308,8 +305,8 @@ impl Window {
         let dpr = self.hidpi_factor();
         match self.kind {
             WindowKind::Window(ref window, _) => {
-                let size = window.get_inner_size().expect("Failed to get window inner size.");
-                size.height as f32 * dpr.get()
+                let (_, height) =  window.get_inner_size().expect("Failed to get window inner size.");
+                height as f32 * dpr.get()
             },
             WindowKind::Headless(ref context) => {
                 context.height as f32 * dpr.get()
@@ -326,14 +323,14 @@ impl Window {
     pub fn set_inner_size(&self, size: DeviceUintSize) {
         if let WindowKind::Window(ref window, _) = self.kind {
             let size = size.to_f32() / self.hidpi_factor();
-            window.set_inner_size(LogicalSize::new(size.width.into(), size.height.into()))
+            window.set_inner_size(size.width as u32, size.height as u32)
         }
     }
 
     pub fn set_position(&self, point: DeviceIntPoint) {
         if let WindowKind::Window(ref window, _) = self.kind {
             let point = point.to_f32() / self.hidpi_factor();
-            window.set_position(LogicalPosition::new(point.x.into(), point.y.into()))
+            window.set_position(point.x as i32, point.y as i32)
         }
     }
 
@@ -401,7 +398,7 @@ impl Window {
         }
     }
 
-    #[cfg(not(any(target_arch = "arm", target_arch = "aarch64", target_os = "android")))]
+    /*#[cfg(not(any(target_arch = "arm", target_arch = "aarch64", target_os = "android")))]
     fn gl_version() -> GlRequest {
         return GlRequest::Specific(Api::OpenGl, (3, 2));
     }
@@ -409,7 +406,7 @@ impl Window {
     #[cfg(any(target_arch = "arm", target_arch = "aarch64", target_os = "android"))]
     fn gl_version() -> GlRequest {
         GlRequest::Specific(Api::OpenGlEs, (3, 0))
-    }
+    }*/
 
     fn handle_received_character(&self, ch: char) {
         let modifiers = keyutils::winit_mods_to_script_mods(self.key_modifiers.get());
@@ -493,7 +490,7 @@ impl Window {
             },
             Event::WindowEvent {
                 event: winit::WindowEvent::CursorMoved {
-                    position: LogicalPosition { x, y },
+                    position: (x, y),
                     ..
                 },
                 ..
@@ -508,7 +505,7 @@ impl Window {
             } => {
                 let (mut dx, mut dy) = match delta {
                     MouseScrollDelta::LineDelta(dx, dy) => (dx, dy * LINE_HEIGHT),
-                    MouseScrollDelta::PixelDelta(LogicalPosition { x: dx, y: dy }) => (dx as f32, dy as f32),
+                    MouseScrollDelta::PixelDelta(dx, dy) => (dx, dy),
                 };
                 // Scroll events snap to the major axis of movement, with vertical
                 // preferred over horizontal.
@@ -531,7 +528,7 @@ impl Window {
 
                 let phase = winit_phase_to_touch_event_type(touch.phase);
                 let id = TouchId(touch.id as i32);
-                let point = TypedPoint2D::new(touch.location.x as f32, touch.location.y as f32);
+                let point = TypedPoint2D::new(touch.location.0 as f32, touch.location.1 as f32);
                 self.event_queue.borrow_mut().push(WindowEvent::Touch(phase, id, point));
             }
             Event::WindowEvent {
@@ -545,13 +542,11 @@ impl Window {
                 self.event_queue.borrow_mut().push(WindowEvent::Quit);
             }
             Event::WindowEvent {
-                event: winit::WindowEvent::Resized(LogicalSize { width, height }),
+                event: winit::WindowEvent::Resized(width, height),
                 ..
             } => {
-                // width and height are DevicePixel.
-                // window.resize() takes DevicePixel.
                 if let WindowKind::Window(ref window, _) = self.kind {
-                    window.resize(PhysicalSize { width, height });
+                    window.set_inner_size(width, height);
                 }
                 // window.set_inner_size() takes DeviceIndependentPixel.
                 let new_size = TypedSize2D::new(width as f32, height as f32);
@@ -622,7 +617,7 @@ impl Window {
                 Some(_) => TypedScale::new(1.0),
                 None => match self.kind {
                     WindowKind::Window(ref window, ..) => {
-                        TypedScale::new(window.get_hidpi_factor() as f32)
+                        TypedScale::new(window.hidpi_factor() as f32)
                     }
                     WindowKind::Headless(..) => {
                         TypedScale::new(1.0)
@@ -684,22 +679,22 @@ impl Window {
 }
 
 impl WindowMethods for Window {
-    fn gl(&self) -> Rc<gl::Gl> {
+    /*fn gl(&self) -> Rc<gl::Gl> {
         self.gl.clone()
-    }
+    }*/
 
     fn get_coordinates(&self) -> EmbedderCoordinates {
         let dpr = self.hidpi_factor();
         match self.kind {
             WindowKind::Window(ref window, _) => {
                 // TODO(ajeffrey): can this fail?
-                let LogicalSize { width, height } = window.get_outer_size().expect("Failed to get window outer size.");
-                let LogicalPosition { x, y } = window.get_position().unwrap_or(LogicalPosition::new(0., 0.));
+                let (width, height) = window.get_outer_size().expect("Failed to get window outer size.");
+                let (x, y) = window.get_position().unwrap_or((0, 0));
                 let win_size = (TypedSize2D::new(width as f32, height as f32) * dpr).to_u32();
                 let win_origin = (TypedPoint2D::new(x as f32, y as f32) * dpr).to_i32();
                 let screen = (self.screen_size.to_f32() * dpr).to_u32();
 
-                let LogicalSize { width, height } = window.get_inner_size().expect("Failed to get window inner size.");
+                let (width, height) = window.get_inner_size().expect("Failed to get window inner size.");
                 let inner_size = (TypedSize2D::new(width as f32, height as f32) * dpr).to_u32();
 
                 let viewport = DeviceUintRect::new(TypedPoint2D::zero(), inner_size);
@@ -728,7 +723,7 @@ impl WindowMethods for Window {
         }
     }
 
-    fn present(&self) {
+    /*fn present(&self) {
         match self.kind {
             WindowKind::Window(ref window, ..) => {
                 if let Err(err) = window.swap_buffers() {
@@ -737,7 +732,7 @@ impl WindowMethods for Window {
             }
             WindowKind::Headless(..) => {}
         }
-    }
+    }*/
 
     fn create_event_loop_waker(&self) -> Box<EventLoopWaker> {
         struct GlutinEventLoopWaker {
@@ -785,6 +780,13 @@ impl WindowMethods for Window {
 
     fn supports_clipboard(&self) -> bool {
         true
+    }
+
+    fn get_window(&self) -> &winit::Window {
+        match self.kind {
+            WindowKind::Window(ref window, ..) => return window,
+            WindowKind::Headless(..) => unreachable!(),
+        }
     }
 }
 

@@ -15,7 +15,7 @@ opt-level = 3
 # debug = true
 # lto = false
 
-[patch.crates-io]
+#[patch.crates-io]
 # If you need to temporarily test Servo with a local fork of some upstream
 # crate, add that here. Use the form:
 #
@@ -25,3 +25,10 @@ opt-level = 3
 #
 #     [patch."https://github.com/servo/<repository>"]
 #     <crate> = { path = "/path/to/local/checkout" }
+
+[replace]
+"https://github.com/servo/webrender#0.57.2" = { git = "https://github.com/szeged/webrender", branch = "wr_for_servo", features = ["gfx"] }
+"https://github.com/servo/webrender#webrender_api:0.57.2" = { git = "https://github.com/szeged/webrender", branch = "wr_for_servo", features = ["ipc"] }
+"https://github.com/gfx-rs/gfx.git#gfx-hal:0.1.0" = { git = "https://github.com/gfx-rs/gfx.git", rev = "36cd85e13ee74b5a5e109b856f19c886f4fe8db3" }
+"https://github.com/gfx-rs/gfx.git#gfx-backend-vulkan:0.1.0" = {  git = "https://github.com/gfx-rs/gfx.git", rev = "36cd85e13ee74b5a5e109b856f19c886f4fe8db3" }
+"https://github.com/gfx-rs/gfx.git#gfx-backend-dx12:0.1.0" = {  git = "https://github.com/gfx-rs/gfx.git", rev = "36cd85e13ee74b5a5e109b856f19c886f4fe8db3" }

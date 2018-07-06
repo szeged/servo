@@ -32,18 +32,22 @@ debugmozjs = ["libservo/debugmozjs"]
 googlevr = ["libservo/googlevr"]
 oculusvr = ["libservo/oculusvr"]
 unstable = ["libservo/unstable"]
+vulkan = []
+dx12 = []
 
 [dependencies]
 backtrace = "0.3"
 bitflags = "1.0"
 euclid = "0.17"
 gleam = "0.5"
-glutin = "0.17"
+#glutin = "0.17"
 lazy_static = "1"
 libservo = {path = "../../components/servo"}
 log = "0.4"
 tinyfiledialogs = "3.0"
-winit = {version = "0.16", features = ["icon_loading"]}
+winit = {version = "0.15", features = ["icon_loading"]}
+gfx-backend-vulkan = { git = "https://github.com/gfx-rs/gfx.git" }
+gfx-hal = { git = "https://github.com/gfx-rs/gfx.git" }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 sig = "0.1"
@@ -62,6 +66,7 @@ servo-egl = "0.2"
 winapi = "0.2"
 user32-sys = "0.2"
 gdi32-sys = "0.2"
+gfx-backend-dx12 = { git = "https://github.com/gfx-rs/gfx.git" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 osmesa-src = {git = "https://github.com/servo/osmesa-src"}

@@ -18,6 +18,8 @@ use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 use style_traits::DevicePixel;
 use webrender_api::{DeviceIntPoint, DevicePoint, DeviceUintSize, DeviceUintRect, ScrollLocation};
+#[cfg(feature = "winit")]
+use winit;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -125,6 +127,7 @@ pub enum AnimationState {
 
 pub trait WindowMethods {
     /// Presents the window to the screen (perhaps by page flipping).
+    #[cfg(feature = "gleam")]
     fn present(&self);
     /// Requests that the window system prepare a composite. Typically this will involve making
     /// some type of platform-specific graphics context current. Returns true if the composite may
@@ -144,6 +147,8 @@ pub trait WindowMethods {
     /// will want to avoid blocking on UI events, and just
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState);
+    #[cfg(feature = "winit")]
+    fn get_window(&self) -> &winit::Window;
 }
 
 #[derive(Clone, Copy, Debug)]
