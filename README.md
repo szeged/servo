@@ -1,3 +1,20 @@
+# U-Szeged version
+
+This version of Servo is using next-gen backend (vulkan/dx12/metal).
+
+The current state is **experimental**. At the moment only the **vulkan** backend is usable.
+
+
+Use the following commands to build and run with vulkan:
+```
+./mach build --features=vulkan -r
+./mach run
+```
+
+It was tested on linux (ubuntu 18.04) and windows 10.
+
+The webrender related work is here: https://github.com/szeged/webrender
+
 # The Servo Parallel Browser Engine Project
 
 [![Linux Build Status](https://img.shields.io/travis/servo/servo/master.svg?label=Linux%20build)](https://travis-ci.org/servo/servo)  [![Windows Build Status](https://img.shields.io/appveyor/ci/servo/servo/master.svg?label=Windows%20build)](https://ci.appveyor.com/project/servo/servo/branch/master)  [![Changelog #228](https://img.shields.io/badge/changelog-%23228-9E978E.svg)](https://changelog.com/podcast/228)
