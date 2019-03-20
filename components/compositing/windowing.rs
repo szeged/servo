@@ -20,6 +20,8 @@ use style_traits::DevicePixel;
 use webrender_api::{DeviceIntPoint, DeviceIntRect, DeviceIntSize, DevicePoint, ScrollLocation};
 use webvr::VRServiceManager;
 use webvr_traits::WebVRMainThreadHeartbeat;
+#[cfg(feature = "winit")]
+use winit;
 
 #[derive(Clone)]
 pub enum MouseWindowEvent {
@@ -130,6 +132,7 @@ pub enum AnimationState {
 
 pub trait WindowMethods {
     /// Presents the window to the screen (perhaps by page flipping).
+    #[cfg(feature = "gleam")]
     fn present(&self);
     /// Requests that the window system prepare a composite. Typically this will involve making
     /// some type of platform-specific graphics context current. Returns true if the composite may
@@ -147,6 +150,8 @@ pub trait WindowMethods {
     /// will want to avoid blocking on UI events, and just
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState);
+    #[cfg(feature = "winit")]
+    fn get_window(&self) -> &winit::Window;
     /// Register services with a VRServiceManager.
     fn register_vr_services(
         &self,

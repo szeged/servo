@@ -39,7 +39,7 @@ bluetooth_traits = {path = "../bluetooth_traits"}
 bluetooth = {path = "../bluetooth"}
 canvas = {path = "../canvas"}
 canvas_traits = {path = "../canvas_traits"}
-compositing = {path = "../compositing", features = ["gl"]}
+compositing = {path = "../compositing", features = ["winit"]}
 constellation = {path = "../constellation"}
 crossbeam-channel = "0.3"
 debugger = {path = "../debugger"}
@@ -72,6 +72,7 @@ webrender_api = {git = "https://github.com/servo/webrender", features = ["ipc"]}
 webdriver_server = {path = "../webdriver_server", optional = true}
 webvr = {path = "../webvr"}
 webvr_traits = {path = "../webvr_traits"}
+gfx-hal = {git = "https://github.com/gfx-rs/gfx.git"}
 
 [target.'cfg(all(not(target_os = "windows"), not(target_os = "ios"), not(target_os="android"), not(target_arch="arm"), not(target_arch="aarch64")))'.dependencies]
 gaol = {git = "https://github.com/servo/gaol"}

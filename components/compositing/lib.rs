@@ -7,6 +7,8 @@
 #[macro_use]
 extern crate log;
 
+extern crate gfx_hal;
+
 pub use crate::compositor::CompositingReason;
 pub use crate::compositor::IOCompositor;
 pub use crate::compositor::ShutdownState;
@@ -15,6 +17,9 @@ use ipc_channel::ipc::IpcSender;
 use msg::constellation_msg::PipelineId;
 use msg::constellation_msg::TopLevelBrowsingContextId;
 use script_traits::{ConstellationControlMsg, LayoutControlMsg};
+
+#[cfg(feature = "winit")]
+extern crate winit;
 
 mod compositor;
 pub mod compositor_thread;

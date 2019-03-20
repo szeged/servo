@@ -24,6 +24,13 @@ use std::env;
 use std::panic;
 use std::process;
 use std::thread;
+#[cfg(feature = "vulkan")]
+extern crate gfx_backend_vulkan as back;
+#[cfg(all(target_os = "windows", feature = "dx12"))]
+extern crate gfx_backend_dx12 as back;
+extern crate gfx_hal;
+use servo::compositing::windowing::WindowMethods;
+use gfx_hal::Instance;
 
 pub mod platform {
     #[cfg(target_os = "macos")]
@@ -138,7 +145,12 @@ pub fn main() {
 
     let target_url = cmdline_url.or(pref_url).or(blank_url).unwrap();
 
-    let mut servo = Servo::new(window.clone());
+    // let mut servo = Servo::new(window.clone());
+    let instance = back::Instance::create("gfx-rs instance", 1);
+    let mut adapters = instance.enumerate_adapters();
+    let adapter = adapters.remove(0);
+    let mut surface = instance.create_surface(window.get_window());
+    let mut servo = Servo::new(window.clone(), &adapter, &mut surface);
     let browser_id = BrowserId::new();
     servo.handle_events(vec![WindowEvent::NewBrowser(target_url, browser_id)]);
 
