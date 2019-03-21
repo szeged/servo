@@ -38,7 +38,7 @@ servo_geometry = {path = "../geometry"}
 servo_url = {path = "../url"}
 style_traits = {path = "../style_traits"}
 time = "0.1.17"
-webrender = {git = "https://github.com/servo/webrender", features = ["capture"]}
+webrender = {git = "https://github.com/servo/webrender", features = ["capture", "serde"]}
 webrender_api = {git = "https://github.com/servo/webrender", features = ["ipc"]}
 webvr_traits = {path = "../webvr_traits"}
 webvr = {path = "../webvr"}
