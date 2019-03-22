@@ -193,7 +193,7 @@ impl Window {
                 .with_title("Servo".to_string())
                 .with_decorations(!opts::get().no_native_titlebar)
                 .with_transparency(opts::get().no_native_titlebar)
-                .with_min_dimensions(width, height)
+                .with_min_dimensions(LogicalSize::new(width as f64, height as f64))
                 .with_visibility(visible)
                 .with_multitouch();
 
@@ -224,12 +224,12 @@ impl Window {
                     .expect("Couldn't make window current");
             }*/
             let winit_window = window_builder.build(&events_loop).expect("Failed to create window.");
-            let (screen_width, screen_height) = events_loop.get_primary_monitor().get_dimensions();
-            screen_size = TypedSize2D::new(screen_width, screen_height);
+            let monitor_size = events_loop.get_primary_monitor().get_dimensions();
+            screen_size = TypedSize2D::new(monitor_size.width as u32, monitor_size.height as u32);
             // TODO(ajeffrey): can this fail?
-            let (width, height) =
+            let window_inner_size =
             winit_window.get_inner_size().expect("Failed to get window inner size.");
-            inner_size = TypedSize2D::new(width, height);
+            inner_size = TypedSize2D::new(window_inner_size.width as u32, window_inner_size.height as u32);
 
             winit_window.show();
 
@@ -290,8 +290,8 @@ impl Window {
         let dpr = self.servo_hidpi_factor();
         match self.kind {
             WindowKind::Window(ref window, _) => {
-                let (_, height) =  window.get_inner_size().expect("Failed to get window inner size.");
-                height as f32 * dpr.get()
+                let inner_size =  window.get_inner_size().expect("Failed to get window inner size.");
+                inner_size.height as f32 * dpr.get()
             },
             WindowKind::Headless(ref context) => context.height as f32 * dpr.get(),
         }
@@ -306,14 +306,14 @@ impl Window {
     pub fn set_inner_size(&self, size: DeviceIntSize) {
         if let WindowKind::Window(ref window, _) = self.kind {
             let size = size.to_f32() / self.device_hidpi_factor();
-            window.set_inner_size(size.width as u32, size.height as u32)
+            window.set_inner_size(LogicalSize::new(size.width as f64, size.height as f64))
         }
     }
 
     pub fn set_position(&self, point: DeviceIntPoint) {
         if let WindowKind::Window(ref window, _) = self.kind {
             let point = point.to_f32() / self.device_hidpi_factor();
-            window.set_position(point.x as i32, point.y as i32)
+            window.set_position(LogicalPosition::new(point.x as f64, point.y as f64))
         }
     }
 
@@ -467,7 +467,7 @@ impl Window {
                 }
             },
             Event::WindowEvent {
-                event: winit::WindowEvent::CursorMoved { position:(x, y), .. },
+                event: winit::WindowEvent::CursorMoved { position, .. },
                 ..
             } => {
                 let pos = position.to_physical(self.device_hidpi_factor().get() as f64);
@@ -536,10 +536,10 @@ impl Window {
             } => {
                 // size is DeviceIndependentPixel.
                 // window.resize() takes DevicePixel.
-                if let WindowKind::Window(ref window, _) = self.kind {
-                    let size = size.to_physical(self.device_hidpi_factor().get() as f64);
-                    window.resize(size);
-                }
+                // if let WindowKind::Window(ref window, _) = self.kind {
+                //     let size = size.to_physical(self.device_hidpi_factor().get() as f64);
+                //     window.resize(size);
+                // }
                 // window.set_inner_size() takes DeviceIndependentPixel.
                 let (width, height) = size.into();
                 let new_size = TypedSize2D::new(width, height);
@@ -606,7 +606,7 @@ impl Window {
 
     fn device_hidpi_factor(&self) -> TypedScale<f32, DeviceIndependentPixel, DevicePixel> {
         match self.kind {
-            WindowKind::Window(ref window, ..) => TypedScale::new(window.hidpi_factor() as f32),
+            WindowKind::Window(ref window, ..) => TypedScale::new(window.get_hidpi_factor() as f32),
             WindowKind::Headless(..) => TypedScale::new(1.0),
         }
     }
@@ -680,14 +680,14 @@ impl WindowMethods for Window {
             WindowKind::Window(ref window, _) => {
                 // TODO(ajeffrey): can this fail?
                 let dpr = self.device_hidpi_factor();
-                let (width, height) = window.get_outer_size().expect("Failed to get window outer size.");
-                let (x, y) = window.get_position().unwrap_or((0, 0));
-                let win_size = (TypedSize2D::new(width as f32, height as f32) * dpr).to_i32();
-                let win_origin = (TypedPoint2D::new(x as f32, y as f32) * dpr).to_i32();
+                let outer_size = window.get_outer_size().expect("Failed to get window outer size.");
+                let position = window.get_position().unwrap_or(LogicalPosition::new(0 as f64, 0 as f64));
+                let win_size = (TypedSize2D::new(outer_size.width as f32,outer_size.height as f32) * dpr).to_i32();
+                let win_origin = (TypedPoint2D::new(position.x as f32, position.y as f32) * dpr).to_i32();
                 let screen = (self.screen_size.to_f32() * dpr).to_i32();
 
-                let (width, height) = window.get_inner_size().expect("Failed to get window inner size.");
-                let inner_size = (TypedSize2D::new(width as f32, height as f32) * dpr).to_i32();
+                let window_inner_size = window.get_inner_size().expect("Failed to get window inner size.");
+                let inner_size = (TypedSize2D::new(window_inner_size.width as f32, window_inner_size.height as f32) * dpr).to_i32();
 
                 let viewport = DeviceIntRect::new(TypedPoint2D::zero(), inner_size);
 
@@ -768,9 +768,9 @@ impl WindowMethods for Window {
 
     fn prepare_for_composite(&self) -> bool {
         if let WindowKind::Window(ref window, ..) = self.kind {
-            if let Err(err) = unsafe { window.context().make_current() } {
-                warn!("Couldn't make window current: {}", err);
-            }
+            // if let Err(err) = unsafe { window.context().make_current() } {
+            //     warn!("Couldn't make window current: {}", err);
+            // }
         };
         true
     }
@@ -780,7 +780,7 @@ impl WindowMethods for Window {
         services: &mut VRServiceManager,
         heartbeats: &mut Vec<Box<WebVRMainThreadHeartbeat>>
     ) {
-        if PREFS.get("dom.webvr.test").as_boolean().unwrap_or(false) {
+        if PREFS.get("dom.webvr.test").as_boolean().unwrap_or(false) {/*
             warn!("Creating test VR display");
             // TODO: support dom.webvr.test in headless environments
             if let WindowKind::Window(_, ref events_loop) = self.kind {
@@ -804,7 +804,7 @@ impl WindowMethods for Window {
 
                 services.register(Box::new(service));
                 heartbeats.push(Box::new(heartbeat));
-            }
+            }*/
         }
     }
     fn get_window(&self) -> &winit::Window {

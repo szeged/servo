@@ -130,7 +130,7 @@ pub use servo_url as url;
 /// loop to pump messages between the embedding application and
 /// various browser components.
 pub struct Servo<Window: WindowMethods + 'static, Back: gfx_hal::Backend + 'static> {
-    compositor: IOCompositor<Window>,
+    compositor: IOCompositor<Window, Back>,
     constellation_chan: Sender<ConstellationMsg>,
     embedder_receiver: EmbedderReceiver,
     embedder_events: Vec<(Option<BrowserId>, EmbedderMsg)>,
@@ -179,7 +179,7 @@ impl<Window, Back> Servo<Window, Back>
 where
     Window: WindowMethods + 'static + 'static, Back: gfx_hal::Backend,
 {
-    pub fn new(window: Rc<Window>, adapter: &gfx_hal::Adapter<Back>, surface: &mut Back::Surface) -> Servo<Window, Back> {
+    pub fn new(window: Rc<Window>, adapter: gfx_hal::Adapter<Back>, surface: Back::Surface, instance: Box<gfx_hal::Instance<Backend=Back>>) -> Servo<Window, Back> {
         // Global configuration options, parsed from the command line.
         let opts = opts::get();
 
@@ -226,11 +226,15 @@ where
             debug_flags.set(webrender::DebugFlags::PROFILER_DBG, opts.webrender_stats);
 
             let render_notifier = Box::new(RenderNotifier::new(compositor_proxy.clone()));
-            let (width, height) = window.get_window().get_inner_size().unwrap();
-            let init = webrender::RendererInit {
-                adapter: &adapter,
-                surface: surface,
-                window_size: (width, height),
+            let size = window.get_window().get_inner_size().unwrap();
+            let init = webrender::DeviceInit {
+                instance,
+                adapter,
+                surface,
+                window_size: (size.width as i32, size.height as i32),
+                descriptor_count: None,
+                cache_path: None,
+                save_cache: false,
             };
             webrender::Renderer::new(
                 init,
@@ -569,7 +573,7 @@ fn create_constellation<Back: gfx_hal::Backend>(
     webrender: &mut webrender::Renderer<Back>,
     webrender_document: webrender_api::DocumentId,
     webrender_api_sender: webrender_api::RenderApiSender,
-    window_gl: Rc<dyn gl::Gl>,
+    //window_gl: Rc<dyn gl::Gl>,
     webvr_services: Option<VRServiceManager>,
 ) -> (Sender<ConstellationMsg>, SWManagerSenders) {
     let bluetooth_thread: IpcSender<BluetoothRequest> =

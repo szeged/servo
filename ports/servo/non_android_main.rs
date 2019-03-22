@@ -150,7 +150,7 @@ pub fn main() {
     let mut adapters = instance.enumerate_adapters();
     let adapter = adapters.remove(0);
     let mut surface = instance.create_surface(window.get_window());
-    let mut servo = Servo::new(window.clone(), &adapter, &mut surface);
+    let mut servo = Servo::new(window.clone(), adapter, surface, Box::new(instance));
     let browser_id = BrowserId::new();
     servo.handle_events(vec![WindowEvent::NewBrowser(target_url, browser_id)]);
 

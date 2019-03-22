@@ -43,7 +43,7 @@ use style_traits::viewport::ViewportConstraints;
 use style_traits::{CSSPixel, DevicePixel, PinchZoomFactor};
 use time::{now, precise_time_ns, precise_time_s};
 use webrender_api::{self, DeviceIntPoint, DevicePoint, HitTestFlags, HitTestResult};
-use webrender_api::{LayoutVector2D, ScrollLocation, DeviceUintRect, DeviceUintPoint, DeviceUintSize};
+use webrender_api::{LayoutVector2D, ScrollLocation, DeviceIntRect, DeviceIntSize};
 use webvr_traits::WebVRMainThreadHeartbeat;
 
 #[derive(Debug, PartialEq)]
@@ -1281,6 +1281,34 @@ impl<Window: WindowMethods, Back: gfx_hal::Backend> IOCompositor<Window, Back> {
                         None => error!("No file specified."),
                     },
                 );
+                None
+            },
+            #[cfg(not(feature = "gl"))]
+            CompositeTarget::PngFile => {
+                let width = width.get();
+                let height = height.get();
+                let pixels = self.webrender.read_pixels_rgba8(
+                    DeviceIntRect::new(
+                        DeviceIntPoint::new(0, 0),
+                        DeviceIntSize::new(width as _, height as _),
+                    )
+                );
+                let img = RgbaImage::from_raw(width as u32, height as u32, pixels).unwrap();
+                profile(ProfilerCategory::ImageSaving, None, self.time_profiler_chan.clone(), || {
+                    match opts::get().output_file.as_ref() {
+                        Some(path) => match File::create(path) {
+                            Ok(mut file) => {
+                                let dynamic_image = DynamicImage::ImageRgba8(img);
+                                let s = path.to_string();
+                                if let Err(e) = dynamic_image.write_to(&mut file, ImageFormat::PNG) {
+                                    error!("Failed to save {} ({}).", path, e);
+                                }
+                            },
+                            Err(e) => error!("Failed to create {} ({}).", path, e),
+                        },
+                        None => error!("No file specified."),
+                    }
+                });
                 None
             },
             #[cfg(not(feature = "gl"))]
