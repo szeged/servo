@@ -14,9 +14,18 @@ use pixels::{self, PixelFormat};
 use std::borrow::Cow;
 use std::thread;
 
+use io_surface;
+use core_foundation::base::{CFRelease, CFRetain, CFTypeID, CFTypeRef, CFType, TCFType};
+use core_foundation::dictionary::{CFDictionary, CFDictionaryRef};
+use core_foundation::string::{CFString, CFStringRef};
+use core_foundation::number::{CFNumber, CFNumberRef};
+use core_foundation::boolean::{CFBoolean, CFBooleanRef};
+
 /// WebGL Threading API entry point that lives in the constellation.
 /// It allows to get a WebGLThread handle for each script pipeline.
 pub use crate::webgl_mode::WebGLThreads;
+
+const BPE: i32 = 4;
 
 struct GLContextData {
     ctx: GLContextWrapper,
@@ -227,12 +236,13 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
     fn handle_lock(
         &mut self,
         context_id: WebGLContextId,
-        sender: WebGLSender<(u32, Size2D<i32>, usize)>,
+        sender: WebGLSender<(u32, Size2D<i32>, u32, usize)>,
     ) {
         let data =
             Self::make_current_if_needed(context_id, &self.contexts, &mut self.bound_context_id)
                 .expect("WebGLContext not found in a WebGLMsg::Lock message");
         let info = self.cached_context_info.get_mut(&context_id).unwrap();
+
         info.render_state = ContextRenderState::Locked(None);
         // Insert a OpenGL Fence sync object that sends a signal when all the WebGL commands are finished.
         // The related gl().wait_sync call is performed in the WR thread. See WebGLExternalImageApi for mor details.
@@ -243,16 +253,18 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         data.ctx.gl().flush();
 
         sender
-            .send((info.texture_id, info.size, gl_sync as usize))
+            .send((info.texture_id, info.size, info.io_surface.get_id(), gl_sync as usize))
             .unwrap();
     }
 
     /// Handles an unlock external callback received from webrender::ExternalImageHandler
     fn handle_unlock(&mut self, context_id: WebGLContextId) {
+
         let data =
             Self::make_current_if_needed(context_id, &self.contexts, &mut self.bound_context_id)
                 .expect("WebGLContext not found in a WebGLMsg::Unlock message");
         let info = self.cached_context_info.get_mut(&context_id).unwrap();
+
         info.render_state = ContextRenderState::Unlocked;
         if let Some(gl_sync) = info.gl_sync.take() {
             // Release the GLSync object.
@@ -275,20 +287,38 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         // Fallback to readback mode if the shared context creation fails.
         let (ctx, share_mode) = self
             .gl_factory
-            .new_shared_context(version, size, attributes)
-            .map(|r| (r, WebGLContextShareMode::SharedTexture))
-            .or_else(|err| {
+            .new_context(version, size, attributes)
+            .map(|r| (r, WebGLContextShareMode::Readback))
+            /*.or_else(|err| {
                 warn!(
                     "Couldn't create shared GL context ({}), using slow readback context instead.",
                     err
                 );
                 let ctx = self.gl_factory.new_context(version, size, attributes)?;
                 Ok((ctx, WebGLContextShareMode::Readback))
-            })
+            })*/
             .map_err(|msg: &str| msg.to_owned())?;
 
         let id = WebGLContextId(self.next_webgl_id);
         let (size, texture_id, limits) = ctx.get_info();
+
+        // create iosruface for the new context
+
+        let io_surface = unsafe {
+            let props = CFDictionary::from_CFType_pairs(
+                &[
+                    (CFString::wrap_under_get_rule(io_surface::kIOSurfaceWidth),CFNumber::from(size.width as i32).as_CFType()),
+                    (CFString::wrap_under_get_rule(io_surface::kIOSurfaceHeight),CFNumber::from(size.height as i32).as_CFType()),
+                    (CFString::wrap_under_get_rule(io_surface::kIOSurfaceBytesPerElement),CFNumber::from(BPE).as_CFType()),
+                    (CFString::wrap_under_get_rule(io_surface::kIOSurfaceBytesPerRow),CFNumber::from(size.width * BPE).as_CFType()),
+                    (CFString::wrap_under_get_rule(io_surface::kIOSurfaceIsGlobal),CFBoolean::from(true).as_CFType()),
+                ]
+            );
+            io_surface::new(&props)
+        };
+
+        println!("Surface created");
+
         self.next_webgl_id += 1;
         self.contexts.insert(
             id,
@@ -307,6 +337,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                 share_mode,
                 gl_sync: None,
                 render_state: ContextRenderState::Unlocked,
+                io_surface,
             },
         );
 
@@ -320,6 +351,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         size: Size2D<u32>,
         sender: WebGLSender<Result<(), String>>,
     ) {
+        warn!("Resize not handled yet");
         let data = Self::make_current_if_needed_mut(
             context_id,
             &mut self.contexts,
@@ -408,6 +440,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
             WebGLContextShareMode::SharedTexture => {
                 let size = info.size;
                 let alpha = info.alpha;
+
                 // Reuse existing ImageKey or generate a new one.
                 // When using a shared texture ImageKeys are only generated after a WebGLContext creation.
                 *info.image_key.get_or_insert_with(|| {
@@ -416,6 +449,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
             },
             WebGLContextShareMode::Readback => {
                 let pixels = Self::raw_pixels(&self.contexts[&context_id].ctx, info.size);
+                info.io_surface.upload(&pixels);
                 match info.image_key.clone() {
                     Some(image_key) => {
                         // ImageKey was already created, but WR Images must
@@ -425,7 +459,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                             info.size,
                             info.alpha,
                             image_key,
-                            pixels,
+                            context_id
                         );
 
                         image_key
@@ -436,7 +470,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                             webrender_api,
                             info.size,
                             info.alpha,
-                            pixels,
+                            context_id
                         );
                         info.image_key = Some(image_key);
                         image_key
@@ -597,10 +631,11 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         webrender_api: &webrender_api::RenderApi,
         size: Size2D<i32>,
         alpha: bool,
-        data: Vec<u8>,
+        context_id: WebGLContextId,
     ) -> webrender_api::ImageKey {
         let descriptor = Self::image_descriptor(size, alpha);
-        let data = webrender_api::ImageData::new(data);
+        //let data = webrender_api::ImageData::new(data);
+        let data = Self::external_image_data(context_id);
 
         let image_key = webrender_api.generate_image_key();
         let mut txn = webrender_api::Transaction::new();
@@ -616,10 +651,11 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         size: Size2D<i32>,
         alpha: bool,
         image_key: webrender_api::ImageKey,
-        data: Vec<u8>,
+        context_id: WebGLContextId,
     ) {
         let descriptor = Self::image_descriptor(size, alpha);
-        let data = webrender_api::ImageData::new(data);
+        //let data = webrender_api::ImageData::new(data);
+        let data = Self::external_image_data(context_id);
 
         let mut txn = webrender_api::Transaction::new();
         txn.update_image(image_key, descriptor, data, &webrender_api::DirtyRect::All);
@@ -644,7 +680,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
             id: webrender_api::ExternalImageId(context_id.0 as u64),
             channel_index: 0,
             image_type: webrender_api::ExternalImageType::TextureHandle(
-                webrender_api::TextureTarget::Default,
+                webrender_api::TextureTarget::Rect,
             ),
         };
         webrender_api::ImageData::External(data)
@@ -728,6 +764,8 @@ struct WebGLContextInfo {
     gl_sync: Option<gl::GLsync>,
     /// The status of this context with respect to external consumers.
     render_state: ContextRenderState,
+    /// IOSurface
+    io_surface: io_surface::IOSurface,
 }
 
 /// This trait is used as a bridge between the `WebGLThreads` implementation and

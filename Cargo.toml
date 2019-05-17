@@ -14,7 +14,17 @@ opt-level = 3
 # debug = true
 # lto = false
 
-[patch.crates-io]
+#[patch."https://github.com/servo/webrender"]
+#"webrender" = { path = "../servo_wr/webrender" }
+#[patch."https://github.com/servo/webrender_api"]
+#"webrender_api" = { path = "../servo_wr/webrender_api" }
+
+[replace]
+"https://github.com/rust-lang/crates.io-index#core-foundation:0.6.4" = { path = "../core-foundation-rs/core-foundation" }
+"https://github.com/rust-lang/crates.io-index#core-foundation-sys:0.6.2" = { path = "../core-foundation-rs/core-foundation-sys" }
+"https://github.com/rust-lang/crates.io-index#io-surface:0.11.1" = { path = "../core-foundation-rs/io-surface" }
+"https://github.com/rust-lang/crates.io-index#cgl:0.2.3" = { path = "../cgl" }
+
 # If you need to temporarily test Servo with a local fork of some upstream
 # crate, add that here. Use the form:
 #
