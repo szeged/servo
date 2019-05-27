@@ -25,8 +25,5 @@ opt-level = 3
 #     [patch."https://github.com/servo/<repository>"]
 #     <crate> = { path = "/path/to/local/checkout" }
 [replace]
-"https://github.com/servo/webrender#0.60.0" = { git = "https://github.com/szeged/webrender", branch = "wr_for_servo"}
-"https://github.com/servo/webrender#webrender_api:0.60.0" = { git = "https://github.com/szeged/webrender", branch = "wr_for_servo", features = ["ipc"] }
-"https://github.com/gfx-rs/gfx.git#gfx-hal:0.1.0" = { git = "https://github.com/gfx-rs/gfx.git", rev = "dea8caac9c09e907eeeb7a1d3d18fdd3e42062cb" }
-"https://github.com/gfx-rs/gfx.git#gfx-backend-vulkan:0.1.0" = {  git = "https://github.com/gfx-rs/gfx.git", rev = "dea8caac9c09e907eeeb7a1d3d18fdd3e42062cb" }
-"https://github.com/gfx-rs/gfx.git#gfx-backend-dx12:0.1.0" = {  git = "https://github.com/gfx-rs/gfx.git", rev = "dea8caac9c09e907eeeb7a1d3d18fdd3e42062cb" }
+"https://github.com/servo/webrender#0.60.0" = { git = "https://github.com/szeged/webrender.git", branch="update_wr60"}
+"https://github.com/servo/webrender#webrender_api:0.60.0" = { git = "https://github.com/szeged/webrender.git", branch="update_wr60", features = ["ipc"] }
