@@ -230,7 +230,7 @@ where
             let init = webrender::DeviceInit {
                 instance,
                 adapter,
-                surface,
+                surface: Some(surface),
                 window_size: (size.width as i32, size.height as i32),
                 descriptor_count: None,
                 cache_path: None,
