@@ -151,7 +151,8 @@ pub trait WindowMethods {
     /// run the event loop at the vsync interval.
     fn set_animation_state(&self, _state: AnimationState);
     #[cfg(feature = "winit")]
-    fn get_window(&self) -> &winit::Window;
+    fn get_window(&self) -> Option<&winit::Window>;
+    fn get_inner_size(&self) -> DeviceIntSize;
     /// Register services with a VRServiceManager.
     fn register_vr_services(
         &self,
