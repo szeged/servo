@@ -556,7 +556,7 @@ impl<Window: WindowMethods, Back: gfx_hal::Backend> IOCompositor<Window, Back> {
 
         self.create_pipeline_details_for_frame_tree(&frame_tree);
 
-        self.send_window_size(WindowSizeType::Initial);
+        self.on_resize_window_event();
 
         self.frame_tree_id.next();
     }
@@ -575,7 +575,6 @@ impl<Window: WindowMethods, Back: gfx_hal::Backend> IOCompositor<Window, Back> {
 
     fn send_window_size(&self, size_type: WindowSizeType) {
         let dppx = self.page_zoom * self.embedder_coordinates.hidpi_factor;
-
         self.webrender_api.set_window_parameters(
             self.webrender_document,
             self.embedder_coordinates.framebuffer,
@@ -607,16 +606,13 @@ impl<Window: WindowMethods, Back: gfx_hal::Backend> IOCompositor<Window, Back> {
 
         let old_coords = self.embedder_coordinates;
         self.embedder_coordinates = self.window.get_coordinates();
+        let new_size = self.embedder_coordinates.viewport.size;
+        let new_size = (new_size.width, new_size.height);
+        self.embedder_coordinates.framebuffer = self.webrender.resize(Some(new_size));
 
         // A size change could also mean a resolution change.
         if self.embedder_coordinates.hidpi_factor != old_coords.hidpi_factor {
             self.update_zoom_transform();
-        }
-
-        if self.embedder_coordinates.viewport == old_coords.viewport &&
-            self.embedder_coordinates.framebuffer == old_coords.framebuffer
-        {
-            return;
         }
 
         self.send_window_size(WindowSizeType::Resize);

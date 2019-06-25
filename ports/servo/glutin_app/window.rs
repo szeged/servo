@@ -183,7 +183,7 @@ impl Window {
 
         let screen_size;
         let inner_size;
-        let window_kind = if false { //opts::get().headless {
+        let window_kind = if opts::get().headless {
             screen_size = TypedSize2D::new(width as u32, height as u32);
             inner_size = TypedSize2D::new(width as u32, height as u32);
             WindowKind::Headless(HeadlessContext::new(width as u32, height as u32))
@@ -534,19 +534,10 @@ impl Window {
                 event: winit::WindowEvent::Resized(size),
                 ..
             } => {
-                // size is DeviceIndependentPixel.
-                // window.resize() takes DevicePixel.
-                // if let WindowKind::Window(ref window, _) = self.kind {
-                //     let size = size.to_physical(self.device_hidpi_factor().get() as f64);
-                //     window.resize(size);
-                // }
-                // window.set_inner_size() takes DeviceIndependentPixel.
                 let (width, height) = size.into();
                 let new_size = TypedSize2D::new(width, height);
-                if self.inner_size.get() != new_size {
-                    self.inner_size.set(new_size);
-                    self.event_queue.borrow_mut().push(WindowEvent::Resize);
-                }
+                self.inner_size.set(new_size);
+                self.event_queue.borrow_mut().push(WindowEvent::Resize);
             },
             Event::Suspended(suspended) => {
                 self.suspended.set(suspended);
@@ -807,11 +798,34 @@ impl WindowMethods for Window {
             }*/
         }
     }
-    fn get_window(&self) -> &winit::Window {
+    fn get_window(&self) -> Option<&winit::Window> {
         match self.kind {
-            WindowKind::Window(ref window, ..) => return window,
-            WindowKind::Headless(..) => unreachable!(),
+            WindowKind::Window(ref window, ..) => return Some(&window),
+            WindowKind::Headless(..) => None,
         }
+    }
+        fn get_inner_size(&self) -> DeviceIntSize {
+            fn inner_size(window: &winit::Window) -> DeviceIntSize {
+                let size = window
+                    .get_inner_size()
+                    .unwrap()
+                    .to_physical(window.get_hidpi_factor());
+                DeviceIntSize::new(size.width as i32, size.height as i32)
+            }
+            #[cfg(feature = "vulkan")]
+            match self.kind {
+                WindowKind::Window(ref window, ..) => inner_size(window),
+                WindowKind::Headless(ref context) => DeviceIntSize::new(context.width as i32, context.height as i32),
+            }
+
+            #[cfg(feature = "gleam")]
+            match self.kind {
+                WindowKind::Window(ref window, ..) => inner_size(window),
+                WindowKind::Headless(ref context) => DeviceIntSize::new(context.width as i32, context.height as i32),
+            }
+
+            #[cfg(not(any(feature = "gleam", feature = "vulkan")))]
+            DeviceIntSize::zero()
     }
 }
 
