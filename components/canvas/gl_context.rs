@@ -87,7 +87,6 @@ impl GLContextFactory {
                 }
             },
             GLContextFactory::OSMesa(ref _handle) => {
-                #[cfg(not(target_os = "macos"))]
                 {
                     GLContextWrapper::OSMesa(GLContext::new_shared_with_dispatcher(
                         // FIXME(nox): Why are those i32 values?
@@ -97,19 +96,6 @@ impl GLContextFactory {
                         gl::GlType::default(),
                         Self::gl_version(webgl_version),
                         Some(_handle),
-                        None,
-                    )?)
-                }
-                #[cfg(target_os = "macos")]
-                {
-                    GLContextWrapper::OSMesaWithIOSurface(GLContext::new_shared_with_dispatcher(
-                        // FIXME(nox): Why are those i32 values?
-                        size.to_i32(),
-                        attributes,
-                        ColorAttachmentType::IOSurface,
-                        gl::GlType::default(),
-                        Self::gl_version(webgl_version),
-                        None,
                         None,
                     )?)
                 }
@@ -167,8 +153,6 @@ pub enum GLContextWrapper {
     OSMesa(GLContext<OSMesaContext>),
     #[cfg(target_os = "macos")]
     NativeWithIOSurface(GLContext<NativeGLContext>),
-    #[cfg(target_os = "macos")]
-    OSMesaWithIOSurface(GLContext<NativeGLContext>),
 }
 
 impl GLContextWrapper {
@@ -182,10 +166,6 @@ impl GLContextWrapper {
             },
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref ctx) => {
-                ctx.make_current().unwrap();
-            },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref ctx) => {
                 ctx.make_current().unwrap();
             },
         }
@@ -208,10 +188,6 @@ impl GLContextWrapper {
             GLContextWrapper::NativeWithIOSurface(ref ctx) => {
                 WebGLImpl::apply(ctx, state, cmd, backtrace);
             },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref ctx) => {
-                WebGLImpl::apply(ctx, state, cmd, backtrace);
-            },
         }
     }
 
@@ -221,8 +197,6 @@ impl GLContextWrapper {
             GLContextWrapper::OSMesa(ref ctx) => ctx.gl(),
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref ctx) => ctx.gl(),
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref ctx) => ctx.gl(),
         }
     }
 
@@ -271,21 +245,6 @@ impl GLContextWrapper {
 
                 (real_size, texture_id, io_surface_id, map_limits(limits))
             },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref ctx) => {
-                let (real_size, texture_id, io_surface_id) = {
-                    let draw_buffer = ctx.borrow_draw_buffer().unwrap();
-                    (
-                        draw_buffer.size(),
-                        draw_buffer.get_bound_texture_id().unwrap(),
-                        draw_buffer.get_active_io_surface_id(),
-                    )
-                };
-
-                let limits = ctx.borrow_limits().clone();
-
-                (real_size, texture_id, io_surface_id, map_limits(limits))
-            },
         }
     }
 
@@ -293,10 +252,6 @@ impl GLContextWrapper {
         match *self {
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref ctx) => {
-                ctx.borrow_draw_buffer().unwrap().get_active_io_surface_id()
-            },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref ctx) => {
                 ctx.borrow_draw_buffer().unwrap().get_active_io_surface_id()
             },
             _ => None,
@@ -311,10 +266,6 @@ impl GLContextWrapper {
             GLContextWrapper::NativeWithIOSurface(ref mut ctx) => {
                 ctx.swap_draw_buffer(_clear_color)
             },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref mut ctx) => {
-                ctx.swap_draw_buffer(_clear_color)
-            },
             _ => None,
         }
     }
@@ -323,8 +274,6 @@ impl GLContextWrapper {
         match *self {
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref mut ctx) => ctx.handle_lock(),
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref mut ctx) => ctx.handle_lock(),
             _ => None,
         }
     }
@@ -341,11 +290,6 @@ impl GLContextWrapper {
             },
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref mut ctx) => {
-                // FIXME(nox): Why are those i32 values?
-                ctx.resize(size.to_i32())
-            },
-            #[cfg(target_os = "macos")]
-            GLContextWrapper::OSMesaWithIOSurface(ref mut ctx) => {
                 // FIXME(nox): Why are those i32 values?
                 ctx.resize(size.to_i32())
             },
