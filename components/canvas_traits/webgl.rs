@@ -41,6 +41,7 @@ pub struct WebGLLockMessage {
     pub size: Size2D<i32>,
     pub io_surface_id: Option<u32>,
     pub gl_sync: usize,
+    pub alpha: bool,
 }
 
 /// WebGL Message API

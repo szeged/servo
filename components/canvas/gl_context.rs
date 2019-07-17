@@ -260,11 +260,15 @@ impl GLContextWrapper {
 
     /// Swap the backing texture for the draw buffer, returning the id of the IOsurface
     /// now used for reading.
-    pub fn swap_draw_buffer(&mut self, _clear_color: (f32, f32, f32, f32)) -> Option<u32> {
+    pub fn swap_draw_buffer(
+        &mut self,
+        _clear_color: (f32, f32, f32, f32),
+        _mask: u32,
+    ) -> Option<u32> {
         match *self {
             #[cfg(target_os = "macos")]
             GLContextWrapper::NativeWithIOSurface(ref mut ctx) => {
-                ctx.swap_draw_buffer(_clear_color)
+                ctx.swap_draw_buffer(_clear_color, _mask)
             },
             _ => None,
         }

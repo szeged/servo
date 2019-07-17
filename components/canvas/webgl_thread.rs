@@ -25,6 +25,7 @@ struct GLContextData {
 
 pub struct GLState {
     clear_color: (f32, f32, f32, f32),
+    clear_mask: gl::GLuint,
     scissor_test_enabled: bool,
     stencil_write_mask: (u32, u32),
     stencil_clear_value: i32,
@@ -36,6 +37,7 @@ impl Default for GLState {
     fn default() -> GLState {
         GLState {
             clear_color: (0., 0., 0., 0.),
+            clear_mask: gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT | gl::STENCIL_BUFFER_BIT,
             scissor_test_enabled: false,
             stencil_write_mask: (0, 0),
             stencil_clear_value: 0,
@@ -201,10 +203,10 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                     data.ctx.make_current();
                     self.bound_context_id = Some(*context_id);
                 }
-                info.io_surface_id = data.ctx.swap_draw_buffer(data.state.clear_color);
+                info.io_surface_id = data.ctx.swap_draw_buffer(data.state.clear_color, data.state.clear_mask);
             }
             info.received_webgl_command = false;
-            info.has_request_animtion = true;
+            info.has_request_animation = true;
         }
         sender.send(()).unwrap();
     }
@@ -268,7 +270,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
         data.ctx.gl().flush();
 
         // If no Swap message received we use the currently bound IOSurface
-        if !info.has_request_animtion {
+        if !info.has_request_animation {
             info.io_surface_id = data.ctx.get_active_io_surface_id();
         } else {
             info.io_surface_id = data.ctx.handle_lock();
@@ -280,6 +282,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                 size: info.size,
                 io_surface_id: info.io_surface_id,
                 gl_sync: gl_sync as usize,
+                alpha: info.alpha,
             })
             .unwrap();
     }
@@ -346,7 +349,7 @@ impl<VR: WebVRRenderHandler + 'static> WebGLThread<VR> {
                 gl_sync: None,
                 render_state: ContextRenderState::Unlocked,
                 io_surface_id,
-                has_request_animtion: false,
+                has_request_animation: false,
                 received_webgl_command: false,
             },
         );
@@ -785,7 +788,7 @@ struct WebGLContextInfo {
     /// The ID of the IOSurface which we can send to the WR thread
     io_surface_id: Option<u32>,
     /// True if the context has requestAnimationFrame call
-    has_request_animtion: bool,
+    has_request_animation: bool,
     /// True if the context received a WebGLCommand between two requestAnimationFrame
     received_webgl_command: bool,
 }
@@ -894,7 +897,10 @@ impl WebGLImpl {
             WebGLCommand::BufferSubData(buffer_type, offset, ref receiver) => {
                 gl::buffer_sub_data(ctx.gl(), buffer_type, offset, &receiver.recv().unwrap())
             },
-            WebGLCommand::Clear(mask) => ctx.gl().clear(mask),
+            WebGLCommand::Clear(mask) => {
+                state.clear_mask = mask;
+                ctx.gl().clear(mask);
+            }
             WebGLCommand::ClearColor(r, g, b, a) => {
                 state.clear_color = (r, g, b, a);
                 ctx.gl().clear_color(r, g, b, a);

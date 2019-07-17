@@ -114,6 +114,7 @@ impl WebGLExternalImageApi for WebGLExternalImages {
             size,
             io_surface_id,
             gl_sync,
+            alpha,
         } = self.lock_channel.1.recv().unwrap();
 
         // If we have a new IOSurface bind it to a new texture on the WR thread,
@@ -128,7 +129,7 @@ impl WebGLExternalImageApi for WebGLExternalImages {
                     let texture_id = gl.gen_textures(1)[0];
                     gl.bind_texture(gl::TEXTURE_RECTANGLE_ARB, texture_id);
                     let io_surface = io_surface::lookup(_io_surface_id);
-                    io_surface.bind_to_gl_texture(size.width, size.height);
+                    io_surface.bind_to_gl_texture(size.width, size.height, alpha);
                     texture_id
                 });
                 texture_id
