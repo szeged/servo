@@ -5,7 +5,7 @@
 use smallvec::SmallVec;
 use webgpu::wgpu::{
     hub::IdentityManager,
-    id::{AdapterId, BufferId, DeviceId},
+    id::{AdapterId, BufferId, CommandEncoderId, DeviceId},
     Backend,
 };
 
@@ -14,6 +14,7 @@ pub struct IdentityHub {
     adapters: IdentityManager,
     devices: IdentityManager,
     buffers: IdentityManager,
+    command_encoders: IdentityManager,
     backend: Backend,
 }
 
@@ -23,6 +24,7 @@ impl IdentityHub {
             adapters: IdentityManager::default(),
             devices: IdentityManager::default(),
             buffers: IdentityManager::default(),
+            command_encoders: IdentityManager::default(),
             backend,
         }
     }
@@ -37,6 +39,10 @@ impl IdentityHub {
 
     pub fn create_buffer_id(&mut self) -> BufferId {
         self.buffers.alloc(self.backend)
+    }
+
+    pub fn create_command_encoder_id(&mut self) -> CommandEncoderId {
+        self.command_encoders.alloc(self.backend)
     }
 }
 
@@ -117,6 +123,20 @@ impl Identities {
             #[cfg(any(target_os = "ios", target_os = "macos"))]
             Backend::Metal => self.metal_hub.create_buffer_id(),
             _ => self.dummy_hub.create_buffer_id(),
+        }
+    }
+
+    pub fn create_command_encoder_id(&mut self, backend: Backend) -> CommandEncoderId {
+        match backend {
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            Backend::Vulkan => self.vk_hub.create_command_encoder_id(),
+            #[cfg(target_os = "windows")]
+            Backend::Dx12 => self.dx12_hub.create_command_encoder_id(),
+            #[cfg(target_os = "windows")]
+            Backend::Dx11 => self.dx11_hub.create_command_encoder_id(),
+            #[cfg(any(target_os = "ios", target_os = "macos"))]
+            Backend::Metal => self.metal_hub.create_command_encoder_id(),
+            _ => self.dummy_hub.create_command_encoder_id(),
         }
     }
 }

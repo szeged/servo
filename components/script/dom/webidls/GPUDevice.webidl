@@ -11,21 +11,25 @@ interface GPUDevice : EventTarget {
 
     GPUBuffer createBuffer(GPUBufferDescriptor descriptor);
     GPUMappedBuffer createBufferMapped(GPUBufferDescriptor descriptor);
-    /*Promise<GPUMappedBuffer> createBufferMappedAsync(GPUBufferDescriptor descriptor);
-    GPUTexture createTexture(GPUTextureDescriptor descriptor);
-    GPUSampler createSampler(optional GPUSamplerDescriptor descriptor = {});
+    // Promise<GPUMappedBuffer> createBufferMappedAsync(GPUBufferDescriptor descriptor);
+    // GPUTexture createTexture(GPUTextureDescriptor descriptor);
+    // GPUSampler createSampler(optional GPUSamplerDescriptor descriptor = {});
 
-    GPUBindGroupLayout createBindGroupLayout(GPUBindGroupLayoutDescriptor descriptor);
-    GPUPipelineLayout createPipelineLayout(GPUPipelineLayoutDescriptor descriptor);
-    GPUBindGroup createBindGroup(GPUBindGroupDescriptor descriptor);
+    // GPUBindGroupLayout createBindGroupLayout(GPUBindGroupLayoutDescriptor descriptor);
+    // GPUPipelineLayout createPipelineLayout(GPUPipelineLayoutDescriptor descriptor);
+    // GPUBindGroup createBindGroup(GPUBindGroupDescriptor descriptor);
 
-    GPUShaderModule createShaderModule(GPUShaderModuleDescriptor descriptor);
-    GPUComputePipeline createComputePipeline(GPUComputePipelineDescriptor descriptor);
-    GPURenderPipeline createRenderPipeline(GPURenderPipelineDescriptor descriptor);
+    // GPUShaderModule createShaderModule(GPUShaderModuleDescriptor descriptor);
+    // GPUComputePipeline createComputePipeline(GPUComputePipelineDescriptor descriptor);
+    // GPURenderPipeline createRenderPipeline(GPURenderPipelineDescriptor descriptor);
 
     GPUCommandEncoder createCommandEncoder(optional GPUCommandEncoderDescriptor descriptor = {});
-    GPURenderBundleEncoder createRenderBundleEncoder(GPURenderBundleEncoderDescriptor descriptor);
+    // GPURenderBundleEncoder createRenderBundleEncoder(GPURenderBundleEncoderDescriptor descriptor);
 
-    GPUQueue getQueue();*/
+    // GPUQueue getQueue();
 };
 GPUDevice includes GPUObjectBase;
+
+dictionary GPUCommandEncoderDescriptor : GPUObjectDescriptorBase {
+    // TODO: reusability flag?
+};

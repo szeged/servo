@@ -18,6 +18,7 @@ use smallvec::SmallVec;
 pub enum WebGPUResponse {
     RequestAdapter(String, WebGPUAdapter, WebGPU),
     RequestDevice(WebGPUDevice, wgpu::instance::DeviceDescriptor),
+    CreateCommandEncoder(WebGPUCommandEncoder),
 }
 
 pub type WebGPUResponseResult = Result<WebGPUResponse, String>;
@@ -50,6 +51,12 @@ pub enum WebGPURequest {
     ),
     UnmapBuffer(WebGPUBuffer),
     DestroyBuffer(WebGPUBuffer),
+    CreateCommandEncoder(
+        IpcSender<WebGPUResponse>,
+        WebGPUDevice,
+        //wgpu::command::CommandEncoderDescriptor,
+        wgpu::id::CommandEncoderId,
+    ),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -220,6 +227,18 @@ impl WGPU {
                     let global = &self.global;
                     gfx_select!(buffer.0 => global.buffer_destroy(buffer.0));
                 },
+                WebGPURequest::CreateCommandEncoder(sender, device, id) => {
+                    let global = &self.global;
+                    let encoder_id = gfx_select!(id => global.device_create_command_encoder(device.0, &Default::default(), id));
+                    if let Err(e) = sender.send(WebGPUResponse::CreateCommandEncoder(
+                        WebGPUCommandEncoder(encoder_id),
+                    )) {
+                        warn!(
+                            "Failed to send response to WebGPURequest::CreateBuffer ({})",
+                            e
+                        )
+                    }
+                },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
                     if let Err(e) = sender.send(()) {
@@ -250,3 +269,4 @@ macro_rules! webgpu_resource {
 webgpu_resource!(WebGPUAdapter, wgpu::id::AdapterId);
 webgpu_resource!(WebGPUDevice, wgpu::id::DeviceId);
 webgpu_resource!(WebGPUBuffer, wgpu::id::BufferId);
+webgpu_resource!(WebGPUCommandEncoder, wgpu::id::CommandEncoderId);

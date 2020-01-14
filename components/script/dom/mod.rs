@@ -320,6 +320,7 @@ pub mod gpu;
 pub mod gpuadapter;
 pub mod gpubuffer;
 pub mod gpubufferusage;
+pub mod gpucommandencoder;
 pub mod gpudevice;
 pub mod hashchangeevent;
 pub mod headers;

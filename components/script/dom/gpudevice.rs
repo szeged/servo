@@ -6,7 +6,9 @@
 
 use crate::dom::bindings::cell::DomRefCell;
 use crate::dom::bindings::codegen::Bindings::GPUBufferBinding::GPUBufferDescriptor;
-use crate::dom::bindings::codegen::Bindings::GPUDeviceBinding::{self, GPUDeviceMethods};
+use crate::dom::bindings::codegen::Bindings::GPUDeviceBinding::{
+    self, GPUCommandEncoderDescriptor, GPUDeviceMethods,
+};
 use crate::dom::bindings::codegen::Bindings::WindowBinding::WindowBinding::WindowMethods;
 use crate::dom::bindings::inheritance::Castable;
 use crate::dom::bindings::reflector::{reflect_dom_object, DomObject};
@@ -16,6 +18,7 @@ use crate::dom::eventtarget::EventTarget;
 use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpuadapter::GPUAdapter;
 use crate::dom::gpubuffer::{GPUBuffer, GPUBufferState};
+use crate::dom::gpucommandencoder::GPUCommandEncoder;
 use crate::dom::window::Window;
 use crate::script_runtime::JSContext as SafeJSContext;
 use dom_struct::dom_struct;
@@ -228,5 +231,27 @@ impl GPUDeviceMethods for GPUDevice {
         unsafe {
             self.resolve_create_buffer_mapped(cx, buffer, array_buffer, wgpu_descriptor, valid)
         }
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpudevice-createcommandencoder
+    fn CreateCommandEncoder(
+        &self,
+        _descriptor: &GPUCommandEncoderDescriptor,
+    ) -> DomRoot<GPUCommandEncoder> {
+        let (sender, receiver) = ipc::channel().unwrap();
+        if let Some(window) = self.global().downcast::<Window>() {
+            let id = window
+                .Navigator()
+                .create_command_encoder_id(self.device.0.backend());
+            self.channel
+                .0
+                .send(WebGPURequest::CreateCommandEncoder(sender, self.device, id))
+                .expect("Failed to create WebGPU command encoder");
+        } else {
+            unimplemented!();
+        };
+        let encoder = receiver.recv().unwrap();
+
+        GPUCommandEncoder::new(&self.global(), self.channel.clone(), encoder)
     }
 }
