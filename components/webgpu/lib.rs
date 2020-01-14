@@ -81,6 +81,12 @@ pub enum WebGPURequest {
     ),
     UnmapBuffer(WebGPUBuffer),
     DestroyBuffer(WebGPUBuffer),
+    CreateCommandEncoder(
+        IpcSender<WebGPUCommandEncoder>,
+        WebGPUDevice,
+        //wgpu::command::CommandEncoderDescriptor,
+        wgpu::id::CommandEncoderId,
+    ),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -344,6 +350,20 @@ impl WGPU {
                         )
                     }
                 },
+                WebGPURequest::CreateCommandEncoder(sender, device, id) => {
+                    let global = &self.global;
+                    let encoder_id = gfx_select!(id => global.device_create_command_encoder(
+                        device.0,
+                        &Default::default(),
+                        id
+                    ));
+                    if let Err(e) = sender.send(WebGPUCommandEncoder(encoder_id)) {
+                        warn!(
+                            "Failed to send response to WebGPURequest::CreateBuffer ({})",
+                            e
+                        )
+                    }
+                },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
                     if let Err(e) = sender.send(()) {
@@ -379,3 +399,4 @@ webgpu_resource!(WebGPUBindGroupLayout, wgpu::id::BindGroupLayoutId);
 webgpu_resource!(WebGPUComputePipeline, wgpu::id::ComputePipelineId);
 webgpu_resource!(WebGPUPipelineLayout, wgpu::id::PipelineLayoutId);
 webgpu_resource!(WebGPUShaderModule, wgpu::id::ShaderModuleId);
+webgpu_resource!(WebGPUCommandEncoder, wgpu::id::CommandEncoderId);
