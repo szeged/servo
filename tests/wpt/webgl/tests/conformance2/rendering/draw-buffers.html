@@ -159,6 +159,8 @@ function runAttachmentTest() {
 
   var maxDrawingBuffers = gl.getParameter(gl.MAX_DRAW_BUFFERS);
   var maxColorAttachments = gl.getParameter(gl.MAX_COLOR_ATTACHMENTS);
+  console.log(maxDrawingBuffers)
+  console.log(maxColorAttachments)
 
   var tex = gl.createTexture();
   var fb = gl.createFramebuffer();

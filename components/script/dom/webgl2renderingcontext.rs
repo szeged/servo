@@ -21,7 +21,7 @@ use crate::dom::htmlcanvaselement::HTMLCanvasElement;
 use crate::dom::htmliframeelement::HTMLIFrameElement;
 use crate::dom::webglactiveinfo::WebGLActiveInfo;
 use crate::dom::webglbuffer::WebGLBuffer;
-use crate::dom::webglframebuffer::WebGLFramebuffer;
+use crate::dom::webglframebuffer::{WebGLFramebuffer, WebGLFramebufferAttachmentRoot};
 use crate::dom::webglprogram::WebGLProgram;
 use crate::dom::webglquery::WebGLQuery;
 use crate::dom::webglrenderbuffer::WebGLRenderbuffer;
@@ -406,6 +406,157 @@ impl WebGL2RenderingContext {
         self.base
             .uniform_vec_section::<u32>(vec, offset, length, uniform_size, uniform_location)
     }
+
+    #[allow(unsafe_code)]
+    fn get_default_fb_attachment_param(&self, attachment: u32, pname: u32) -> WebGLResult<JSVal> {
+        match attachment {
+            constants::BACK | constants::DEPTH | constants::STENCIL => {},
+            _ => return Err(InvalidEnum),
+        }
+
+        if pname == constants::FRAMEBUFFER_ATTACHMENT_OBJECT_NAME {
+            return Ok(NullValue());
+        }
+
+        let attrs = self
+            .GetContextAttributes()
+            .unwrap_or_else(WebGLContextAttributes::empty);
+
+        let intval = match pname {
+            constants::FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE => match attachment {
+                constants::DEPTH if !attrs.depth => constants::NONE as _,
+                constants::STENCIL if !attrs.stencil => constants::NONE as _,
+                _ => constants::FRAMEBUFFER_DEFAULT as _,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_RED_SIZE |
+            constants::FRAMEBUFFER_ATTACHMENT_GREEN_SIZE |
+            constants::FRAMEBUFFER_ATTACHMENT_BLUE_SIZE => match attachment {
+                constants::BACK => 8,
+                _ => 0,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE => match attachment {
+                constants::BACK if attrs.alpha => 8,
+                constants::BACK => return Err(InvalidOperation),
+                _ => 0,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE => match attachment {
+                constants::DEPTH if attrs.depth => 24,
+                constants::DEPTH => return Err(InvalidOperation),
+                _ => 0,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE => match attachment {
+                constants::STENCIL if attrs.stencil => 8,
+                constants::STENCIL => return Err(InvalidOperation),
+                _ => 0,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE => match attachment {
+                constants::DEPTH if attrs.depth => constants::UNSIGNED_NORMALIZED as _,
+                constants::STENCIL if attrs.stencil => constants::UNSIGNED_INT as _,
+                constants::DEPTH => return Err(InvalidOperation),
+                constants::STENCIL => return Err(InvalidOperation),
+                _ => constants::UNSIGNED_NORMALIZED as _,
+            },
+            constants::FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING => match attachment {
+                constants::DEPTH if !attrs.depth => return Err(InvalidOperation),
+                constants::STENCIL if !attrs.stencil => return Err(InvalidOperation),
+                _ => constants::LINEAR as _,
+            },
+            _ => return Err(InvalidEnum),
+        };
+        Ok(Int32Value(intval))
+    }
+
+    #[allow(unsafe_code)]
+    fn get_specific_fb_attachment_param(
+        &self,
+        cx: JSContext,
+        fb: &WebGLFramebuffer,
+        target: u32,
+        attachment: u32,
+        pname: u32,
+    ) -> WebGLResult<JSVal> {
+        use crate::dom::webglframebuffer::WebGLFramebufferAttachmentRoot::{Renderbuffer, Texture};
+
+        match attachment {
+            constants::DEPTH_ATTACHMENT | constants::STENCIL_ATTACHMENT => {},
+            constants::DEPTH_STENCIL_ATTACHMENT => {
+                if pname == constants::FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE {
+                    return Err(InvalidOperation);
+                }
+
+                let a = fb.attachment(constants::DEPTH_ATTACHMENT);
+                let b = fb.attachment(constants::STENCIL_ATTACHMENT);
+                match (a, b) {
+                    (Some(Renderbuffer(ref a)), Some(Renderbuffer(ref b))) if a.id() == b.id() => {
+                    },
+                    (Some(Texture(ref a)), Some(Texture(ref b))) if a.id() == b.id() => {},
+                    _ => return Err(InvalidOperation),
+                }
+            },
+            constants::COLOR_ATTACHMENT0..=constants::COLOR_ATTACHMENT15 => {
+                let last_slot =
+                    constants::COLOR_ATTACHMENT0 + self.base.limits().max_color_attachments - 1;
+                if last_slot < attachment {
+                    return Err(InvalidEnum);
+                }
+            },
+            _ => return Err(InvalidEnum),
+        }
+
+        let attachment = match attachment {
+            constants::DEPTH_STENCIL_ATTACHMENT => constants::DEPTH_ATTACHMENT,
+            _ => attachment,
+        };
+
+        if pname == constants::FRAMEBUFFER_ATTACHMENT_OBJECT_NAME {
+            rooted!(in(*cx) let mut rval = NullValue());
+            match fb.attachment(attachment) {
+                Some(Renderbuffer(rb)) => unsafe {
+                    rb.to_jsval(*cx, rval.handle_mut());
+                },
+                Some(Texture(texture)) => unsafe {
+                    texture.to_jsval(*cx, rval.handle_mut());
+                },
+                _ => {},
+            }
+            return Ok(rval.get());
+        }
+
+        match pname {
+            constants::FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE => {},
+            _ => match fb.attachment(attachment) {
+                Some(webgl_attachment) => match pname {
+                    constants::FRAMEBUFFER_ATTACHMENT_RED_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_GREEN_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_BLUE_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE |
+                    constants::FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE |
+                    constants::FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING => {},
+                    _ => match webgl_attachment {
+                        WebGLFramebufferAttachmentRoot::Renderbuffer(_) => return Err(InvalidEnum),
+                        WebGLFramebufferAttachmentRoot::Texture(_) => match pname {
+                            constants::FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL |
+                            constants::FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE |
+                            constants::FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER => {},
+                            _ => return Err(InvalidEnum),
+                        },
+                    },
+                },
+                None => return Err(InvalidOperation),
+            },
+        }
+
+        let (sender, receiver) = webgl_channel().unwrap();
+        self.base
+            .send_command(WebGLCommand::GetFramebufferAttachmentParameter(
+                target, attachment, pname, sender,
+            ));
+
+        let retval = receiver.recv().unwrap();
+        Ok(Int32Value(retval))
+    }
 }
 
 impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
@@ -503,6 +654,13 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
                     self.current_transform_feedback.get()
                 );
             },
+            // NOTE: DRAW_FRAMEBUFFER_BINDING is the same as FRAMEBUFFER_BINDING, handled on the WebGL1 side
+            constants::READ_FRAMEBUFFER_BINDING => unsafe {
+                return optional_root_object_to_js_or_null!(
+                    *cx,
+                    &self.base.get_read_framebuffer_slot().get()
+                );
+            },
             _ => {},
         }
 
@@ -535,6 +693,8 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
             constants::UNIFORM_BUFFER_OFFSET_ALIGNMENT => {
                 Some(self.base.limits().uniform_buffer_offset_alignment)
             },
+            constants::MAX_COLOR_ATTACHMENTS => Some(self.base.limits().max_color_attachments),
+            constants::MAX_DRAW_BUFFERS => Some(self.base.limits().max_draw_buffers),
             _ => None,
         };
         if let Some(limit) = limit {
@@ -577,8 +737,33 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
         attachment: u32,
         pname: u32,
     ) -> JSVal {
-        self.base
-            .GetFramebufferAttachmentParameter(cx, target, attachment, pname)
+        let fb_slot = match target {
+            constants::FRAMEBUFFER | constants::DRAW_FRAMEBUFFER => {
+                self.base.get_draw_framebuffer_slot()
+            },
+            constants::READ_FRAMEBUFFER => &self.base.get_read_framebuffer_slot(),
+            _ => {
+                self.base.webgl_error(InvalidEnum);
+                return NullValue();
+            },
+        };
+
+        if let Some(fb) = fb_slot.get() {
+            // A selected framebuffer is bound to the target
+            handle_potential_webgl_error!(self.base, fb.validate_transparent(), return NullValue());
+            handle_potential_webgl_error!(
+                self.base,
+                self.get_specific_fb_attachment_param(cx, &fb, target, attachment, pname),
+                return NullValue()
+            )
+        } else {
+            // The default framebuffer is bound to the target
+            handle_potential_webgl_error!(
+                self.base,
+                self.get_default_fb_attachment_param(attachment, pname),
+                return NullValue()
+            )
+        }
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.7
@@ -648,7 +833,32 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.6
     fn BindFramebuffer(&self, target: u32, framebuffer: Option<&WebGLFramebuffer>) {
-        self.base.BindFramebuffer(target, framebuffer)
+        handle_potential_webgl_error!(
+            self.base,
+            self.base.validate_new_framebuffer_binding(framebuffer),
+            return
+        );
+
+        let (bind_read, bind_draw) = match target {
+            constants::FRAMEBUFFER => (true, true),
+            constants::READ_FRAMEBUFFER => (true, false),
+            constants::DRAW_FRAMEBUFFER => (false, true),
+            _ => return self.base.webgl_error(InvalidEnum),
+        };
+        if bind_read {
+            self.base.bind_framebuffer_to(
+                target,
+                framebuffer,
+                &self.base.get_read_framebuffer_slot(),
+            );
+        }
+        if bind_draw {
+            self.base.bind_framebuffer_to(
+                target,
+                framebuffer,
+                &self.base.get_draw_framebuffer_slot(),
+            );
+        }
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.7
@@ -2219,7 +2429,20 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.6
     fn CheckFramebufferStatus(&self, target: u32) -> u32 {
-        self.base.CheckFramebufferStatus(target)
+        let fb_slot = match target {
+            constants::FRAMEBUFFER | constants::DRAW_FRAMEBUFFER => {
+                self.base.get_draw_framebuffer_slot()
+            },
+            constants::READ_FRAMEBUFFER => &self.base.get_read_framebuffer_slot(),
+            _ => {
+                self.base.webgl_error(InvalidEnum);
+                return 0;
+            },
+        };
+        match fb_slot.get() {
+            Some(fb) => fb.check_status(),
+            None => constants::FRAMEBUFFER_COMPLETE,
+        }
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.7
@@ -2236,8 +2459,38 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
         renderbuffertarget: u32,
         rb: Option<&WebGLRenderbuffer>,
     ) {
-        self.base
-            .FramebufferRenderbuffer(target, attachment, renderbuffertarget, rb)
+        if let Some(rb) = rb {
+            handle_potential_webgl_error!(self.base, self.base.validate_ownership(rb), return);
+        }
+
+        let fb_slot = match target {
+            constants::FRAMEBUFFER | constants::DRAW_FRAMEBUFFER => {
+                self.base.get_draw_framebuffer_slot()
+            },
+            constants::READ_FRAMEBUFFER => &self.base.get_read_framebuffer_slot(),
+            _ => return self.base.webgl_error(InvalidEnum),
+        };
+
+        if renderbuffertarget != constants::RENDERBUFFER {
+            return self.base.webgl_error(InvalidEnum);
+        }
+
+        match fb_slot.get() {
+            Some(fb) => match attachment {
+                constants::DEPTH_STENCIL_ATTACHMENT => {
+                    handle_potential_webgl_error!(
+                        self.base,
+                        fb.renderbuffer(constants::DEPTH_ATTACHMENT, rb)
+                    );
+                    handle_potential_webgl_error!(
+                        self.base,
+                        fb.renderbuffer(constants::STENCIL_ATTACHMENT, rb)
+                    );
+                },
+                _ => handle_potential_webgl_error!(self.base, fb.renderbuffer(attachment, rb)),
+            },
+            None => self.base.webgl_error(InvalidOperation),
+        };
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.6
@@ -2249,8 +2502,24 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
         texture: Option<&WebGLTexture>,
         level: i32,
     ) {
-        self.base
-            .FramebufferTexture2D(target, attachment, textarget, texture, level)
+        if let Some(texture) = texture {
+            handle_potential_webgl_error!(self.base, self.base.validate_ownership(texture), return);
+        }
+
+        let fb_slot = match target {
+            constants::FRAMEBUFFER | constants::DRAW_FRAMEBUFFER => {
+                self.base.get_draw_framebuffer_slot()
+            },
+            constants::READ_FRAMEBUFFER => self.base.get_read_framebuffer_slot(),
+            _ => return self.base.webgl_error(InvalidEnum),
+        };
+        match fb_slot.get() {
+            Some(fb) => handle_potential_webgl_error!(
+                self.base,
+                fb.texture2d(target, attachment, textarget, texture, level)
+            ),
+            None => self.base.webgl_error(InvalidOperation),
+        }
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.9
