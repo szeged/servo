@@ -15,7 +15,7 @@ use smallvec::SmallVec;
 #[derive(Debug, Deserialize, Serialize)]
 pub enum WebGPUResponse {
     RequestAdapter(String, WebGPUAdapter, WebGPU),
-    RequestDevice(WebGPUDevice, wgpu::instance::DeviceDescriptor),
+    RequestDevice(WebGPUDevice, WebGPUQueue, wgpu::instance::DeviceDescriptor),
 }
 
 pub type WebGPUResponseResult = Result<WebGPUResponse, String>;
@@ -222,9 +222,12 @@ impl WGPU {
                         id
                     ));
                     let device = WebGPUDevice(id);
+                    // Note: (zakorgy) Note sure if sending the queue is needed at all,
+                    // since wgpu-core uses the same id for the device and the queue
+                    let queue = WebGPUQueue(id);
                     self.devices.push(device);
                     if let Err(e) =
-                        sender.send(Ok(WebGPUResponse::RequestDevice(device, descriptor)))
+                        sender.send(Ok(WebGPUResponse::RequestDevice(device, queue, descriptor)))
                     {
                         warn!(
                             "Failed to send response to WebGPURequest::RequestDevice ({})",
@@ -443,3 +446,4 @@ webgpu_resource!(WebGPUPipelineLayout, wgpu::id::PipelineLayoutId);
 webgpu_resource!(WebGPUShaderModule, wgpu::id::ShaderModuleId);
 webgpu_resource!(WebGPUCommandEncoder, wgpu::id::CommandEncoderId);
 webgpu_resource!(WebGPUCommandBuffer, wgpu::id::CommandBufferId);
+webgpu_resource!(WebGPUQueue, wgpu::id::QueueId);
