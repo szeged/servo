@@ -102,6 +102,7 @@ pub enum WebGPURequest {
         // TODO(zakorgy): Serialize CommandBufferDescriptor in wgpu-core
         // wgpu::CommandBufferDescriptor,
     ),
+    Submit(wgpu::id::QueueId, Vec<wgpu::id::CommandBufferId>),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -408,6 +409,13 @@ impl WGPU {
                             e
                         )
                     }
+                },
+                WebGPURequest::Submit(queue_id, command_buffer_ids) => {
+                    let global = &self.global;
+                    let _ = gfx_select!(queue_id => global.queue_submit(
+                        queue_id,
+                        &command_buffer_ids
+                    ));
                 },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();

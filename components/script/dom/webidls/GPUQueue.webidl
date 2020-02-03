@@ -5,7 +5,7 @@
 // https://gpuweb.github.io/gpuweb/#gpudevice
 [Exposed=(Window, DedicatedWorker)/*, Serializable */, Pref="dom.webgpu.enabled"]
 interface GPUQueue {
-    // void submit(sequence<GPUCommandBuffer> commandBuffers);
+    void submit(sequence<GPUCommandBuffer> commandBuffers);
 
     // GPUFence createFence(optional GPUFenceDescriptor descriptor = {});
     // void signal(GPUFence fence, unsigned long long signalValue);

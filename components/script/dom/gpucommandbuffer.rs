@@ -43,6 +43,10 @@ impl GPUCommandBuffer {
             GPUCommandBufferBinding::Wrap,
         )
     }
+
+    pub fn buffer(&self) -> &WebGPUCommandBuffer {
+        &self.buffer
+    }
 }
 
 impl GPUCommandBufferMethods for GPUCommandBuffer {

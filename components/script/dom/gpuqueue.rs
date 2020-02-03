@@ -8,8 +8,9 @@ use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
+use crate::dom::gpucommandbuffer::GPUCommandBuffer;
 use dom_struct::dom_struct;
-use webgpu::{WebGPU, WebGPUQueue};
+use webgpu::{WebGPU, WebGPUQueue, WebGPURequest};
 
 #[dom_struct]
 pub struct GPUQueue {
@@ -48,5 +49,15 @@ impl GPUQueueMethods for GPUQueue {
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
     fn SetLabel(&self, value: Option<DOMString>) {
         *self.label.borrow_mut() = value;
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpuqueue-submit
+    fn Submit(&self, command_buffers: Vec<DomRoot<GPUCommandBuffer>>) {
+        // TODO(zakorgy) Add missing check step
+        let buffer_ids = command_buffers.iter().map(|cb| cb.buffer().0).collect();
+        self.channel
+            .0
+            .send(WebGPURequest::Submit(self.queue.0, buffer_ids))
+            .unwrap();
     }
 }
