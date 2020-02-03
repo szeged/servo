@@ -84,7 +84,8 @@ pub enum WebGPURequest {
     CreateCommandEncoder(
         IpcSender<WebGPUCommandEncoder>,
         WebGPUDevice,
-        //wgpu::command::CommandEncoderDescriptor,
+        // TODO(zakorgy): Serialize CommandEncoderDescriptor in wgpu-core
+        // wgpu::command::CommandEncoderDescriptor,
         wgpu::id::CommandEncoderId,
     ),
     CopyBuffer(
@@ -94,6 +95,12 @@ pub enum WebGPURequest {
         wgpu::id::BufferId,
         wgpu::BufferAddress,
         wgpu::BufferAddress,
+    ),
+    CommandEncoderFinish(
+        IpcSender<WebGPUCommandBuffer>,
+        wgpu::id::CommandEncoderId,
+        // TODO(zakorgy): Serialize CommandBufferDescriptor in wgpu-core
+        // wgpu::CommandBufferDescriptor,
     ),
 }
 
@@ -386,6 +393,19 @@ impl WGPU {
                         size
                     ));
                 },
+                WebGPURequest::CommandEncoderFinish(sender, command_encoder_id) => {
+                    let global = &self.global;
+                    let command_buffer_id = gfx_select!(command_encoder_id => global.command_encoder_finish(
+                        command_encoder_id,
+                        &wgpu::command::CommandBufferDescriptor::default()
+                    ));
+                    if let Err(e) = sender.send(WebGPUCommandBuffer(command_buffer_id)) {
+                        warn!(
+                            "Failed to send response to WebGPURequest::CommandEncoderFinish ({})",
+                            e
+                        )
+                    }
+                },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
                     if let Err(e) = sender.send(()) {
@@ -422,3 +442,4 @@ webgpu_resource!(WebGPUComputePipeline, wgpu::id::ComputePipelineId);
 webgpu_resource!(WebGPUPipelineLayout, wgpu::id::PipelineLayoutId);
 webgpu_resource!(WebGPUShaderModule, wgpu::id::ShaderModuleId);
 webgpu_resource!(WebGPUCommandEncoder, wgpu::id::CommandEncoderId);
+webgpu_resource!(WebGPUCommandBuffer, wgpu::id::CommandBufferId);

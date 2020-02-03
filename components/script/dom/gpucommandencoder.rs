@@ -4,7 +4,7 @@
 
 use crate::dom::bindings::cell::DomRefCell;
 use crate::dom::bindings::codegen::Bindings::GPUCommandEncoderBinding::{
-    self, GPUCommandEncoderMethods, GPUComputePassDescriptor,
+    self, GPUCommandBufferDescriptor, GPUCommandEncoderMethods, GPUComputePassDescriptor,
 };
 use crate::dom::bindings::reflector::DomObject;
 use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
@@ -12,8 +12,10 @@ use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpubuffer::GPUBuffer;
+use crate::dom::gpucommandbuffer::GPUCommandBuffer;
 use crate::dom::gpucomputepassencoder::GPUComputePassEncoder;
 use dom_struct::dom_struct;
+use ipc_channel::ipc;
 use webgpu::{wgpu::command::RawPass, WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
 #[dom_struct]
@@ -91,5 +93,22 @@ impl GPUCommandEncoderMethods for GPUCommandEncoder {
                 size,
             ))
             .expect("Failed to send CopyBufferToBuffer");
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpucommandencoder-finish
+    fn Finish(&self, _descriptor: &GPUCommandBufferDescriptor) -> DomRoot<GPUCommandBuffer> {
+        let (sender, receiver) = ipc::channel().unwrap();
+        self.channel
+            .0
+            .send(WebGPURequest::CommandEncoderFinish(
+                sender,
+                self.encoder.0,
+                // TODO(zakorgy): We should use `_descriptor` here after it's not empty
+                // and the underlying wgpu-core struct is serializable
+            ))
+            .expect("Failed to send CopyBufferToBuffer");
+
+        let buffer = receiver.recv().unwrap();
+        GPUCommandBuffer::new(&self.global(), self.channel.clone(), buffer)
     }
 }

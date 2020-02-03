@@ -34,7 +34,7 @@ interface GPUCommandEncoder {
     // void popDebugGroup();
     // void insertDebugMarker(DOMString markerLabel);
 
-    // GPUCommandBuffer finish(optional GPUCommandBufferDescriptor descriptor = {});
+    GPUCommandBuffer finish(optional GPUCommandBufferDescriptor descriptor = {});
 };
 GPUCommandEncoder includes GPUObjectBase;
 
