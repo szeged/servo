@@ -34,6 +34,14 @@ pub enum WebGPURequest {
         wgpu::id::DeviceId,
     ),
     Exit(IpcSender<()>),
+    CreateComputePipeline(
+        IpcSender<WebGPUComputePipeline>,
+        WebGPUDevice,
+        wgpu::id::ComputePipelineId,
+        wgpu::id::PipelineLayoutId,
+        wgpu::id::ShaderModuleId,
+        Vec<i8>,
+    ),
     CreateBuffer(
         IpcSender<WebGPUBuffer>,
         WebGPUDevice,
@@ -310,6 +318,32 @@ impl WGPU {
                         )
                     }
                 },
+                WebGPURequest::CreateComputePipeline(
+                    sender,
+                    device,
+                    id,
+                    layout,
+                    program,
+                    entry,
+                ) => {
+                    let global = &self.global;
+                    let descriptor = wgpu_core::pipeline::ComputePipelineDescriptor {
+                        layout,
+                        compute_stage: wgpu_core::pipeline::ProgrammableStageDescriptor {
+                            module: program,
+                            entry_point: entry.as_ptr(),
+                        },
+                    };
+                    let cp_id = gfx_select!(id => global.device_create_compute_pipeline(device.0, &descriptor, id));
+                    let compute_pipeline = WebGPUComputePipeline(cp_id);
+
+                    if let Err(e) = sender.send(compute_pipeline) {
+                        warn!(
+                            "Failed to send response to WebGPURequest::CreateComputePipeline ({})",
+                            e
+                        )
+                    }
+                },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
                     if let Err(e) = sender.send(()) {
@@ -342,5 +376,6 @@ webgpu_resource!(WebGPUDevice, wgpu::id::DeviceId);
 webgpu_resource!(WebGPUBuffer, wgpu::id::BufferId);
 webgpu_resource!(WebGPUBindGroup, wgpu::id::BindGroupId);
 webgpu_resource!(WebGPUBindGroupLayout, wgpu::id::BindGroupLayoutId);
+webgpu_resource!(WebGPUComputePipeline, wgpu::id::ComputePipelineId);
 webgpu_resource!(WebGPUPipelineLayout, wgpu::id::PipelineLayoutId);
 webgpu_resource!(WebGPUShaderModule, wgpu::id::ShaderModuleId);
