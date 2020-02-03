@@ -540,6 +540,7 @@ unsafe_no_jsmanaged_fields!(WebGPUPipelineLayout);
 unsafe_no_jsmanaged_fields!(WebGPUShaderModule);
 unsafe_no_jsmanaged_fields!(WebGPUCommandEncoder);
 unsafe_no_jsmanaged_fields!(WebGPUDevice);
+unsafe_no_jsmanaged_fields!(webgpu::wgpu::command::RawPass);
 unsafe_no_jsmanaged_fields!(GPUBufferState);
 unsafe_no_jsmanaged_fields!(WebXRSwapChainId);
 unsafe_no_jsmanaged_fields!(MediaList);

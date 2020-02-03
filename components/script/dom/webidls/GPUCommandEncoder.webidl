@@ -6,10 +6,11 @@
 [Exposed=(Window, DedicatedWorker), Serializable, Pref="dom.webgpu.enabled"]
 interface GPUCommandEncoder {
     // GPURenderPassEncoder beginRenderPass(GPURenderPassDescriptor descriptor);
-    // GPUComputePassEncoder beginComputePass(optional GPUComputePassDescriptor descriptor = {});
+    GPUComputePassEncoder beginComputePass(optional GPUComputePassDescriptor descriptor = {});
 
     // void copyBufferToBuffer(
     //     GPUBuffer source,
+    //     GPUBufferSize sourceOffset,
     //     GPUBufferSize sourceOffset,
     //     GPUBuffer destination,
     //     GPUBufferSize destinationOffset,
@@ -37,3 +38,9 @@ interface GPUCommandEncoder {
     // GPUCommandBuffer finish(optional GPUCommandBufferDescriptor descriptor = {});
 };
 GPUCommandEncoder includes GPUObjectBase;
+
+dictionary GPUComputePassDescriptor : GPUObjectDescriptorBase {
+};
+
+dictionary GPUCommandBufferDescriptor : GPUObjectDescriptorBase {
+};

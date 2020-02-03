@@ -352,12 +352,8 @@ impl WGPU {
                 },
                 WebGPURequest::CreateCommandEncoder(sender, device, id) => {
                     let global = &self.global;
-                    let encoder_id = gfx_select!(id => global.device_create_command_encoder(
-                        device.0,
-                        &Default::default(),
-                        id
-                    ));
-                    if let Err(e) = sender.send(WebGPUCommandEncoder(encoder_id)) {
+                    let id = gfx_select!(id => global.device_create_command_encoder(device.0, &Default::default(), id));
+                    if let Err(e) = sender.send(WebGPUCommandEncoder(id)) {
                         warn!(
                             "Failed to send response to WebGPURequest::CreateBuffer ({})",
                             e
