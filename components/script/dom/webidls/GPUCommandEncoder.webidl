@@ -8,13 +8,12 @@ interface GPUCommandEncoder {
     // GPURenderPassEncoder beginRenderPass(GPURenderPassDescriptor descriptor);
     GPUComputePassEncoder beginComputePass(optional GPUComputePassDescriptor descriptor = {});
 
-    // void copyBufferToBuffer(
-    //     GPUBuffer source,
-    //     GPUBufferSize sourceOffset,
-    //     GPUBufferSize sourceOffset,
-    //     GPUBuffer destination,
-    //     GPUBufferSize destinationOffset,
-    //     GPUBufferSize size);
+    void copyBufferToBuffer(
+        GPUBuffer source,
+        GPUBufferSize sourceOffset,
+        GPUBuffer destination,
+        GPUBufferSize destinationOffset,
+        GPUBufferSize size);
 
     // void copyBufferToTexture(
     //     GPUBufferCopyView source,

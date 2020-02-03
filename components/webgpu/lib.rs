@@ -87,6 +87,14 @@ pub enum WebGPURequest {
         //wgpu::command::CommandEncoderDescriptor,
         wgpu::id::CommandEncoderId,
     ),
+    CopyBuffer(
+        wgpu::id::CommandEncoderId,
+        wgpu::id::BufferId,
+        wgpu::BufferAddress,
+        wgpu::id::BufferId,
+        wgpu::BufferAddress,
+        wgpu::BufferAddress,
+    ),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -359,6 +367,24 @@ impl WGPU {
                             e
                         )
                     }
+                },
+                WebGPURequest::CopyBuffer(
+                    command_encoder_id,
+                    source,
+                    source_offset,
+                    destination,
+                    destination_offset,
+                    size,
+                ) => {
+                    let global = &self.global;
+                    let _ = gfx_select!(command_encoder_id => global.command_encoder_copy_buffer_to_buffer(
+                        command_encoder_id,
+                        source,
+                        source_offset,
+                        destination,
+                        destination_offset,
+                        size
+                    ));
                 },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();

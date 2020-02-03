@@ -11,9 +11,10 @@ use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
+use crate::dom::gpubuffer::GPUBuffer;
 use crate::dom::gpucomputepassencoder::GPUComputePassEncoder;
 use dom_struct::dom_struct;
-use webgpu::{wgpu::command::RawPass, WebGPU, WebGPUCommandEncoder};
+use webgpu::{wgpu::command::RawPass, WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
 #[dom_struct]
 pub struct GPUCommandEncoder {
@@ -68,5 +69,27 @@ impl GPUCommandEncoderMethods for GPUCommandEncoder {
             self.channel.clone(),
             RawPass::new_compute(self.encoder.0),
         )
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpucommandencoder-copybuffertobuffer
+    fn CopyBufferToBuffer(
+        &self,
+        source: &GPUBuffer,
+        source_offset: u64,
+        destination: &GPUBuffer,
+        destination_offset: u64,
+        size: u64,
+    ) {
+        self.channel
+            .0
+            .send(WebGPURequest::CopyBuffer(
+                self.encoder.0,
+                source.id().0,
+                source_offset,
+                destination.id().0,
+                destination_offset,
+                size,
+            ))
+            .expect("Failed to send CopyBufferToBuffer");
     }
 }
