@@ -11,6 +11,7 @@ use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpubindgroup::GPUBindGroup;
+use crate::dom::gpucomputepipeline::GPUComputePipeline;
 use dom_struct::dom_struct;
 use std::cell::RefCell;
 use webgpu::{ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
@@ -90,5 +91,12 @@ impl GPUComputePassEncoderMethods for GPUComputePassEncoder {
                 bind_group_id: bind_group.id().0,
                 dynamic_offsets: dynamic_offsets.iter().map(|o| *o as u64).collect(),
             });
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-setpipeline
+    fn SetPipeline(&self, pipeline: &GPUComputePipeline) {
+        self.commands
+            .borrow_mut()
+            .push(ComputeCommand::SetComputePipeline(pipeline.id().0));
     }
 }

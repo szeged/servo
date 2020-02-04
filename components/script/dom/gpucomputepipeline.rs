@@ -40,6 +40,10 @@ impl GPUComputePipeline {
             GPUComputePipelineBinding::Wrap,
         )
     }
+
+    pub fn id(&self) -> &WebGPUComputePipeline {
+        &self.compute_pipeline
+    }
 }
 
 impl GPUComputePipelineMethods for GPUComputePipeline {

@@ -115,7 +115,7 @@ pub enum ComputeCommand {
         bind_group_id: wgpu::id::BindGroupId,
         dynamic_offsets: Vec<u64>,
     },
-    SetPipeline(wgpu::id::ComputePipelineId),
+    SetComputePipeline(wgpu::id::ComputePipelineId),
     Dispatch([u32; 3]),
     End,
 }
@@ -455,6 +455,7 @@ impl WGPU {
 
                     let (pipeline_layout_guard, mut token) = hub.pipeline_layouts.read(&mut token);
                     let (bind_group_guard, mut token) = hub.bind_groups.read(&mut token);
+                    let (pipeline_guard, mut token) = hub.compute_pipelines.read(&mut token);
                     let (buffer_guard, mut token) = hub.buffers.read(&mut token);
                     let (texture_guard, _) = hub.textures.read(&mut token);
 
@@ -486,8 +487,20 @@ impl WGPU {
                                     return warn!("({:?})", e);
                                 }
                             },
+                            ComputeCommand::SetComputePipeline(pipeline_id) => {
+                                if let Err(e) = unsafe {
+                                    cmb.set_compute_pipeline(
+                                        pipeline_id,
+                                        &*bind_group_guard,
+                                        &*pipeline_guard,
+                                        &*pipeline_layout_guard,
+                                        &mut binder,
+                                    )
+                                } {
+                                    return warn!("({:?})", e);
+                                }
+                            },
                             ComputeCommand::End => break,
-                            c => warn!("Command not implemented ({:?})", c),
                         }
                     }
                 },
