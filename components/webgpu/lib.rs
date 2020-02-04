@@ -16,6 +16,7 @@ use smallvec::SmallVec;
 pub enum WebGPUResponse {
     RequestAdapter(String, WebGPUAdapter, WebGPU),
     RequestDevice(WebGPUDevice, wgpu::instance::DeviceDescriptor),
+    MapReadAsync(),
 }
 
 pub type WebGPUResponseResult = Result<WebGPUResponse, String>;
@@ -78,6 +79,12 @@ pub enum WebGPURequest {
         WebGPUDevice,
         wgpu::id::ShaderModuleId,
         Vec<u32>,
+    ),
+    MapReadAsync(
+        IpcSender<WebGPUResponseResult>,
+        wgpu::id::BufferId,
+        u32,
+        u64,
     ),
     UnmapBuffer(WebGPUBuffer),
     DestroyBuffer(WebGPUBuffer),
@@ -336,6 +343,19 @@ impl WGPU {
                             e
                         )
                     }
+                },
+                WebGPURequest::MapReadAsync(sender, buffer, usage, size) => {
+                    let global = &self.global;
+                    let read_fn = move |status, data| {
+                        std::dbg!(println!("{:?}", status));
+                        std::dbg!(println!("{:?}", data));
+                    };
+                    gfx_select!(buffer => global.buffer_map_async(
+                        buffer,
+                        wgpu_core::resource::BufferUsage::from_bits(usage).unwrap(),
+                        0..size,
+                        wgpu_core::resource::BufferMapOperation::Read(Box::new(read_fn))
+                    ));
                 },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();

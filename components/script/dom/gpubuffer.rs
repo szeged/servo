@@ -6,13 +6,20 @@ use crate::dom::bindings::cell::DomRefCell;
 use crate::dom::bindings::codegen::Bindings::GPUBufferBinding::{
     self, GPUBufferMethods, GPUBufferSize,
 };
+use crate::dom::bindings::reflector::DomObject;
+use crate::dom::bindings::error::Error;
 use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
+use crate::dom::gpu::response_async;
+use crate::dom::promise::Promise;
+use crate::realms::InRealm;
+use crate::dom::gpu::AsyncWGPUListener;
 use dom_struct::dom_struct;
 use std::cell::Cell;
-use webgpu::{WebGPU, WebGPUBuffer, WebGPUDevice, WebGPURequest};
+use std::rc::Rc;
+use webgpu::{WebGPU, WebGPUBuffer, WebGPUDevice, WebGPURequest, WebGPUResponse};
 
 #[derive(MallocSizeOf)]
 pub enum GPUBufferState {
@@ -123,6 +130,20 @@ impl GPUBufferMethods for GPUBuffer {
         *self.state.borrow_mut() = GPUBufferState::Destroyed;
     }
 
+    fn MapReadAsync(&self, comp: InRealm) -> Rc<Promise> {
+        let promise = Promise::new_in_current_realm(&self.global(), comp);
+        let sender = response_async(&promise, self);
+        if self
+            .channel
+            .0
+            .send(WebGPURequest::MapReadAsync(sender, self.buffer.0, self.usage, self.size))
+            .is_err()
+        {
+            promise.reject_error(Error::Operation);
+        }
+        promise
+    }
+
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
     fn GetLabel(&self) -> Option<DOMString> {
         self.label.borrow().clone()
@@ -131,5 +152,17 @@ impl GPUBufferMethods for GPUBuffer {
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
     fn SetLabel(&self, value: Option<DOMString>) {
         *self.label.borrow_mut() = value;
+    }
+}
+
+impl AsyncWGPUListener for GPUBuffer {
+    fn handle_response(&self, response: WebGPUResponse, promise: &Rc<Promise>) {
+        match response {
+            WebGPUResponse::MapReadAsync() => {
+                let a = 5;
+                promise.resolve_native(&a);
+            },
+            _ => promise.reject_error(Error::Operation),
+        }
     }
 }
