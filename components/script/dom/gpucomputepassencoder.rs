@@ -11,7 +11,8 @@ use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
 use dom_struct::dom_struct;
-use webgpu::{wgpu::command::RawPass, WebGPU};
+use std::cell::RefCell;
+use webgpu::{wgpu::command::ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
 #[dom_struct]
 pub struct GPUComputePassEncoder {
@@ -20,26 +21,29 @@ pub struct GPUComputePassEncoder {
     channel: WebGPU,
     label: DomRefCell<Option<DOMString>>,
     #[ignore_malloc_size_of = "wgpu handle"]
-    pass: RawPass,
+    parent: WebGPUCommandEncoder,
+    #[ignore_malloc_size_of = "WIP"]
+    commands: RefCell<Vec<ComputeCommand>>,
 }
 
 impl GPUComputePassEncoder {
-    pub fn new_inherited(channel: WebGPU, pass: RawPass) -> GPUComputePassEncoder {
+    pub fn new_inherited(channel: WebGPU, parent: WebGPUCommandEncoder) -> GPUComputePassEncoder {
         GPUComputePassEncoder {
             channel,
             reflector_: Reflector::new(),
             label: DomRefCell::new(None),
-            pass,
+            parent,
+            commands: RefCell::new(Vec::<ComputeCommand>::with_capacity(1)),
         }
     }
 
     pub fn new(
         global: &GlobalScope,
         channel: WebGPU,
-        pass: RawPass,
+        parent: WebGPUCommandEncoder,
     ) -> DomRoot<GPUComputePassEncoder> {
         reflect_dom_object(
-            Box::new(GPUComputePassEncoder::new_inherited(channel, pass)),
+            Box::new(GPUComputePassEncoder::new_inherited(channel, parent)),
             global,
             GPUComputePassEncoderBinding::Wrap,
         )
@@ -55,5 +59,24 @@ impl GPUComputePassEncoderMethods for GPUComputePassEncoder {
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
     fn SetLabel(&self, value: Option<DOMString>) {
         *self.label.borrow_mut() = value;
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-dispatch
+    fn Dispatch(&self, x: u32, y: u32, z: u32) {
+        self.commands
+            .borrow_mut()
+            .push(ComputeCommand::Dispatch([x, y, z]));
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-endpass
+    fn EndPass(&self) {
+        self.commands.borrow_mut().push(ComputeCommand::End);
+        self.channel
+            .0
+            .send(WebGPURequest::RunComputePass(
+                self.parent.0,
+                self.commands.borrow_mut().drain(..).collect(),
+            ))
+            .unwrap();
     }
 }

@@ -16,7 +16,7 @@ use crate::dom::gpucommandbuffer::GPUCommandBuffer;
 use crate::dom::gpucomputepassencoder::GPUComputePassEncoder;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
-use webgpu::{wgpu::command::RawPass, WebGPU, WebGPUCommandEncoder, WebGPURequest};
+use webgpu::{WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
 #[dom_struct]
 pub struct GPUCommandEncoder {
@@ -66,11 +66,7 @@ impl GPUCommandEncoderMethods for GPUCommandEncoder {
         &self,
         _descriptor: &GPUComputePassDescriptor,
     ) -> DomRoot<GPUComputePassEncoder> {
-        GPUComputePassEncoder::new(
-            &self.global(),
-            self.channel.clone(),
-            RawPass::new_compute(self.encoder.0),
-        )
+        GPUComputePassEncoder::new(&self.global(), self.channel.clone(), self.encoder)
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpucommandencoder-copybuffertobuffer

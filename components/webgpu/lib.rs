@@ -11,6 +11,7 @@ use ipc_channel::ipc::{self, IpcReceiver, IpcSender};
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 use servo_config::pref;
 use smallvec::SmallVec;
+use wgpu::hub::{GfxBackend, Token};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum WebGPUResponse {
@@ -103,6 +104,10 @@ pub enum WebGPURequest {
         // wgpu::CommandBufferDescriptor,
     ),
     Submit(wgpu::id::QueueId, Vec<wgpu::id::CommandBufferId>),
+    RunComputePass(
+        wgpu::id::CommandEncoderId,
+        Vec<wgpu::command::ComputeCommand>,
+    ),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -416,6 +421,38 @@ impl WGPU {
                         queue_id,
                         &command_buffer_ids
                     ));
+                },
+                WebGPURequest::RunComputePass(command_encoder_id, commands) => {
+                    let hub = match command_encoder_id.backend() {
+                        #[cfg(any(
+                            not(any(target_os = "ios", target_os = "macos")),
+                            feature = "gfx-backend-vulkan"
+                        ))]
+                        wgpu::Backend::Vulkan => wgpu::backend::Vulkan::hub(&self.global),
+                        #[cfg(any(target_os = "ios", target_os = "macos"))]
+                        wgpu::Backend::Metal => wgpu::backend::Metal::hub(&self.global),
+                        #[cfg(windows)]
+                        wgpu::Backend::Dx12 => wgpu::backend::Dx12::hub(&self.global),
+                        #[cfg(windows)]
+                        wgpu::Backend::Dx11 => wgpu::backend::Dx11::hub(&self.global),
+                        _ => return warn!("unsupported backend"),
+                    };
+                    let mut token = Token::root();
+
+                    let (mut cmb_guard, _) = hub.command_buffers.write(&mut token);
+                    let cmb = &mut cmb_guard[command_encoder_id];
+
+                    for command in commands {
+                        match command {
+                            wgpu::command::ComputeCommand::Dispatch(groups) => {
+                                if let Err(e) = unsafe { cmb.dispatch(groups) } {
+                                    return warn!("({:?})", e);
+                                }
+                            },
+                            wgpu::command::ComputeCommand::End => break,
+                            c => warn!("Command not implemented ({:?})", c),
+                        }
+                    }
                 },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
