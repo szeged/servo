@@ -11,6 +11,7 @@ use ipc_channel::ipc::{self, IpcReceiver, IpcSender};
 use malloc_size_of::{MallocSizeOf, MallocSizeOfOps};
 use servo_config::pref;
 use smallvec::SmallVec;
+use wgpu::command::Binder;
 use wgpu::hub::{GfxBackend, Token};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -104,10 +105,19 @@ pub enum WebGPURequest {
         // wgpu::CommandBufferDescriptor,
     ),
     Submit(wgpu::id::QueueId, Vec<wgpu::id::CommandBufferId>),
-    RunComputePass(
-        wgpu::id::CommandEncoderId,
-        Vec<wgpu::command::ComputeCommand>,
-    ),
+    RunComputePass(wgpu::id::CommandEncoderId, Vec<ComputeCommand>),
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum ComputeCommand {
+    SetBindGroup {
+        index: u32,
+        bind_group_id: wgpu::id::BindGroupId,
+        dynamic_offsets: Vec<u64>,
+    },
+    SetPipeline(wgpu::id::ComputePipelineId),
+    Dispatch([u32; 3]),
+    End,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -439,17 +449,44 @@ impl WGPU {
                     };
                     let mut token = Token::root();
 
-                    let (mut cmb_guard, _) = hub.command_buffers.write(&mut token);
+                    let (mut cmb_guard, mut token) = hub.command_buffers.write(&mut token);
                     let cmb = &mut cmb_guard[command_encoder_id];
+                    let mut binder = Binder::new(cmb.max_bind_groups());
+
+                    let (pipeline_layout_guard, mut token) = hub.pipeline_layouts.read(&mut token);
+                    let (bind_group_guard, mut token) = hub.bind_groups.read(&mut token);
+                    let (buffer_guard, mut token) = hub.buffers.read(&mut token);
+                    let (texture_guard, _) = hub.textures.read(&mut token);
 
                     for command in commands {
                         match command {
-                            wgpu::command::ComputeCommand::Dispatch(groups) => {
+                            ComputeCommand::Dispatch(groups) => {
                                 if let Err(e) = unsafe { cmb.dispatch(groups) } {
                                     return warn!("({:?})", e);
                                 }
                             },
-                            wgpu::command::ComputeCommand::End => break,
+                            ComputeCommand::SetBindGroup {
+                                index,
+                                bind_group_id,
+                                dynamic_offsets,
+                            } => {
+                                if let Err(e) = unsafe {
+                                    cmb.set_bind_group(
+                                        command_encoder_id,
+                                        index,
+                                        bind_group_id,
+                                        &dynamic_offsets,
+                                        &*bind_group_guard,
+                                        &*buffer_guard,
+                                        &*texture_guard,
+                                        &*pipeline_layout_guard,
+                                        &mut binder,
+                                    )
+                                } {
+                                    return warn!("({:?})", e);
+                                }
+                            },
+                            ComputeCommand::End => break,
                             c => warn!("Command not implemented ({:?})", c),
                         }
                     }

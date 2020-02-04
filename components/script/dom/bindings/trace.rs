@@ -152,8 +152,8 @@ use tendril::{StrTendril, TendrilSink};
 use time::{Duration, Timespec, Tm};
 use uuid::Uuid;
 use webgpu::{
-    wgpu::command::ComputeCommand, WebGPU, WebGPUAdapter, WebGPUBindGroup, WebGPUBindGroupLayout,
-    WebGPUBuffer, WebGPUCommandBuffer, WebGPUCommandEncoder, WebGPUComputePipeline, WebGPUDevice,
+    ComputeCommand, WebGPU, WebGPUAdapter, WebGPUBindGroup, WebGPUBindGroupLayout, WebGPUBuffer,
+    WebGPUCommandBuffer, WebGPUCommandEncoder, WebGPUComputePipeline, WebGPUDevice,
     WebGPUPipelineLayout, WebGPUQueue, WebGPUShaderModule,
 };
 use webrender_api::{DocumentId, ImageKey};

@@ -10,9 +10,10 @@ use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
 use crate::dom::globalscope::GlobalScope;
+use crate::dom::gpubindgroup::GPUBindGroup;
 use dom_struct::dom_struct;
 use std::cell::RefCell;
-use webgpu::{wgpu::command::ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
+use webgpu::{ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
 #[dom_struct]
 pub struct GPUComputePassEncoder {
@@ -78,5 +79,16 @@ impl GPUComputePassEncoderMethods for GPUComputePassEncoder {
                 self.commands.borrow_mut().drain(..).collect(),
             ))
             .unwrap();
+    }
+
+    /// https://gpuweb.github.io/gpuweb/#dom-gpuprogrammablepassencoder-setbindgroup
+    fn SetBindGroup(&self, index: u32, bind_group: &GPUBindGroup, dynamic_offsets: Vec<u32>) {
+        self.commands
+            .borrow_mut()
+            .push(ComputeCommand::SetBindGroup {
+                index,
+                bind_group_id: bind_group.id().0,
+                dynamic_offsets: dynamic_offsets.iter().map(|o| *o as u64).collect(),
+            });
     }
 }

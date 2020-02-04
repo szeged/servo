@@ -43,6 +43,10 @@ impl GPUBindGroup {
             GPUBindGroupBinding::Wrap,
         )
     }
+
+    pub fn id(&self) -> &WebGPUBindGroup {
+        &self.bind_group
+    }
 }
 
 impl GPUBindGroupMethods for GPUBindGroup {
