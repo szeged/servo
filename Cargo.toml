@@ -34,4 +34,5 @@ spirv_cross = { git = "https://github.com/servo/spirv_cross", branch = "wgpu-ser
 backtrace = { git = "https://github.com/MeFisto94/backtrace-rs", branch = "fix-strtab-freeing-crash" }
 
 [patch.'https://github.com/gfx-rs/wgpu']
-wgpu-core = { path= "../wgpu/wgpu-core"}
+#wgpu-core = { path= "../wgpu/wgpu-core"}
+wgpu-core = { git = "https://github.com/zakorgy/wgpu", branch="szeged-wgpu" }

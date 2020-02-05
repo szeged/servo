@@ -6764,6 +6764,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core"
 version = "0.1.0"
+source = "git+https://github.com/zakorgy/wgpu?branch=szeged-wgpu#6091f12dd0c5980af164c65b9387a74896bc004f"
 dependencies = [
  "arrayvec 0.5.1",
  "battery",
