@@ -29,3 +29,20 @@ interface GPUDevice : EventTarget {
     GPUQueue getQueue();*/
 };
 GPUDevice includes GPUObjectBase;
+
+typedef (GPUOutOfMemoryError or GPUValidationError) GPUError;
+
+enum GPUErrorFilter {
+    "none",
+    "out-of-memory",
+    "validation"
+};
+
+partial interface GPUDevice {
+    readonly attribute Promise<GPUDeviceLostInfo> lost;
+};
+
+partial interface GPUDevice {
+    void pushErrorScope(GPUErrorFilter filter);
+    Promise<GPUError?> popErrorScope();
+};

@@ -11,7 +11,7 @@ use crate::dom::bindings::codegen::Bindings::GPUBindGroupLayoutBinding::{
     GPUBindGroupLayoutBindings, GPUBindGroupLayoutDescriptor, GPUBindingType,
 };
 use crate::dom::bindings::codegen::Bindings::GPUBufferBinding::GPUBufferDescriptor;
-use crate::dom::bindings::codegen::Bindings::GPUDeviceBinding::{self, GPUDeviceMethods};
+use crate::dom::bindings::codegen::Bindings::GPUDeviceBinding::{self, GPUDeviceMethods, GPUError, GPUErrorFilter};
 use crate::dom::bindings::codegen::Bindings::GPUPipelineLayoutBinding::GPUPipelineLayoutDescriptor;
 use crate::dom::bindings::reflector::{reflect_dom_object, DomObject};
 use crate::dom::bindings::root::{Dom, DomRoot};
@@ -19,11 +19,16 @@ use crate::dom::bindings::str::DOMString;
 use crate::dom::eventtarget::EventTarget;
 use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpuadapter::GPUAdapter;
+use crate::dom::gpu::response_async;
 use crate::dom::gpubindgroup::GPUBindGroup;
 use crate::dom::gpubindgrouplayout::GPUBindGroupLayout;
 use crate::dom::gpubuffer::{GPUBuffer, GPUBufferState};
 use crate::dom::gpupipelinelayout::GPUPipelineLayout;
+use crate::dom::gpuoutofmemoryerror::GPUOutOfMemoryError;
+use crate::dom::gpuvalidationerror::GPUValidationError;
+use crate::dom::promise::Promise;
 use crate::script_runtime::JSContext as SafeJSContext;
+use crate::realms::InRealm;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
 use js::jsapi::{Heap, JSObject};
@@ -31,6 +36,7 @@ use js::jsval::{JSVal, ObjectValue};
 use js::typedarray::{ArrayBuffer, CreateWith};
 use std::collections::{HashMap, HashSet};
 use std::ptr::{self, NonNull};
+use std::rc::Rc;
 use webgpu::wgpu::binding_model::{
     BindGroupBinding, BindGroupLayoutBinding, BindingResource, BindingType, BufferBinding,
     ShaderStage,
@@ -50,6 +56,13 @@ pub struct GPUDevice {
     limits: Heap<*mut JSObject>,
     label: DomRefCell<Option<DOMString>>,
     device: WebGPUDevice,
+    #[ignore_malloc_size_of = "mozjs"]
+    errors: Vec<WebGPUError>,
+}
+
+enum WebGPUError {
+    GPUOutOfMemoryError,
+    GPUValidationError,
 }
 
 impl GPUDevice {
@@ -68,6 +81,7 @@ impl GPUDevice {
             limits,
             label: DomRefCell::new(None),
             device,
+            errors: Vec::new(),
         }
     }
 
@@ -165,6 +179,21 @@ impl GPUDeviceMethods for GPUDevice {
     /// https://gpuweb.github.io/gpuweb/#dom-gpudevice-limits
     fn Limits(&self, _cx: SafeJSContext) -> NonNull<JSObject> {
         NonNull::new(self.extensions.get()).unwrap()
+    }
+
+    fn Lost(&self, comp: InRealm) -> Rc<Promise> {
+        let promise = Promise::new_in_current_realm(&self.global(), comp);
+        //let sender = response_async(&promise, self);
+        promise.resolve_native(&true);
+        /* if self
+            .channel
+            .0
+            .send(WebGPURequest::Lost(sender, self.device))
+            .is_err()
+        {
+            promise.reject_error(Error::Operation);
+        } */
+        promise
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
@@ -527,5 +556,28 @@ impl GPUDeviceMethods for GPUDevice {
 
         let bind_group = receiver.recv().unwrap();
         GPUBindGroup::new(&self.global(), bind_group, valid)
+    }
+
+    fn PushErrorScope(&self, filter: GPUErrorFilter) {
+        match filter {
+            GPUErrorFilter::None => {},
+            GPUErrorFilter::Out_of_memory => self.errors.push(GPUOutOfMemoryError::Constructor(&self.global())), //std::dbg!(println!("{:?}", err)),
+            GPUErrorFilter::Validation => self.errors.push(GPUValidationError::Constructor(&self.global(), DOMString::from("message"))), //std::dbg!(println!("{:?}", err)),
+        }
+    }
+
+    fn PopErrorScope(&self, comp: InRealm) -> Rc<Promise> {
+        let promise = Promise::new_in_current_realm(&self.global(), comp);
+        //let sender = response_async(&promise, self);
+        promise.resolve_native(&true);
+        /* if self
+            .channel
+            .0
+            .send(WebGPURequest::Lost(sender, self.device))
+            .is_err()
+        {
+            promise.reject_error(Error::Operation);
+        } */
+        promise
     }
 }
