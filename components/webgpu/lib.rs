@@ -18,6 +18,7 @@ use wgpu::hub::{GfxBackend, Token};
 pub enum WebGPUResponse {
     RequestAdapter(String, WebGPUAdapter, WebGPU),
     RequestDevice(WebGPUDevice, WebGPUQueue, wgpu::instance::DeviceDescriptor),
+    MapReadAsync(Vec<u8>),
 }
 
 pub type WebGPUResponseResult = Result<WebGPUResponse, String>;
@@ -81,6 +82,13 @@ pub enum WebGPURequest {
         wgpu::id::ShaderModuleId,
         Vec<u32>,
     ),
+    MapReadAsync(
+        IpcSender<WebGPUResponseResult>,
+        wgpu::id::BufferId,
+        wgpu::id::DeviceId,
+        u32,
+        u64,
+    ),
     UnmapBuffer(WebGPUBuffer),
     DestroyBuffer(WebGPUBuffer),
     CreateCommandEncoder(
@@ -105,7 +113,11 @@ pub enum WebGPURequest {
         // wgpu::CommandBufferDescriptor,
     ),
     Submit(wgpu::id::QueueId, Vec<wgpu::id::CommandBufferId>),
-    RunComputePass(wgpu::id::CommandEncoderId, Vec<ComputeCommand>),
+    RunComputePass(
+        IpcSender<()>,
+        wgpu::id::CommandEncoderId,
+        Vec<ComputeCommand>,
+    ),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -432,7 +444,7 @@ impl WGPU {
                         &command_buffer_ids
                     ));
                 },
-                WebGPURequest::RunComputePass(command_encoder_id, commands) => {
+                WebGPURequest::RunComputePass(sender, command_encoder_id, commands) => {
                     let hub = match command_encoder_id.backend() {
                         #[cfg(any(
                             not(any(target_os = "ios", target_os = "macos")),
@@ -502,6 +514,26 @@ impl WGPU {
                             },
                             ComputeCommand::End => break,
                         }
+                    }
+                    if let Err(e) = sender.send(()) {
+                        warn!("Failed to send response to WebGPURequest::Exit ({})", e)
+                    }
+                },
+                WebGPURequest::MapReadAsync(sender, buffer_id, device_id, usage, size) => {
+                    let global = &self.global;
+                    let mut result = vec![0_u8; size as usize];
+                    gfx_select!(buffer_id => global.device_get_buffer_sub_data(
+                        device_id,
+                        buffer_id,
+                        0,
+                        &mut result
+                    ));
+                    println!("## Result {:?}", result);
+                    if let Err(e) = sender.send(Ok(WebGPUResponse::MapReadAsync(result))) {
+                        warn!(
+                            "Failed to send response to WebGPURequest::MapReadAsync ({})",
+                            e
+                        )
                     }
                 },
                 WebGPURequest::Exit(sender) => {

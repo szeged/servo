@@ -13,6 +13,7 @@ use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpubindgroup::GPUBindGroup;
 use crate::dom::gpucomputepipeline::GPUComputePipeline;
 use dom_struct::dom_struct;
+use ipc_channel::ipc;
 use std::cell::RefCell;
 use webgpu::{ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
 
@@ -72,14 +73,18 @@ impl GPUComputePassEncoderMethods for GPUComputePassEncoder {
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-endpass
     fn EndPass(&self) {
+        let (sender, receiver) = ipc::channel().unwrap();
         self.commands.borrow_mut().push(ComputeCommand::End);
         self.channel
             .0
             .send(WebGPURequest::RunComputePass(
+                sender,
                 self.parent.0,
                 self.commands.borrow_mut().drain(..).collect(),
             ))
             .unwrap();
+
+        let _ = receiver.recv().unwrap();
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpuprogrammablepassencoder-setbindgroup
