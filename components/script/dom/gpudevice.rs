@@ -37,6 +37,7 @@ use crate::script_runtime::JSContext as SafeJSContext;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
 use js::jsapi::{Heap, JSObject};
+use js::jsval::NullValue;
 use js::jsval::{JSVal, ObjectValue};
 use js::typedarray::{ArrayBuffer, CreateWith};
 use std::collections::{HashMap, HashSet};
@@ -132,6 +133,7 @@ impl GPUDevice {
             descriptor.size,
             descriptor.usage.bits(),
             valid,
+            RootedTraceableBox::from_box(Heap::boxed(js_array_buffer.get())),
         );
         out.push(ObjectValue(buff.reflector().get_jsobject().get()));
         out.push(ObjectValue(js_array_buffer.get()));
@@ -223,6 +225,7 @@ impl GPUDeviceMethods for GPUDevice {
             descriptor.size,
             descriptor.usage,
             valid,
+            RootedTraceableBox::new(Heap::default()),
         )
     }
 

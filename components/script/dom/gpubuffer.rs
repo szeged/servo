@@ -11,6 +11,7 @@ use crate::dom::bindings::reflector::DomObject;
 use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::DomRoot;
 use crate::dom::bindings::str::DOMString;
+use crate::dom::bindings::trace::RootedTraceableBox;
 use crate::dom::globalscope::GlobalScope;
 use crate::dom::gpu::response_async;
 use crate::dom::gpu::AsyncWGPUListener;
@@ -19,6 +20,7 @@ use crate::realms::InRealm;
 use crate::script_runtime::JSContext as SafeJSContext;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
+use js::jsapi::Heap;
 use js::jsapi::JSObject;
 use js::jsval::{JSVal, ObjectValue};
 use js::typedarray::{ArrayBuffer, CreateWith};
@@ -46,6 +48,8 @@ pub struct GPUBuffer {
     buffer: WebGPUBuffer,
     device: WebGPUDevice,
     valid: Cell<bool>,
+    #[ignore_malloc_size_of = "channels are hard"]
+    mapping: RootedTraceableBox<Heap<*mut JSObject>>,
 }
 
 impl GPUBuffer {
@@ -57,6 +61,7 @@ impl GPUBuffer {
         size: GPUBufferSize,
         usage: u32,
         valid: bool,
+        mapping: RootedTraceableBox<Heap<*mut JSObject>>,
     ) -> GPUBuffer {
         Self {
             reflector_: Reflector::new(),
@@ -68,6 +73,7 @@ impl GPUBuffer {
             valid: Cell::new(valid),
             device,
             buffer,
+            mapping,
         }
     }
 
@@ -81,10 +87,11 @@ impl GPUBuffer {
         size: GPUBufferSize,
         usage: u32,
         valid: bool,
+        mapping: RootedTraceableBox<Heap<*mut JSObject>>,
     ) -> DomRoot<GPUBuffer> {
         reflect_dom_object(
             Box::new(GPUBuffer::new_inherited(
-                channel, buffer, device, state, size, usage, valid,
+                channel, buffer, device, state, size, usage, valid, mapping,
             )),
             global,
             GPUBufferBinding::Wrap,
@@ -115,10 +122,21 @@ impl Drop for GPUBuffer {
 impl GPUBufferMethods for GPUBuffer {
     /// https://gpuweb.github.io/gpuweb/#dom-gpubuffer-unmap
     fn Unmap(&self) {
+        let array_buffer = match ArrayBuffer::from(self.mapping.get()) {
+            Ok(array_buffer) => array_buffer.to_vec(),
+            _ => unimplemented!(),
+        };
         self.channel
             .0
-            .send(WebGPURequest::UnmapBuffer(self.buffer))
+            .send(WebGPURequest::UnmapBuffer(
+                self.device.0,
+                self.id(),
+                self.usage(),
+                self.size(),
+                array_buffer,
+            ))
             .unwrap();
+        *self.state.borrow_mut() = GPUBufferState::Unmapped;
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpubuffer-destroy

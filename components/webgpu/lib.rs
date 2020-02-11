@@ -89,7 +89,7 @@ pub enum WebGPURequest {
         u32,
         u64,
     ),
-    UnmapBuffer(WebGPUBuffer),
+    UnmapBuffer(wgpu::id::DeviceId, WebGPUBuffer, u32, u64, Vec<u8>),
     DestroyBuffer(WebGPUBuffer),
     CreateCommandEncoder(
         IpcSender<WebGPUCommandEncoder>,
@@ -295,8 +295,31 @@ impl WGPU {
                         )
                     }
                 },
-                WebGPURequest::UnmapBuffer(buffer) => {
+                WebGPURequest::UnmapBuffer(device_id, buffer, usage, size, mut array_buffer) => {
                     let global = &self.global;
+                    let on_write = move |status: wgpu::resource::BufferMapAsyncStatus,
+                                         ptr: *mut u8| {
+                        match status {
+                            wgpu::resource::BufferMapAsyncStatus::Success => {
+                                unsafe {
+                                    std::ptr::copy(
+                                        array_buffer.as_mut_ptr(),
+                                        ptr,
+                                        array_buffer.len(),
+                                    );
+                                };
+                            },
+                            _ => unimplemented!(),
+                        }
+                    };
+
+                    gfx_select!(buffer.0 => global.buffer_map_async(
+                        buffer.0,
+                        wgpu::resource::BufferUsage::from_bits(usage).unwrap(),
+                        0..size,
+                        wgpu::resource::BufferMapOperation::Write(Box::new(on_write))
+                    ));
+                    gfx_select!(device_id => global.device_poll(device_id, true));
                     gfx_select!(buffer.0 => global.buffer_unmap(buffer.0));
                 },
                 WebGPURequest::DestroyBuffer(buffer) => {
@@ -521,20 +544,34 @@ impl WGPU {
                 },
                 WebGPURequest::MapReadAsync(sender, buffer_id, device_id, usage, size) => {
                     let global = &self.global;
-                    let mut result = vec![0_u8; size as usize];
-                    gfx_select!(buffer_id => global.device_get_buffer_sub_data(
-                        device_id,
+                    let on_read = move |status: wgpu::resource::BufferMapAsyncStatus,
+                                        ptr: *const u8| {
+                        match status {
+                            wgpu::resource::BufferMapAsyncStatus::Success => {
+                                let mut array_buffer = Vec::with_capacity(size as usize);
+                                unsafe {
+                                    array_buffer.set_len(size as usize);
+                                    std::ptr::copy(ptr, array_buffer.as_mut_ptr(), size as usize);
+                                };
+                                if let Err(e) =
+                                    sender.send(Ok(WebGPUResponse::MapReadAsync(array_buffer)))
+                                {
+                                    warn!(
+                                        "Failed to send response to WebGPURequest::MapReadAsync ({})",
+                                        e
+                                    )
+                                }
+                            },
+                            _ => unimplemented!(),
+                        }
+                    };
+                    gfx_select!(buffer_id => global.buffer_map_async(
                         buffer_id,
-                        0,
-                        &mut result
+                        wgpu::resource::BufferUsage::from_bits(usage).unwrap(),
+                        0..size,
+                        wgpu::resource::BufferMapOperation::Read(Box::new(on_read))
                     ));
-                    println!("## Result {:?}", result);
-                    if let Err(e) = sender.send(Ok(WebGPUResponse::MapReadAsync(result))) {
-                        warn!(
-                            "Failed to send response to WebGPURequest::MapReadAsync ({})",
-                            e
-                        )
-                    }
+                    gfx_select!(device_id => global.device_poll(device_id, true));
                 },
                 WebGPURequest::Exit(sender) => {
                     self.deinit();
