@@ -116,25 +116,11 @@ pub enum WebGPURequest {
     RunComputePass(
         IpcSender<()>,
         wgpu::id::CommandEncoderId,
-        Vec<ComputeCommand>,
+        Vec<u8>,
     ),
 }
-
-#[derive(Debug, Deserialize, Serialize)]
-pub enum ComputeCommand {
-    SetBindGroup {
-        index: u32,
-        bind_group_id: wgpu::id::BindGroupId,
-        dynamic_offsets: Vec<u64>,
-    },
-    SetComputePipeline(wgpu::id::ComputePipelineId),
-    Dispatch([u32; 3]),
-    End,
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct WebGPU(pub IpcSender<WebGPURequest>);
-
 impl WebGPU {
     pub fn new() -> Option<Self> {
         if !pref!(dom.webgpu.enabled) {
@@ -445,80 +431,12 @@ impl WGPU {
                         &command_buffer_ids
                     ));
                 },
-                WebGPURequest::RunComputePass(sender, command_encoder_id, commands) => {
-                    let hub = match command_encoder_id.backend() {
-                        #[cfg(any(
-                            not(any(target_os = "ios", target_os = "macos")),
-                            feature = "gfx-backend-vulkan"
-                        ))]
-                        wgpu::Backend::Vulkan => wgpu::backend::Vulkan::hub(&self.global),
-                        #[cfg(any(target_os = "ios", target_os = "macos"))]
-                        wgpu::Backend::Metal => wgpu::backend::Metal::hub(&self.global),
-                        #[cfg(windows)]
-                        wgpu::Backend::Dx12 => wgpu::backend::Dx12::hub(&self.global),
-                        #[cfg(windows)]
-                        wgpu::Backend::Dx11 => wgpu::backend::Dx11::hub(&self.global),
-                        _ => return warn!("unsupported backend"),
-                    };
-                    let mut token = Token::root();
-
-                    let (mut cmb_guard, mut token) = hub.command_buffers.write(&mut token);
-                    let cmb = &mut cmb_guard[command_encoder_id];
-                    let mut binder = Binder::new(cmb.max_bind_groups());
-
-                    let (pipeline_layout_guard, mut token) = hub.pipeline_layouts.read(&mut token);
-                    let (bind_group_guard, mut token) = hub.bind_groups.read(&mut token);
-                    let (pipeline_guard, mut token) = hub.compute_pipelines.read(&mut token);
-                    let (buffer_guard, mut token) = hub.buffers.read(&mut token);
-                    let (texture_guard, _) = hub.textures.read(&mut token);
-
-                    for command in commands {
-                        match command {
-                            ComputeCommand::Dispatch(groups) => {
-                                if let Err(e) = unsafe { cmb.dispatch(groups) } {
-                                    return warn!("({:?})", e);
-                                }
-                            },
-                            ComputeCommand::SetBindGroup {
-                                index,
-                                bind_group_id,
-                                dynamic_offsets,
-                            } => {
-                                if let Err(e) = unsafe {
-                                    cmb.set_bind_group(
-                                        command_encoder_id,
-                                        index,
-                                        bind_group_id,
-                                        &dynamic_offsets,
-                                        &*bind_group_guard,
-                                        &*buffer_guard,
-                                        &*texture_guard,
-                                        &*pipeline_layout_guard,
-                                        &mut binder,
-                                    )
-                                } {
-                                    return warn!("({:?})", e);
-                                }
-                            },
-                            ComputeCommand::SetComputePipeline(pipeline_id) => {
-                                if let Err(e) = unsafe {
-                                    cmb.set_compute_pipeline(
-                                        pipeline_id,
-                                        &*bind_group_guard,
-                                        &*pipeline_guard,
-                                        &*pipeline_layout_guard,
-                                        &mut binder,
-                                    )
-                                } {
-                                    return warn!("({:?})", e);
-                                }
-                            },
-                            ComputeCommand::End => break,
-                        }
-                    }
-                    if let Err(e) = sender.send(()) {
-                        warn!("Failed to send response to WebGPURequest::Exit ({})", e)
-                    }
+                WebGPURequest::RunComputePass(sender, command_encoder_id, raw_data) => {
+                    let global = &self.global;
+                    gfx_select!(command_encoder_id => global.command_encoder_run_compute_pass(
+                        command_encoder_id,
+                        &raw_data
+                    ));
                 },
                 WebGPURequest::MapReadAsync(sender, buffer_id, device_id, usage, size) => {
                     let global = &self.global;

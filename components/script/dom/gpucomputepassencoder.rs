@@ -15,7 +15,7 @@ use crate::dom::gpucomputepipeline::GPUComputePipeline;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
 use std::cell::RefCell;
-use webgpu::{ComputeCommand, WebGPU, WebGPUCommandEncoder, WebGPURequest};
+use webgpu::{WebGPU, WebGPUCommandEncoder, WebGPURequest, wgpu::command::{ComputeCommand, PhantomSlice, RawPass}};
 
 #[dom_struct]
 pub struct GPUComputePassEncoder {
@@ -23,10 +23,8 @@ pub struct GPUComputePassEncoder {
     #[ignore_malloc_size_of = "channels are hard"]
     channel: WebGPU,
     label: DomRefCell<Option<DOMString>>,
-    #[ignore_malloc_size_of = "wgpu handle"]
-    parent: WebGPUCommandEncoder,
     #[ignore_malloc_size_of = "WIP"]
-    commands: RefCell<Vec<ComputeCommand>>,
+    raw_pass: RefCell<Option<RawPass>>,
 }
 
 impl GPUComputePassEncoder {
@@ -35,8 +33,7 @@ impl GPUComputePassEncoder {
             channel,
             reflector_: Reflector::new(),
             label: DomRefCell::new(None),
-            parent,
-            commands: RefCell::new(Vec::<ComputeCommand>::with_capacity(1)),
+            raw_pass: RefCell::new(Some(RawPass::new_compute(parent.0))),
         }
     }
 
@@ -64,44 +61,66 @@ impl GPUComputePassEncoderMethods for GPUComputePassEncoder {
         *self.label.borrow_mut() = value;
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-dispatch
     fn Dispatch(&self, x: u32, y: u32, z: u32) {
-        self.commands
+        if let Some(raw_pass) = self.raw_pass
             .borrow_mut()
-            .push(ComputeCommand::Dispatch([x, y, z]));
+            .as_mut() {
+                unsafe { raw_pass.encode(&ComputeCommand::Dispatch([x, y, z])) };
+            }
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-endpass
     fn EndPass(&self) {
         let (sender, receiver) = ipc::channel().unwrap();
-        self.commands.borrow_mut().push(ComputeCommand::End);
-        self.channel
-            .0
-            .send(WebGPURequest::RunComputePass(
-                sender,
-                self.parent.0,
-                self.commands.borrow_mut().drain(..).collect(),
-            ))
-            .unwrap();
+        if let Some(raw_pass) = self.raw_pass
+            .borrow_mut()
+            .take() {
+                let (pass_data, id) = unsafe { raw_pass.finish_compute() };
 
-        let _ = receiver.recv().unwrap();
+                self.channel
+                    .0
+                    .send(WebGPURequest::RunComputePass(
+                        sender,
+                        id,
+                        pass_data,
+                    ))
+                    .unwrap();
+            }
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpuprogrammablepassencoder-setbindgroup
     fn SetBindGroup(&self, index: u32, bind_group: &GPUBindGroup, dynamic_offsets: Vec<u32>) {
-        self.commands
+        // TODO(zakorgy): Update wgpu-core and remove this conversion
+        let dynamic_offsets: Vec<_> = dynamic_offsets.iter().map(|o| *o as u64).collect();
+        if let Some(raw_pass) = self.raw_pass
             .borrow_mut()
-            .push(ComputeCommand::SetBindGroup {
-                index,
-                bind_group_id: bind_group.id().0,
-                dynamic_offsets: dynamic_offsets.iter().map(|o| *o as u64).collect(),
-            });
+            .as_mut() {
+                unsafe {
+                    raw_pass.encode(&ComputeCommand::SetBindGroup {
+                        index: index as u8,
+                        num_dynamic_offsets: dynamic_offsets.len() as u8,
+                        bind_group_id: bind_group.id().0,
+                        phantom_offsets: PhantomSlice::new(),
+                    });
+
+                    raw_pass.encode_slice(
+                        &dynamic_offsets,
+                    );
+                }
+            }
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-setpipeline
     fn SetPipeline(&self, pipeline: &GPUComputePipeline) {
-        self.commands
+        if let Some(raw_pass) = self.raw_pass
             .borrow_mut()
-            .push(ComputeCommand::SetComputePipeline(pipeline.id().0));
+            .as_mut() {
+                unsafe { raw_pass.encode(&ComputeCommand::SetPipeline(pipeline.id().0)) };
+            }
     }
 }
