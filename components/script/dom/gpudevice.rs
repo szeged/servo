@@ -107,39 +107,6 @@ impl GPUDevice {
 }
 
 impl GPUDevice {
-    unsafe fn resolve_create_buffer_mapped(
-        &self,
-        cx: SafeJSContext,
-        gpu_buffer: WebGPUBuffer,
-        array_buffer: Vec<u8>,
-        descriptor: BufferDescriptor,
-        valid: bool,
-    ) -> Vec<JSVal> {
-        rooted!(in(*cx) let mut js_array_buffer = ptr::null_mut::<JSObject>());
-        let mut out = Vec::new();
-        assert!(ArrayBuffer::create(
-            *cx,
-            CreateWith::Slice(array_buffer.as_slice()),
-            js_array_buffer.handle_mut(),
-        )
-        .is_ok());
-
-        let buff = GPUBuffer::new(
-            &self.global(),
-            self.channel.clone(),
-            gpu_buffer,
-            self.device,
-            GPUBufferState::Mapped,
-            descriptor.size,
-            descriptor.usage.bits(),
-            valid,
-            RootedTraceableBox::from_box(Heap::boxed(js_array_buffer.get())),
-        );
-        out.push(ObjectValue(buff.reflector().get_jsobject().get()));
-        out.push(ObjectValue(js_array_buffer.get()));
-        out
-    }
-
     fn validate_buffer_descriptor(
         &self,
         descriptor: &GPUBufferDescriptor,
@@ -248,11 +215,33 @@ impl GPUDeviceMethods for GPUDevice {
             ))
             .expect("Failed to create WebGPU buffer");
 
-        let (buffer, array_buffer) = receiver.recv().unwrap();
+        let buffer = receiver.recv().unwrap();
 
+        rooted!(in(*cx) let mut js_array_buffer = ptr::null_mut::<JSObject>());
+        let mut array = Vec::with_capacity(descriptor.size as usize);
         unsafe {
-            self.resolve_create_buffer_mapped(cx, buffer, array_buffer, wgpu_descriptor, valid)
+            array.set_len(descriptor.size as usize);
+            assert!(ArrayBuffer::create(
+                *cx,
+                CreateWith::Slice(&array.as_slice()),
+                js_array_buffer.handle_mut(),
+            )
+            .is_ok());
         }
+
+        let buff = GPUBuffer::new(
+            &self.global(),
+            self.channel.clone(),
+            buffer,
+            self.device,
+            GPUBufferState::Mapped,
+            wgpu_descriptor.size,
+            wgpu_descriptor.usage.bits(),
+            valid,
+            RootedTraceableBox::from_box(Heap::boxed(js_array_buffer.get())),
+        );
+
+        vec![ObjectValue(buff.reflector().get_jsobject().get()), ObjectValue(js_array_buffer.get())]
     }
 
     /// https://gpuweb.github.io/gpuweb/#GPUDevice-createBindGroupLayout

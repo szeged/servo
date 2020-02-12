@@ -52,7 +52,7 @@ pub enum WebGPURequest {
         wgpu::resource::BufferDescriptor,
     ),
     CreateBufferMapped(
-        IpcSender<(WebGPUBuffer, Vec<u8>)>,
+        IpcSender<(WebGPUBuffer)>,
         WebGPUDevice,
         wgpu::id::BufferId,
         wgpu::resource::BufferDescriptor,
@@ -279,16 +279,11 @@ impl WGPU {
                     let global = &self.global;
                     let buffer_size = descriptor.size as usize;
 
-                    let (buffer_id, arr_buff_ptr) = gfx_select!(id =>
+                    let (buffer_id, _arr_buff_ptr) = gfx_select!(id =>
                         global.device_create_buffer_mapped(device.0, &descriptor, id));
                     let buffer = WebGPUBuffer(buffer_id);
 
-                    let mut array_buffer = Vec::with_capacity(buffer_size);
-                    unsafe {
-                        array_buffer.set_len(buffer_size);
-                        std::ptr::copy(arr_buff_ptr, array_buffer.as_mut_ptr(), buffer_size);
-                    };
-                    if let Err(e) = sender.send((buffer, array_buffer)) {
+                    if let Err(e) = sender.send(buffer) {
                         warn!(
                             "Failed to send response to WebGPURequest::CreateBufferMapped ({})",
                             e
