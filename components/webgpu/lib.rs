@@ -290,32 +290,15 @@ impl WGPU {
                         )
                     }
                 },
-                WebGPURequest::UnmapBuffer(device_id, buffer, usage, size, mut array_buffer) => {
+                WebGPURequest::UnmapBuffer(device_id, buffer, usage, size, array_buffer) => {
                     let global = &self.global;
-                    let on_write = move |status: wgpu::resource::BufferMapAsyncStatus,
-                                         ptr: *mut u8| {
-                        match status {
-                            wgpu::resource::BufferMapAsyncStatus::Success => {
-                                unsafe {
-                                    std::ptr::copy(
-                                        array_buffer.as_mut_ptr(),
-                                        ptr,
-                                        array_buffer.len(),
-                                    );
-                                };
-                            },
-                            _ => unimplemented!(),
-                        }
-                    };
 
-                    gfx_select!(buffer.0 => global.buffer_map_async(
+                    gfx_select!(buffer.0 => global.device_set_buffer_sub_data(
+                        device_id,
                         buffer.0,
-                        wgpu::resource::BufferUsage::from_bits(usage).unwrap(),
-                        0..size,
-                        wgpu::resource::BufferMapOperation::Write(Box::new(on_write))
+                        0,
+                        array_buffer.as_slice()
                     ));
-                    gfx_select!(device_id => global.device_poll(device_id, true));
-                    gfx_select!(buffer.0 => global.buffer_unmap(buffer.0));
                 },
                 WebGPURequest::DestroyBuffer(buffer) => {
                     let global = &self.global;

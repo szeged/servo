@@ -241,7 +241,10 @@ impl GPUDeviceMethods for GPUDevice {
             RootedTraceableBox::from_box(Heap::boxed(js_array_buffer.get())),
         );
 
-        vec![ObjectValue(buff.reflector().get_jsobject().get()), ObjectValue(js_array_buffer.get())]
+        vec![
+            ObjectValue(buff.reflector().get_jsobject().get()),
+            ObjectValue(js_array_buffer.get()),
+        ]
     }
 
     /// https://gpuweb.github.io/gpuweb/#GPUDevice-createBindGroupLayout
