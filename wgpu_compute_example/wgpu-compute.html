@@ -1,0 +1,252 @@
+<html>
+  <head>
+    <title>WebGPU Compute 101 Demo</title>
+    <script src="gls.js"></script>
+  </head>
+
+  <body>
+    <div id="not-supported" style="display: block;">WebGPU not supported! Please visit <a href="//webgpu.io">webgpu.io</a> to see the current implementation status.</div>
+    Matrix dimension: <input id="dimension" type="text" value="128"> <button onclick="benchmark()">Compute!</button>
+    <p>Status: <span id="status"></span></p>
+    <p>Correctness: <span id="correctness"></span></p>
+    <p>GPU Time: <span id="gputime"></span></p>
+    <p>CPU Time: <span id="cputime"></span></p>
+    <input type="file" id="shader">
+    <button type="button" onclick="loadShader()">LOAD</button>
+    <script>
+// matrix dim 128
+let compiledShader = new Uint32Array([119734787,65536,524295,83,0,131089,1,393227,1,1280527431,1685353262,808793134,0,196622,0,1,393231,5,4,1852399981,0,12,393232,4,17,8,8,1,196611,2,450,262149,4,1852399981,0,327685,9,1970496882,1698919532,27756,524293,12,1197436007,1633841004,1986939244,1952539503,1231974249,68,327685,16,1970496882,1850307692,7890276,262149,28,1970496882,29804,196613,30,105,262149,39,1818575713,108,262149,45,1818575714,108,262149,52,1920229709,4290665,327686,52,0,1635017060,0,196613,54,65,262149,62,1920229709,4356201,327686,62,0,1635017060,0,196613,64,66,262149,75,1920229709,4421737,327686,75,0,1635017060,0,196613,77,67,262215,12,11,28,262215,51,6,4,262216,52,0,24,327752,52,0,35,0,196679,52,3,262215,54,34,0,262215,54,33,0,262215,61,6,4,262216,62,0,24,327752,62,0,35,0,196679,62,3,262215,64,34,0,262215,64,33,1,262215,74,6,4,327752,75,0,35,0,196679,75,3,262215,77,34,0,262215,77,33,2,262215,82,11,25,131091,2,196641,3,2,262165,6,32,0,262167,7,6,2,262176,8,7,7,262167,10,6,3,262176,11,1,10,262203,11,12,1,262176,15,7,6,262187,6,17,1,262187,6,20,0,262187,6,23,128,196630,26,32,262176,27,7,26,262187,26,29,0,131092,37,196637,51,26,196638,52,51,262176,53,2,52,262203,53,54,2,262165,55,32,1,262187,55,56,0,262176,58,2,26,196637,61,26,196638,62,61,262176,63,2,62,262203,63,64,2,262187,55,72,1,196637,74,26,196638,75,74,262176,76,2,75,262203,76,77,2,262187,6,81,8,393260,10,82,81,81,17,327734,2,4,0,3,131320,5,262203,8,9,7,262203,15,16,7,262203,27,28,7,262203,15,30,7,262203,15,39,7,262203,15,45,7,262205,10,13,12,458831,7,14,13,13,0,1,196670,9,14,327745,15,18,9,17,262205,6,19,18,327745,15,21,9,20,262205,6,22,21,327812,6,24,22,23,327808,6,25,19,24,196670,16,25,196670,28,29,196670,30,20,131321,31,131320,31,262390,33,34,0,131321,35,131320,35,262205,6,36,30,327856,37,38,36,23,262394,38,32,33,131320,32,262205,6,40,30,327745,15,41,9,20,262205,6,42,41,327812,6,43,42,23,327808,6,44,40,43,196670,39,44,327745,15,46,9,17,262205,6,47,46,262205,6,48,30,327812,6,49,48,23,327808,6,50,47,49,196670,45,50,262205,6,57,39,393281,58,59,54,56,57,262205,26,60,59,262205,6,65,45,393281,58,66,64,56,65,262205,26,67,66,327813,26,68,60,67,262205,26,69,28,327809,26,70,69,68,196670,28,70,131321,34,131320,34,262205,6,71,30,327808,6,73,71,72,196670,30,73,131321,31,131320,33,262205,6,78,16,262205,26,79,28,393281,58,80,77,56,78,196670,80,79,65789,65592]);
+function loadShader() {
+    let shader = document.getElementById("shader").files[0]
+    let reader = new FileReader()
+    // as Uint32Array
+    reader.readAsArrayBuffer(shader)
+    reader.onload = e => {
+        compiledShader = new Uint32Array(e.target.result)
+    };
+}
+if (navigator.gpu) {
+    document.getElementById('not-supported').style.display = 'none';
+}
+
+
+let matrixDimension = 128;
+let matrixElements = matrixDimension * matrixDimension;
+
+// Not on the slides. Local size in X and Y. Without this the GPU will only run
+// one instance of the compute shader on a block of (for example) 32 ALUs,
+// wasting 31 of them.
+const localSize = 8;
+
+function yieldToBrowser() {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve();
+        }, 0);
+    });
+}
+
+async function setStatus(message) {
+    document.getElementById('status').textContent = message;
+    await yieldToBrowser();
+}
+
+async function computeOnGPU(matrixA, matrixB) {
+    await setStatus("Preparing for the GPU");
+
+    // Slide 1: Initialize WebGPU
+
+    // Slide 1: Initialize WebGPU
+    const adapter = await navigator.gpu.requestAdapter();
+    const device = await adapter.requestDevice();
+
+
+    // Slide 2: Allocate memory for the matrix data.
+    const matrixSize = matrixDimension * matrixDimension * 4; // sizeof(float) == 4
+
+    const [gpuMatrixA, cpuMatrixA] = device.createBufferMapped({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE
+    });
+
+    new Float32Array(cpuMatrixA).set(matrixA);
+    gpuMatrixA.unmap();
+
+    const [gpuMatrixB, cpuMatrixB] = device.createBufferMapped({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE
+    });
+
+    new Float32Array(cpuMatrixB).set(matrixB);
+    gpuMatrixB.unmap();
+
+    const gpuMatrixC = device.createBuffer({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+    });
+
+    // Layout things that are hidden
+    const bindGroupLayout = device.createBindGroupLayout({
+        bindings: [
+        {
+            binding: 0,
+            visibility: GPUShaderStage.COMPUTE,
+            type: "storage-buffer"
+        },
+        {
+            binding: 1,
+            visibility: GPUShaderStage.COMPUTE,
+            type: "storage-buffer"
+        },
+        {
+            binding: 2,
+            visibility: GPUShaderStage.COMPUTE,
+            type: "storage-buffer"
+        }
+        ]
+    });
+    const pipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout]
+    });
+
+    // Slide 3: Create the data “group”.
+    const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        bindings: [
+        { binding: 0, resource: { buffer: gpuMatrixA } },
+        { binding: 1, resource: { buffer: gpuMatrixB } },
+        { binding: 2, resource: { buffer: gpuMatrixC } }
+        ]
+    });
+
+    // Slide 4b: Compile the GPU program.
+    const computePipeline = device.createComputePipeline({
+        layout: pipelineLayout,
+        computeStage: {
+        module: device.createShaderModule({
+            code: compiledShader
+        }),
+        entryPoint: "main"
+        }
+    });
+
+    // Slide 5: Encode the compute commands.
+    const commandEncoder = device.createCommandEncoder();
+
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(computePipeline);
+    passEncoder.setBindGroup(0, bindGroup);
+    passEncoder.dispatch(
+        matrixDimension / localSize,
+        matrixDimension / localSize
+    );
+    passEncoder.endPass();
+
+    // Slide 6: Encode the readback commands.
+    const gpuReadBuffer = device.createBuffer({
+        size: matrixSize,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+    });
+
+    commandEncoder.copyBufferToBuffer(
+        gpuMatrixC,
+        0,
+        gpuReadBuffer,
+        0,
+        matrixSize
+    );
+
+    // Slide 7: Submit work to the GPU.
+    await setStatus("Computing on the GPU");
+    const timeBefore = window.performance.now();
+
+    const gpuCommands = commandEncoder.finish();
+    device.defaultQueue.submit([gpuCommands]);
+
+    const cpuMatrixC = await gpuReadBuffer.mapReadAsync();
+
+    const elapsedTime = window.performance.now() - timeBefore;
+    await setStatus("GPU finished");
+
+    const resultArray = new ArrayBuffer(cpuMatrixC.byteLength);
+    const result = new Float32Array(resultArray);
+    result.set(new Float32Array(cpuMatrixC));
+
+    return [result, elapsedTime];
+}
+
+async function computeOnCPU(matrixA, matrixB) {
+    const resultArray = new ArrayBuffer(matrixA.length * 4);
+    const result = new Float32Array(resultArray);
+
+    const timeBefore = window.performance.now();
+    await setStatus("Computing on the GPU");
+
+    for (let resultX = 0; resultX < matrixDimension; resultX ++) {
+        for (let resultY = 0; resultY < matrixDimension; resultY ++) {
+            let sum = 0.0;
+
+            for (let i = 0; i < matrixDimension; i++) {
+                const aCell = i + resultX * matrixDimension;
+                const bCell = resultY + i * matrixDimension;
+                sum += matrixA[aCell] * matrixB[bCell];
+            }
+
+            const resultCell = resultY + resultX * matrixDimension;
+            result[resultCell] = sum;
+        }
+
+        if (resultX % 10 === 0) {
+            await setStatus("CPU computed row " + resultX);
+        }
+    }
+
+    const elapsedTime = window.performance.now() - timeBefore;
+    await setStatus("CPU finished");
+
+    return [result, elapsedTime];
+}
+
+function randomFloats(elementCount) {
+    const matrix = [];
+    for (let i = 0; i < elementCount; i++) {
+        matrix.push(Math.random() * 10);
+    }
+    return matrix;
+}
+
+async function benchmark() {
+    //matrixDimension = document.getElementById("dimension").value;
+    matrixElements = matrixDimension * matrixDimension;
+    if (matrixDimension > 2048) {alert("don't push it!"); return;}
+
+    document.getElementById("correctness").textContent = "";
+
+    const matrixA = randomFloats(matrixElements);
+    const matrixB = randomFloats(matrixElements);
+
+    const [gpuResult, gpuTime] = await computeOnGPU(matrixA, matrixB);
+    document.getElementById("gputime").textContent = (gpuTime / 1000).toFixed(3) + "s";
+
+    const [cpuResult, cpuTime] = await computeOnCPU(matrixA, matrixB);
+    document.getElementById("cputime").textContent = (cpuTime / 1000).toFixed(3) + "s";
+
+    await setStatus("Computing correctness");
+
+    let correct = true;
+    for (let i = 0; i < matrixElements; i++) {
+        if (Math.abs(1.0 - (gpuResult[i] / cpuResult[i])) > 0.00001) {
+            correct = false;
+        }
+    }
+
+    if (correct) {
+        document.getElementById("correctness").textContent = "Computations match!";
+    } else {
+        document.getElementById("correctness").textContent = "Computations don't match (float addition issue?)";
+    }
+    await setStatus("Done");
+}
+    </script>
+  </body>
+</html>
