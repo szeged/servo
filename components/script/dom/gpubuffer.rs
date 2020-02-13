@@ -29,9 +29,13 @@ use std::ptr::NonNull;
 use std::rc::Rc;
 use webgpu::{WebGPU, WebGPUBuffer, WebGPUDevice, WebGPURequest, WebGPUResponse};
 
+// https://gpuweb.github.io/gpuweb/#buffer-state
 #[derive(MallocSizeOf)]
 pub enum GPUBufferState {
-    Mapped,
+    MappedForReading,
+    MappedForWriting,
+    MappedPendingForReading,
+    MappedPendingForWriting,
     Unmapped,
     Destroyed,
 }
@@ -142,7 +146,7 @@ impl GPUBufferMethods for GPUBuffer {
     /// https://gpuweb.github.io/gpuweb/#dom-gpubuffer-destroy
     fn Destroy(&self) {
         match *self.state.borrow() {
-            GPUBufferState::Mapped => {
+            GPUBufferState::MappedForReading | GPUBufferState::MappedForWriting => {
                 self.Unmap();
             },
             _ => {},
@@ -155,9 +159,31 @@ impl GPUBufferMethods for GPUBuffer {
     }
 
     #[allow(unsafe_code)]
-    fn MapReadAsync(&self, cx: SafeJSContext) -> NonNull<JSObject> {
-        let (sender, receiver) = ipc::channel().unwrap();
-        self.channel
+    /// https://gpuweb.github.io/gpuweb/#dom-gpubuffer-mapreadasync
+    fn MapReadAsync(&self, comp: InRealm) -> Rc<Promise> {
+        // TODO(zakorgy) Add missing Step 1
+        // Step 2
+        let promise = Promise::new_in_current_realm(&self.global(), comp);
+        // TODO(zakorgy) Add missing Step 3
+        // Step 4
+        *self.state.borrow_mut() = GPUBufferState::MappedPendingForReading;
+        let cx = self.global().get_cx();
+
+        // Step 5.1
+        rooted!(in(*cx) let mut array_buffer_ptr = std::ptr::null_mut::<JSObject>());
+        if unsafe {
+            ArrayBuffer::create(
+                *cx,
+                CreateWith::Length(self.size as u32),
+                array_buffer_ptr.handle_mut(),
+            )
+        }.is_err() {
+            promise.reject_error(Error::Operation);
+            return promise;
+        }
+        self.mapping.set(array_buffer_ptr.get());
+        let sender = response_async(&promise, self);
+        if self.channel
             .0
             .send(WebGPURequest::MapReadAsync(
                 sender,
@@ -165,25 +191,13 @@ impl GPUBufferMethods for GPUBuffer {
                 self.device.0,
                 self.usage,
                 self.size,
-            ))
-            .expect("Failed to send MapReadAsync request");
+            )).is_err() {
+                promise.reject_error(Error::Operation);
+                return promise;
+            }
 
-        let response = receiver.recv().unwrap();
-        match response.unwrap() {
-            WebGPUResponse::MapReadAsync(data) => {
-                rooted!(in(*cx) let mut js_array_buffer = std::ptr::null_mut::<JSObject>());
-                unsafe {
-                    assert!(ArrayBuffer::create(
-                        *cx,
-                        CreateWith::Slice(&data),
-                        js_array_buffer.handle_mut(),
-                    )
-                    .is_ok());
-                    return NonNull::new_unchecked(js_array_buffer.get());
-                }
-            },
-            _ => panic!("Wrong response"),
-        }
+        //Step 6
+        promise
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpuobjectbase-label
@@ -197,27 +211,25 @@ impl GPUBufferMethods for GPUBuffer {
     }
 }
 
-/*impl AsyncWGPUListener for GPUBuffer {
+impl AsyncWGPUListener for GPUBuffer {
     #[allow(unsafe_code)]
     fn handle_response(&self, response: WebGPUResponse, promise: &Rc<Promise>) {
         match response {
-            WebGPUResponse::MapReadAsync(bytes) => {
-                println!("## bytes {:?}", &bytes[0..10]);
-                let cx = promise.global().get_cx();
-                rooted!(in(*cx) let mut array_buffer_ptr = std::ptr::null_mut::<JSObject>());
-                let arraybuffer = unsafe {
-                    ArrayBuffer::create(
-                        *cx,
-                        CreateWith::Slice(&bytes[0..10]),
-                        array_buffer_ptr.handle_mut(),
-                    )
+            // https://gpuweb.github.io/gpuweb/#dom-gpubuffer-mapreadasync
+            WebGPUResponse::MapReadAsync(bytes) => unsafe {
+                let array_buffer = match ArrayBuffer::from(self.mapping.get()) {
+                    Ok(mut array_buffer) => {
+                        // Step 5.2
+                        array_buffer.update(&bytes);
+                        // Step 5.3
+                        *self.state.borrow_mut() = GPUBufferState::MappedForReading;
+                        // Step 5.4
+                        promise.resolve_native(&ObjectValue(*array_buffer.underlying_object()));
+                    },
+                    _ => promise.reject_error(Error::Operation),
                 };
-                match arraybuffer {
-                    Ok(_) => promise.resolve_native(&ObjectValue(array_buffer_ptr.get())),
-                    Err(_) => promise.reject_error(Error::Operation),
-                }
             },
             _ => promise.reject_error(Error::Operation),
         }
     }
-}*/
+}

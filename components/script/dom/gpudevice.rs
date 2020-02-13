@@ -234,7 +234,7 @@ impl GPUDeviceMethods for GPUDevice {
             self.channel.clone(),
             buffer,
             self.device,
-            GPUBufferState::Mapped,
+            GPUBufferState::MappedForWriting,
             wgpu_descriptor.size,
             wgpu_descriptor.usage.bits(),
             valid,
