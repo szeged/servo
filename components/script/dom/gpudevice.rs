@@ -5,7 +5,7 @@
 #![allow(unsafe_code)]
 
 use crate::dom::bindings::cell::DomRefCell;
-use crate::dom::bindings::codegen::Bindings::GPUAdapterBinding::GPULimits;
+use crate::dom::bindings::codegen::Bindings::GPUAdapterBinding::{GPULimits, GPUExtensions};
 use crate::dom::bindings::codegen::Bindings::GPUBindGroupBinding::GPUBindGroupDescriptor;
 use crate::dom::bindings::codegen::Bindings::GPUBindGroupLayoutBinding::{
     GPUBindGroupLayoutBindings, GPUBindGroupLayoutDescriptor, GPUBindingType,
@@ -34,6 +34,7 @@ use crate::dom::gpupipelinelayout::GPUPipelineLayout;
 use crate::dom::gpuqueue::GPUQueue;
 use crate::dom::gpushadermodule::GPUShaderModule;
 use crate::script_runtime::JSContext as SafeJSContext;
+use crate::js::conversions::ToJSValConvertible;
 use dom_struct::dom_struct;
 use ipc_channel::ipc;
 use js::jsapi::{Heap, JSObject};
@@ -45,6 +46,7 @@ use webgpu::wgpu::binding_model::{
     BindGroupBinding, BindGroupLayoutBinding, BindingResource, BindingType, BufferBinding,
     ShaderStage,
 };
+use js::jsval::UndefinedValue;
 use webgpu::wgpu::resource::{BufferDescriptor, BufferUsage};
 use webgpu::{WebGPU, WebGPUDevice, WebGPUQueue, WebGPURequest};
 
@@ -55,9 +57,9 @@ pub struct GPUDevice {
     channel: WebGPU,
     adapter: Dom<GPUAdapter>,
     #[ignore_malloc_size_of = "mozjs"]
-    extensions: Heap<*mut JSObject>,
+    extensions: GPUExtensions,
     #[ignore_malloc_size_of = "mozjs"]
-    limits: Heap<*mut JSObject>,
+    limits: GPULimits,
     label: DomRefCell<Option<DOMString>>,
     device: WebGPUDevice,
     default_queue: Dom<GPUQueue>,
@@ -67,8 +69,8 @@ impl GPUDevice {
     fn new_inherited(
         channel: WebGPU,
         adapter: &GPUAdapter,
-        extensions: Heap<*mut JSObject>,
-        limits: Heap<*mut JSObject>,
+        extensions: GPUExtensions,
+        limits: GPULimits,
         device: WebGPUDevice,
         queue: &GPUQueue,
     ) -> GPUDevice {
@@ -89,8 +91,8 @@ impl GPUDevice {
         global: &GlobalScope,
         channel: WebGPU,
         adapter: &GPUAdapter,
-        extensions: Heap<*mut JSObject>,
-        limits: Heap<*mut JSObject>,
+        extensions: GPUExtensions,
+        limits: GPULimits,
         device: WebGPUDevice,
         queue: WebGPUQueue,
     ) -> DomRoot<GPUDevice> {
@@ -140,14 +142,20 @@ impl GPUDeviceMethods for GPUDevice {
         DomRoot::from_ref(&self.adapter)
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpudevice-extensions
-    fn Extensions(&self, _cx: SafeJSContext) -> NonNull<JSObject> {
-        NonNull::new(self.extensions.get()).unwrap()
+    fn Extensions(&self, cx: SafeJSContext) -> NonNull<JSObject> {
+        rooted!(in(*cx) let mut rval = UndefinedValue());
+        unsafe { self.extensions.to_jsval(*cx, rval.handle_mut()); }
+        NonNull::new(rval.get().to_object()).unwrap()
     }
 
+    #[allow(unsafe_code)]
     /// https://gpuweb.github.io/gpuweb/#dom-gpudevice-limits
-    fn Limits(&self, _cx: SafeJSContext) -> NonNull<JSObject> {
-        NonNull::new(self.extensions.get()).unwrap()
+    fn Limits(&self, cx: SafeJSContext) -> NonNull<JSObject> {
+        rooted!(in(*cx) let mut rval = UndefinedValue());
+        unsafe { self.limits.to_jsval(*cx, rval.handle_mut()); }
+        NonNull::new(rval.get().to_object()).unwrap()
     }
 
     /// https://gpuweb.github.io/gpuweb/#dom-gpudevice-defaultqueue
@@ -258,16 +266,13 @@ impl GPUDeviceMethods for GPUDevice {
             max_samplers_per_shader_stage: i32,
         }
         let mut storeBindings = HashSet::new();
-        // TODO: We should have these limits on device creation
-        let limits = GPULimits::empty();
-
         let mut validation_map = HashMap::new();
         let maxLimits = MaxLimits {
-            max_uniform_buffers_per_shader_stage: limits.maxUniformBuffersPerShaderStage as i32,
-            max_storage_buffers_per_shader_stage: limits.maxStorageBuffersPerShaderStage as i32,
-            max_sampled_textures_per_shader_stage: limits.maxSampledTexturesPerShaderStage as i32,
-            max_storage_textures_per_shader_stage: limits.maxStorageTexturesPerShaderStage as i32,
-            max_samplers_per_shader_stage: limits.maxSamplersPerShaderStage as i32,
+            max_uniform_buffers_per_shader_stage: self.limits.maxUniformBuffersPerShaderStage as i32,
+            max_storage_buffers_per_shader_stage: self.limits.maxStorageBuffersPerShaderStage as i32,
+            max_sampled_textures_per_shader_stage: self.limits.maxSampledTexturesPerShaderStage as i32,
+            max_storage_textures_per_shader_stage: self.limits.maxStorageTexturesPerShaderStage as i32,
+            max_samplers_per_shader_stage: self.limits.maxSamplersPerShaderStage as i32,
         };
         validation_map.insert(
             webgpu::wgpu::binding_model::ShaderStage::VERTEX,
@@ -282,9 +287,9 @@ impl GPUDeviceMethods for GPUDevice {
             maxLimits.clone(),
         );
         let mut max_dynamic_uniform_buffers_per_pipeline_layout =
-            limits.maxDynamicUniformBuffersPerPipelineLayout as i32;
+            self.limits.maxDynamicUniformBuffersPerPipelineLayout as i32;
         let mut max_dynamic_storage_buffers_per_pipeline_layout =
-            limits.maxDynamicStorageBuffersPerPipelineLayout as i32;
+            self.limits.maxDynamicStorageBuffersPerPipelineLayout as i32;
         let mut valid = true;
 
         let bindings = descriptor
@@ -421,14 +426,12 @@ impl GPUDeviceMethods for GPUDevice {
         &self,
         descriptor: &GPUPipelineLayoutDescriptor,
     ) -> DomRoot<GPUPipelineLayout> {
-        // TODO: We should have these limits on device creation
-        let limits = GPULimits::empty();
         let mut bind_group_layouts = Vec::new();
         let mut bgl_ids = Vec::new();
         let mut max_dynamic_uniform_buffers_per_pipeline_layout =
-            limits.maxDynamicUniformBuffersPerPipelineLayout as i32;
+            self.limits.maxDynamicUniformBuffersPerPipelineLayout as i32;
         let mut max_dynamic_storage_buffers_per_pipeline_layout =
-            limits.maxDynamicStorageBuffersPerPipelineLayout as i32;
+            self.limits.maxDynamicStorageBuffersPerPipelineLayout as i32;
         descriptor.bindGroupLayouts.iter().for_each(|each| {
             if each.is_valid() {
                 let id = each.id();
@@ -457,7 +460,7 @@ impl GPUDeviceMethods for GPUDevice {
             });
         });
 
-        let valid = descriptor.bindGroupLayouts.len() <= limits.maxBindGroups as usize &&
+        let valid = descriptor.bindGroupLayouts.len() <= self.limits.maxBindGroups as usize &&
             descriptor.bindGroupLayouts.len() == bind_group_layouts.len() &&
             max_dynamic_uniform_buffers_per_pipeline_layout >= 0 &&
             max_dynamic_storage_buffers_per_pipeline_layout >= 0;

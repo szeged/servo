@@ -15,7 +15,7 @@ use smallvec::SmallVec;
 #[derive(Debug, Deserialize, Serialize)]
 pub enum WebGPUResponse {
     RequestAdapter(String, WebGPUAdapter, WebGPU),
-    RequestDevice(WebGPUDevice, WebGPUQueue, wgpu::instance::DeviceDescriptor),
+    RequestDevice(WebGPUDevice, WebGPUQueue, WebGPULimits, WebGPUExtensions),
     MapReadAsync(IpcSharedMemory),
 }
 
@@ -31,7 +31,8 @@ pub enum WebGPURequest {
     RequestDevice(
         IpcSender<WebGPUResponseResult>,
         WebGPUAdapter,
-        wgpu::instance::DeviceDescriptor,
+        WebGPUExtensions,
+        WebGPULimits,
         wgpu::id::DeviceId,
     ),
     Exit(IpcSender<()>),
@@ -112,6 +113,34 @@ pub enum WebGPURequest {
     ),
     Submit(wgpu::id::QueueId, Vec<wgpu::id::CommandBufferId>),
     RunComputePass(wgpu::id::CommandEncoderId, Vec<u8>),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct WebGPUExtensions {
+    pub anisotropic_filtering: bool,
+}
+
+impl MallocSizeOf for WebGPUExtensions {
+    fn size_of(&self, _ops: &mut MallocSizeOfOps) -> usize {
+        0
+    }
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct WebGPULimits {
+    pub max_bind_groups: u32,
+    pub max_dynamic_uniform_buffers_per_pipeline_layout: u32,
+    pub max_dynamic_storage_buffers_per_pipeline_layout: u32,
+    pub max_sampled_textures_per_shader_stage: u32,
+    pub max_samplers_per_shader_stage: u32,
+    pub max_storage_buffers_per_shader_stage: u32,
+    pub max_storage_textures_per_shader_stage: u32,
+    pub max_uniform_buffers_per_shader_stage: u32,
+}
+
+impl MallocSizeOf for WebGPULimits {
+    fn size_of(&self, _ops: &mut MallocSizeOfOps) -> usize {
+        0
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -224,20 +253,29 @@ impl WGPU {
                         )
                     }
                 },
-                WebGPURequest::RequestDevice(sender, adapter, descriptor, id) => {
+                WebGPURequest::RequestDevice(sender, adapter, extensions, limits, id) => {
                     let global = &self.global;
+                    let descriptor = wgpu::instance::DeviceDescriptor {
+                        extensions: wgpu::instance::Extensions {
+                            anisotropic_filtering: extensions.anisotropic_filtering,
+                        },
+                        limits: wgpu::instance::Limits {
+                            max_bind_groups: limits.max_bind_groups,
+                        }
+                    };
                     let id = gfx_select!(id => global.adapter_request_device(
                         adapter.0,
                         &descriptor,
                         id
                     ));
+
                     let device = WebGPUDevice(id);
                     // Note: (zakorgy) Note sure if sending the queue is needed at all,
                     // since wgpu-core uses the same id for the device and the queue
                     let queue = WebGPUQueue(id);
                     self.devices.push(device);
                     if let Err(e) =
-                        sender.send(Ok(WebGPUResponse::RequestDevice(device, queue, descriptor)))
+                        sender.send(Ok(WebGPUResponse::RequestDevice(device, queue, limits, extensions)))
                     {
                         warn!(
                             "Failed to send response to WebGPURequest::RequestDevice ({})",
