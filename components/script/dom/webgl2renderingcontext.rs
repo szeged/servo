@@ -67,6 +67,7 @@ pub struct WebGL2RenderingContext {
     bound_copy_write_buffer: MutNullableDom<WebGLBuffer>,
     bound_pixel_pack_buffer: MutNullableDom<WebGLBuffer>,
     bound_pixel_unpack_buffer: MutNullableDom<WebGLBuffer>,
+    bound_array_buffer: MutNullableDom<WebGLBuffer>,
     bound_transform_feedback_buffer: MutNullableDom<WebGLBuffer>,
     bound_uniform_buffer: MutNullableDom<WebGLBuffer>,
     current_transform_feedback: MutNullableDom<WebGLTransformFeedback>,
@@ -121,6 +122,7 @@ impl WebGL2RenderingContext {
             bound_copy_write_buffer: MutNullableDom::new(None),
             bound_pixel_pack_buffer: MutNullableDom::new(None),
             bound_pixel_unpack_buffer: MutNullableDom::new(None),
+            bound_array_buffer: MutNullableDom::new(None),
             bound_transform_feedback_buffer: MutNullableDom::new(None),
             bound_uniform_buffer: MutNullableDom::new(None),
             current_transform_feedback: MutNullableDom::new(None),
@@ -1132,8 +1134,6 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
         }
         let copy_bytes = copy_count * dst_elem_size;
 
-        // TODO(mmatyas): Transform Feedback
-
         let src_byte_offset = src_byte_offset as usize;
         if src_byte_offset + copy_bytes > bound_buffer.capacity() ||
             dst_byte_offset + copy_bytes > dst_buffer.len()
@@ -1141,17 +1141,46 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
             return self.base.webgl_error(InvalidValue);
         }
 
+        let (is_tf, map_target) = match target {
+            constants::TRANSFORM_FEEDBACK_BUFFER => {
+                match self.current_transform_feedback.get() {
+                    Some(tf) => {
+                        if tf.is_active() {
+                            return self.base.webgl_error(InvalidOperation);
+                        }
+                    },
+                    None => {}
+                };
+                self.BindTransformFeedback(constants::TRANSFORM_FEEDBACK, None);
+                self.BindBuffer(constants::ARRAY_BUFFER, Some(&*buffer));
+                (true, constants::ARRAY_BUFFER)
+            },
+            _ => (false, target),
+        };
+
         let (sender, receiver) = ipc::bytes_channel().unwrap();
         self.base.send_command(WebGLCommand::GetBufferSubData(
-            target,
+            map_target,
             src_byte_offset,
             copy_bytes,
             sender,
         ));
         let data = receiver.recv().unwrap();
+
         let dst_end = dst_byte_offset + copy_bytes;
         unsafe {
             dst_buffer.as_mut_slice()[dst_byte_offset..dst_end].copy_from_slice(&data);
+        }
+
+        if is_tf {
+            match self.bound_array_buffer.get() {
+                Some(ab) => self.BindBuffer(constants::ARRAY_BUFFER, Some(&*ab)),
+                None => self.BindBuffer(constants::ARRAY_BUFFER, None),
+            }
+            match self.current_transform_feedback.get() {
+                Some(tf) => tf.bind(&self.base, constants::TRANSFORM_FEEDBACK),
+                None => self.BindTransformFeedback(constants::TRANSFORM_FEEDBACK, None),
+            }
         }
     }
 
@@ -3050,7 +3079,7 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
                 return;
             },
         };
-        if !program.is_linked() || program.transform_feedback_varyings_length() != 0 {
+        if !program.is_linked() {
             self.base.webgl_error(InvalidOperation);
             return;
         };
