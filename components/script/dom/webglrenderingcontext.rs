@@ -4,7 +4,7 @@
 
 use crate::dom::bindings::codegen::Bindings::ANGLEInstancedArraysBinding::ANGLEInstancedArraysConstants;
 use crate::dom::bindings::codegen::Bindings::EXTBlendMinmaxBinding::EXTBlendMinmaxConstants;
-use crate::dom::bindings::codegen::Bindings::OESVertexArrayObjectBinding::OESVertexArrayObjectConstants;
+//use crate::dom::bindings::codegen::Bindings::OESVertexArrayObjectBinding::OESVertexArrayObjectConstants;
 use crate::dom::bindings::codegen::Bindings::WebGLRenderingContextBinding;
 use crate::dom::bindings::codegen::Bindings::WebGLRenderingContextBinding::TexImageSource;
 use crate::dom::bindings::codegen::Bindings::WebGLRenderingContextBinding::WebGLContextAttributes;
@@ -47,7 +47,7 @@ use crate::dom::webglshader::WebGLShader;
 use crate::dom::webglshaderprecisionformat::WebGLShaderPrecisionFormat;
 use crate::dom::webgltexture::{TexParameterValue, WebGLTexture};
 use crate::dom::webgluniformlocation::WebGLUniformLocation;
-use crate::dom::webglvertexarrayobjectoes::WebGLVertexArrayObjectOES;
+use crate::dom::webglvertexarrayobject::WebGLVertexArrayObject;
 use crate::dom::window::Window;
 use crate::script_runtime::JSContext as SafeJSContext;
 #[cfg(feature = "webgl_backtrace")]
@@ -180,8 +180,8 @@ pub struct WebGLRenderingContext {
     size: Cell<Size2D<u32>>,
     extension_manager: WebGLExtensions,
     capabilities: Capabilities,
-    default_vao: DomOnceCell<WebGLVertexArrayObjectOES>,
-    current_vao: MutNullableDom<WebGLVertexArrayObjectOES>,
+    default_vao: DomOnceCell<WebGLVertexArrayObject>,
+    current_vao: MutNullableDom<WebGLVertexArrayObject>,
     textures: Textures,
     api_type: GlType,
 }
@@ -284,11 +284,11 @@ impl WebGLRenderingContext {
         &self.limits
     }
 
-    pub fn current_vao(&self) -> DomRoot<WebGLVertexArrayObjectOES> {
+    pub fn current_vao(&self) -> DomRoot<WebGLVertexArrayObject> {
         self.current_vao.or_init(|| {
             DomRoot::from_ref(
                 self.default_vao
-                    .init_once(|| WebGLVertexArrayObjectOES::new(self, None)),
+                    .init_once(|| WebGLVertexArrayObject::new(self, None)),
             )
         })
     }
@@ -1056,16 +1056,16 @@ impl WebGLRenderingContext {
         }
     }
 
-    pub fn create_vertex_array(&self) -> Option<DomRoot<WebGLVertexArrayObjectOES>> {
+    pub fn create_vertex_array(&self) -> Option<DomRoot<WebGLVertexArrayObject>> {
         let (sender, receiver) = webgl_channel().unwrap();
         self.send_command(WebGLCommand::CreateVertexArray(sender));
         receiver
             .recv()
             .unwrap()
-            .map(|id| WebGLVertexArrayObjectOES::new(self, Some(id)))
+            .map(|id| WebGLVertexArrayObject::new(self, Some(id)))
     }
 
-    pub fn delete_vertex_array(&self, vao: Option<&WebGLVertexArrayObjectOES>) {
+    pub fn delete_vertex_array(&self, vao: Option<&WebGLVertexArrayObject>) {
         if let Some(vao) = vao {
             handle_potential_webgl_error!(self, self.validate_ownership(vao), return);
             // The default vertex array has no id and should never be passed around.
@@ -1083,7 +1083,7 @@ impl WebGLRenderingContext {
         }
     }
 
-    pub fn is_vertex_array(&self, vao: Option<&WebGLVertexArrayObjectOES>) -> bool {
+    pub fn is_vertex_array(&self, vao: Option<&WebGLVertexArrayObject>) -> bool {
         vao.map_or(false, |vao| {
             // The default vertex array has no id and should never be passed around.
             assert!(vao.id().is_some());
@@ -1091,7 +1091,7 @@ impl WebGLRenderingContext {
         })
     }
 
-    pub fn bind_vertex_array(&self, vao: Option<&WebGLVertexArrayObjectOES>) {
+    pub fn bind_vertex_array(&self, vao: Option<&WebGLVertexArrayObject>) {
         if let Some(vao) = vao {
             // The default vertex array has no id and should never be passed around.
             assert!(vao.id().is_some());
@@ -1514,10 +1514,10 @@ impl WebGLRenderingContextMethods for WebGLRenderingContext {
                     .get();
                 return optional_root_object_to_js_or_null!(*cx, texture);
             },
-            OESVertexArrayObjectConstants::VERTEX_ARRAY_BINDING_OES => unsafe {
+            /* constants::VERTEX_ARRAY_BINDING => unsafe {
                 let vao = self.current_vao.get().filter(|vao| vao.id().is_some());
                 return optional_root_object_to_js_or_null!(*cx, vao);
-            },
+            }, */
             // In readPixels we currently support RGBA/UBYTE only.  If
             // we wanted to support other formats, we could ask the
             // driver, but we would need to check for

@@ -6,7 +6,7 @@
  * https://www.khronos.org/registry/webgl/extensions/OES_vertex_array_object/
  */
 
-[NoInterfaceObject, Exposed=Window]
+/*[NoInterfaceObject, Exposed=Window]
 interface OESVertexArrayObject {
     const unsigned long VERTEX_ARRAY_BINDING_OES = 0x85B5;
 
@@ -14,4 +14,4 @@ interface OESVertexArrayObject {
     void deleteVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject);
     boolean isVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject);
     void bindVertexArrayOES(WebGLVertexArrayObjectOES? arrayObject);
-};
+};*/

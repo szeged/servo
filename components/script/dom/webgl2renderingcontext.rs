@@ -14,6 +14,7 @@ use crate::dom::bindings::codegen::UnionTypes::Int32ArrayOrLongSequence;
 use crate::dom::bindings::codegen::UnionTypes::Uint32ArrayOrUnsignedLongSequence;
 use crate::dom::bindings::error::{ErrorResult, Fallible};
 use crate::dom::bindings::reflector::DomObject;
+use crate::dom::webglvertexarrayobject::WebGLVertexArrayObject;
 use crate::dom::bindings::reflector::{reflect_dom_object, Reflector};
 use crate::dom::bindings::root::{Dom, DomRoot, LayoutDom, MutNullableDom};
 use crate::dom::bindings::str::DOMString;
@@ -707,6 +708,14 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
                     &self.base.get_read_framebuffer_slot().get()
                 );
             },
+            constants::VERTEX_ARRAY_BINDING => unsafe {
+                let vao = self.base.current_vao();
+                let vao = match vao.id() {
+                    Some(_) => Some(vao),
+                    None => None,
+                };
+                return optional_root_object_to_js_or_null!(*cx, vao);
+            },
             _ => {},
         }
 
@@ -1330,6 +1339,19 @@ impl WebGL2RenderingContextMethods for WebGL2RenderingContext {
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.9
     fn CreateShader(&self, shader_type: u32) -> Option<DomRoot<WebGLShader>> {
         self.base.CreateShader(shader_type)
+    }
+
+    fn CreateVertexArray(&self) -> Option<DomRoot<WebGLVertexArrayObject>> {
+        self.base.create_vertex_array()
+    }
+    fn DeleteVertexArray(&self, vertexArray: Option<&WebGLVertexArrayObject>) {
+        self.base.delete_vertex_array(vertexArray);
+    }
+    fn IsVertexArray(&self, vertexArray: Option<&WebGLVertexArrayObject>) -> bool {
+        self.base.is_vertex_array(vertexArray)
+    }
+    fn BindVertexArray(&self, array: Option<&WebGLVertexArrayObject>) {
+        self.base.bind_vertex_array(array)
     }
 
     /// https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.5

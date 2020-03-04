@@ -4,7 +4,7 @@
 
 use crate::dom::bindings::cell::{ref_filter_map, DomRefCell, Ref};
 use crate::dom::bindings::codegen::Bindings::WebGLRenderingContextBinding::WebGLRenderingContextConstants as constants;
-use crate::dom::bindings::codegen::Bindings::WebGLVertexArrayObjectOESBinding;
+use crate::dom::bindings::codegen::Bindings::WebGLVertexArrayObjectBinding;
 use crate::dom::bindings::inheritance::Castable;
 use crate::dom::bindings::reflector::{reflect_dom_object, DomObject};
 use crate::dom::bindings::root::{Dom, DomRoot, MutNullableDom};
@@ -18,7 +18,7 @@ use dom_struct::dom_struct;
 use std::cell::Cell;
 
 #[dom_struct]
-pub struct WebGLVertexArrayObjectOES {
+pub struct WebGLVertexArrayObject {
     webgl_object_: WebGLObject,
     id: Option<WebGLVertexArrayId>,
     ever_bound: Cell<bool>,
@@ -27,7 +27,7 @@ pub struct WebGLVertexArrayObjectOES {
     element_array_buffer: MutNullableDom<WebGLBuffer>,
 }
 
-impl WebGLVertexArrayObjectOES {
+impl WebGLVertexArrayObject {
     fn new_inherited(context: &WebGLRenderingContext, id: Option<WebGLVertexArrayId>) -> Self {
         let max_vertex_attribs = context.limits().max_vertex_attribs as usize;
         Self {
@@ -42,9 +42,9 @@ impl WebGLVertexArrayObjectOES {
 
     pub fn new(context: &WebGLRenderingContext, id: Option<WebGLVertexArrayId>) -> DomRoot<Self> {
         reflect_dom_object(
-            Box::new(WebGLVertexArrayObjectOES::new_inherited(context, id)),
+            Box::new(WebGLVertexArrayObject::new_inherited(context, id)),
             &*context.global(),
-            WebGLVertexArrayObjectOESBinding::Wrap,
+            WebGLVertexArrayObjectBinding::Wrap,
         )
     }
 
@@ -248,7 +248,7 @@ impl WebGLVertexArrayObjectOES {
     }
 }
 
-impl Drop for WebGLVertexArrayObjectOES {
+impl Drop for WebGLVertexArrayObject {
     fn drop(&mut self) {
         if self.id.is_some() {
             self.delete(true);

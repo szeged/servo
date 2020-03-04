@@ -9,7 +9,6 @@ use crate::dom::bindings::codegen::Bindings::ANGLEInstancedArraysBinding::ANGLEI
 use crate::dom::bindings::codegen::Bindings::EXTTextureFilterAnisotropicBinding::EXTTextureFilterAnisotropicConstants;
 use crate::dom::bindings::codegen::Bindings::OESStandardDerivativesBinding::OESStandardDerivativesConstants;
 use crate::dom::bindings::codegen::Bindings::OESTextureHalfFloatBinding::OESTextureHalfFloatConstants;
-use crate::dom::bindings::codegen::Bindings::OESVertexArrayObjectBinding::OESVertexArrayObjectConstants;
 use crate::dom::bindings::codegen::Bindings::WebGLRenderingContextBinding::WebGLRenderingContextConstants as constants;
 use crate::dom::bindings::trace::JSTraceable;
 use crate::dom::extcolorbufferhalffloat::EXTColorBufferHalfFloat;
@@ -46,10 +45,9 @@ const DEFAULT_NOT_FILTERABLE_TEX_TYPES: [GLenum; 2] = [
 // Param names that are implemented for glGetParameter in a WebGL 1.0 context
 // but must trigger a InvalidEnum error until the related WebGL Extensions are enabled.
 // Example: https://www.khronos.org/registry/webgl/extensions/OES_standard_derivatives/
-const DEFAULT_DISABLED_GET_PARAMETER_NAMES_WEBGL1: [GLenum; 3] = [
+const DEFAULT_DISABLED_GET_PARAMETER_NAMES_WEBGL1: [GLenum; 2] = [
     EXTTextureFilterAnisotropicConstants::MAX_TEXTURE_MAX_ANISOTROPY_EXT,
     OESStandardDerivativesConstants::FRAGMENT_SHADER_DERIVATIVE_HINT_OES,
-    OESVertexArrayObjectConstants::VERTEX_ARRAY_BINDING_OES,
 ];
 
 // Param names that are implemented for glGetTexParameter in a WebGL 1.0 context
@@ -389,7 +387,6 @@ impl WebGLExtensions {
         self.register::<ext::oestexturefloatlinear::OESTextureFloatLinear>();
         self.register::<ext::oestexturehalffloat::OESTextureHalfFloat>();
         self.register::<ext::oestexturehalffloatlinear::OESTextureHalfFloatLinear>();
-        self.register::<ext::oesvertexarrayobject::OESVertexArrayObject>();
         self.register::<ext::webglcolorbufferfloat::WEBGLColorBufferFloat>();
         self.register::<ext::webglcompressedtextureetc1::WEBGLCompressedTextureETC1>();
         self.register::<ext::webglcompressedtextures3tc::WEBGLCompressedTextureS3TC>();

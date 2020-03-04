@@ -6,6 +6,6 @@
  * https://www.khronos.org/registry/webgl/extensions/OES_vertex_array_object/
  */
 
-[NoInterfaceObject, Exposed=Window]
-interface WebGLVertexArrayObjectOES: WebGLObject {
+[Exposed=(Window), Pref="dom.webgl2.enabled"]
+interface WebGLVertexArrayObject: WebGLObject {
 };

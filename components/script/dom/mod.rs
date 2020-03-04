@@ -558,7 +558,7 @@ pub mod webglsync;
 pub mod webgltexture;
 pub mod webgltransformfeedback;
 pub mod webgluniformlocation;
-pub mod webglvertexarrayobjectoes;
+pub mod webglvertexarrayobject;
 pub mod websocket;
 pub mod wheelevent;
 pub mod window;
